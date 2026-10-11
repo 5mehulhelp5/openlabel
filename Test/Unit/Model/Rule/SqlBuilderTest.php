@@ -112,11 +112,11 @@ class SqlBuilderTest extends TestCase
             }
 
             /**
-             * @return array<string, string>
+             * @return array<string, \Magento\Framework\Phrase>
              */
             protected function attributeOptions(): array
             {
-                return ['field' => 'Field'];
+                return ['field' => new \Magento\Framework\Phrase('Field')];
             }
 
             protected function productValue(\Magento\Catalog\Model\Product $product): mixed
@@ -126,6 +126,7 @@ class SqlBuilderTest extends TestCase
 
             /**
              * @return \Zend_Db_Expr
+             * @phpstan-ignore method.childReturnType, method.childReturnType (the built-ins return expressions)
              */
             public function getMappedSqlField()
             {
