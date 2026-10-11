@@ -3,7 +3,15 @@
     "description": "OpenLabel: product labels for Magento 2 and Hyvä. Rule-based labels with a dedicated indexer, zero layout shift, full page cache safe. Free and MIT.",
     "type": "magento2-module",
     "license": "MIT",
-    "keywords": ["magento2", "mage-os", "hyva", "product-labels", "badges", "stickers", "openlabel"],
+    "keywords": [
+        "magento2",
+        "mage-os",
+        "hyva",
+        "product-labels",
+        "badges",
+        "stickers",
+        "openlabel"
+    ],
     "homepage": "https://github.com/iranimij/openlabel",
     "support": {
         "issues": "https://github.com/iranimij/openlabel/issues",
@@ -22,10 +30,13 @@
         "magento/framework": "^103.0.7",
         "magento/module-backend": "^102.0.7",
         "magento/module-catalog": "^104.0.7",
+        "magento/module-catalog-graph-ql": "^100.4.6",
         "magento/module-catalog-inventory": "^100.4.7",
         "magento/module-catalog-widget": "^100.4.6",
         "magento/module-config": "^101.2.7",
         "magento/module-customer": "^103.0.7",
+        "magento/module-customer-graph-ql": "^100.4.6",
+        "magento/module-graph-ql": "^100.4.6",
         "magento/module-review": "^100.4.7",
         "magento/module-rule": "^100.4.6",
         "magento/module-sales": "^103.0.7",
@@ -37,7 +48,9 @@
         "iranimij/openlabel-hyva": "Storefront rendering for Hyvä themes"
     },
     "autoload": {
-        "files": ["registration.php"],
+        "files": [
+            "registration.php"
+        ],
         "psr-4": {
             "Iranimij\\OpenLabel\\": ""
         }
