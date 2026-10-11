@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## [Unreleased]
 
+## [1.0.0-rc1] - 2026-10-11
+
+First release candidate of OpenLabel 1.0: engine (M1), admin (M2), Hyvä render (M3), GraphQL, export/import, Smile importer and documentation (M4). Everything in `Api/` follows semantic versioning from 1.0.0. Supported: Magento 2.4.7–2.4.9, PHP 8.2–8.4, Hyvä 1.4 (1.3 best effort; on 1.5 listings work, product-page labels not yet).
+
 ### Added
 - M4 S6 · README for 1.0 (one-line pitch, the three install commands, a five-minute quick start, compatibility (Hyvä 1.4 tested; 1.3 best effort; 1.5 listings only, product gallery not yet), caching notes, support promise and Discussions); documentation site (`mkdocs.yml`, built with `--strict` in CI, published to GitHub Pages on release tags) with new pages for installation/upgrade/uninstall and the CLI; draft Hyvä compatibility tracker entry (`docs/tracker-entry.md`); `dev-main` is aliased `1.0.x-dev`.
 - M4 S4 · German storefront translations (`i18n/de_DE.csv`: day and hour units of {SPECIAL_ENDS_IN} and {NEW_FOR}); a unit test keeps `en_US.csv` complete.
@@ -36,3 +40,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 ### Fixed
 - `openlabel:reindex` and `openlabel:preview` run in the adminhtml area: right after a cache flush they failed with "Area code is not set" while building a label's condition tree.
 - Label and design changes now also clean the application cache (theme block caches such as Hyvä's one-hour product card cache), not only the page cache; a design save cleans `openlabel_design_<id>` even when only a store text changed. Found by the M3 storefront purge spec.
+
+[Unreleased]: https://github.com/iranimij/openlabel/compare/v1.0.0-rc1...HEAD
+[1.0.0-rc1]: https://github.com/iranimij/openlabel/releases/tag/v1.0.0-rc1
