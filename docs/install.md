@@ -3,7 +3,8 @@
 ## Requirements
 
 - Magento Open Source, Mage-OS or Adobe Commerce 2.4.7, 2.4.8 or 2.4.9, PHP 8.2 to 8.4.
-- For the storefront on Hyvä: the Hyvä default theme 1.4 or 1.5 (1.3: best effort). Other themes: see
+- For the storefront on Hyvä: the Hyvä default theme 1.4 (1.3: best effort; 1.5: listings only for now, see
+  [Custom themes](storefront.md#custom-themes)). Other themes: see
   [Custom themes](storefront.md#custom-themes).
 - MSI is optional.
 
