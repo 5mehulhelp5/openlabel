@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-11
+
+OpenLabel 1.0: everything of 1.0.0-rc1 and rc2 plus the changes below. Supported: Magento 2.4.7–2.4.9, PHP 8.2–8.4, Hyvä 1.4 and 1.5 (1.3 best effort).
+
 ### Changed
 - Hyvä 1.5 is supported and tested end to end on every change, like 1.4 (product-page labels via openlabel-hyva).
 
@@ -59,6 +63,7 @@ First release candidate of OpenLabel 1.0: engine (M1), admin (M2), Hyvä render 
 - `openlabel:reindex` and `openlabel:preview` run in the adminhtml area: right after a cache flush they failed with "Area code is not set" while building a label's condition tree.
 - Label and design changes now also clean the application cache (theme block caches such as Hyvä's one-hour product card cache), not only the page cache; a design save cleans `openlabel_design_<id>` even when only a store text changed. Found by the M3 storefront purge spec.
 
-[Unreleased]: https://github.com/iranimij/openlabel/compare/v1.0.0-rc2...HEAD
+[Unreleased]: https://github.com/iranimij/openlabel/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/iranimij/openlabel/compare/v1.0.0-rc2...v1.0.0
 [1.0.0-rc2]: https://github.com/iranimij/openlabel/compare/v1.0.0-rc1...v1.0.0-rc2
 [1.0.0-rc1]: https://github.com/iranimij/openlabel/releases/tag/v1.0.0-rc1
