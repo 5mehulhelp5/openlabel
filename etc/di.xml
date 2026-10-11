@@ -78,6 +78,8 @@
                 <item name="openlabel_reindex" xsi:type="object">Iranimij\OpenLabel\Console\Reindex</item>
                 <item name="openlabel_preview" xsi:type="object">Iranimij\OpenLabel\Console\Preview</item>
                 <item name="openlabel_css_regenerate" xsi:type="object">Iranimij\OpenLabel\Console\CssRegenerate</item>
+                <item name="openlabel_export" xsi:type="object">Iranimij\OpenLabel\Console\Export</item>
+                <item name="openlabel_import" xsi:type="object">Iranimij\OpenLabel\Console\Import</item>
             </argument>
         </arguments>
     </type>
