@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## [Unreleased]
 
+### Fixed
+- Admin live preview: the sample image box is reserved up front, so the preview card (and the labels, sized relative to it) no longer collapses while the image is being laid out after "Preview as" or a design change.
+
 ## [1.0.0-rc2] - 2026-10-11
 
 ### Fixed
