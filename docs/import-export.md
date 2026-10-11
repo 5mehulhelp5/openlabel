@@ -44,3 +44,23 @@ labels are written in one database transaction, and each label is indexed as it 
 - With `--replace`, a label or design with the same name is updated instead; built-in designs are never changed.
 - An image that already exists with the same content is reused; a different file with the same name gets a new
   name, so existing designs never change their picture.
+
+## Moving from the Smile product label module
+
+```bash
+bin/magento openlabel:import-smile --dry-run
+bin/magento openlabel:import-smile
+```
+
+The command reads the `smile_productlabel` tables directly, so it works even after the Smile module was disabled
+(keep its tables and `pub/media/smile_productlabel/imagelabel/` until you are done). Every Smile label becomes:
+
+- an image design `Smile: <name>` with the label's image and alt text (18 % of the image width; adjust it in the
+  design form),
+- a label with the same name, status and store views, the condition "<attribute> is <option>", and a placement on
+  listings and/or the product page at the same corner (`top-left` → top left, `lower-right` → bottom right, …).
+
+Labels whose name already exists in OpenLabel are skipped, so you can run the command again after fixing a
+problem. A Smile label whose image file or attribute is missing is reported and skipped; everything else goes
+through the same checks and the same single transaction as `openlabel:import`. Importers for paid modules are not
+part of 1.0.

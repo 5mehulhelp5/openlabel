@@ -80,6 +80,7 @@
                 <item name="openlabel_css_regenerate" xsi:type="object">Iranimij\OpenLabel\Console\CssRegenerate</item>
                 <item name="openlabel_export" xsi:type="object">Iranimij\OpenLabel\Console\Export</item>
                 <item name="openlabel_import" xsi:type="object">Iranimij\OpenLabel\Console\Import</item>
+                <item name="openlabel_import_smile" xsi:type="object">Iranimij\OpenLabel\Console\ImportSmile</item>
             </argument>
         </arguments>
     </type>
