@@ -68,6 +68,8 @@ class LabelRendererTest extends TestCase
         }
     }
 
+    // 2.4.7: method-level fixtures replace the class-level ones, so the search index is scheduled here too.
+    #[DataFixture(ScheduledSearchIndex::class)]
     #[DataFixture(DesignFixture::class, ['store_texts' => [0 => ['text' => 'Sale <b>now</b><script>x</script>']]], 'design')]
     public function testTextLabelMarkupFollowsTheCssContract(): void
     {
@@ -101,6 +103,8 @@ class LabelRendererTest extends TestCase
         );
     }
 
+    // 2.4.7: method-level fixtures replace the class-level ones, so the search index is scheduled here too.
+    #[DataFixture(ScheduledSearchIndex::class)]
     #[Config('openlabel/general/debug', 1, 'store', 'default')]
     #[DataFixture(DesignFixture::class, [], 'design')]
     public function testDebugModeAddsTheLabelId(): void
@@ -111,6 +115,8 @@ class LabelRendererTest extends TestCase
         self::assertStringContainsString('data-ol-label="' . $id . '"', $this->renderer()->getStacksHtml($product, 'listing'));
     }
 
+    // 2.4.7: method-level fixtures replace the class-level ones, so the search index is scheduled here too.
+    #[DataFixture(ScheduledSearchIndex::class)]
     #[DataFixture(DesignFixture::class, ['store_texts' => [0 => ['text' => '-{SAVE_PERCENT}%']]], 'design')]
     public function testAListingOf36ProductsRendersWithOneQuery(): void
     {
@@ -131,6 +137,8 @@ class LabelRendererTest extends TestCase
         self::assertSame(self::LISTING_SIZE, substr_count($html, 'class="ol-stack '));
     }
 
+    // 2.4.7: method-level fixtures replace the class-level ones, so the search index is scheduled here too.
+    #[DataFixture(ScheduledSearchIndex::class)]
     #[DataFixture(DesignFixture::class, [], 'design')]
     public function testIdentitiesBlockTagsThePageWithRenderedLabelsAndDesigns(): void
     {
