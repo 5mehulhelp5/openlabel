@@ -19,6 +19,7 @@
             <directory suffix=".php">Model/Html</directory>
             <directory suffix=".php">Model/Css</directory>
             <directory suffix=".php">Model/Image</directory>
+            <directory suffix=".php">Model/GraphQl</directory>
         </include>
     </source>
 </phpunit>
