@@ -4,7 +4,30 @@ Fine-grained checkpoint for the OpenLabel build. Updated with every merged PR. T
 
 ## Current milestone
 
-M3 · Hyvä render: **done** (2026-10-11), except the Hyvä 1.3 end-to-end leg (open question for Iman, below). M2 · Admin: **done** (merged 2026-10-11; Iman's recorded real-person ≤ 3 min test still open). M1 · Engine done 2026-10-10. M0 · Foundation done 2026-10-09. Next: M4 · GraphQL, export/import, Smile importer, release 1.0.0, in a new session.
+M4 · API, import/export, release: **in progress** (2026-10-11). S1–S4 and S6 merged on openlabel main; S5 (README install gate) in openlabel-dev-env #7; S7 (1.0.0-rc1, close-out) next. M3 · Hyvä render done 2026-10-11 (Hyvä 1.3 leg: best effort, see decisions). M2 done 2026-10-11, M1 2026-10-10, M0 2026-10-09.
+
+## M4 slices
+
+Merged by me when CI is green (Iman, 2026-10-11).
+
+| # | Slice | State |
+|---|---|---|
+| S1 | GraphQL `openlabel_labels` on `ProductInterface` (batch resolver, structured data, cache identity) | merged (#29, full matrix green); Playwright spec openlabel-dev-env #6 |
+| S2 | `openlabel:export` / `openlabel:import` (portable JSON, all or nothing, `--dry-run`, `--replace`) | merged (#30) |
+| S3 | `openlabel:import-smile` (Smile tables → converter → S2 importer) | merged (#31) |
+| S4 | `de_DE.csv` + i18n test; `openlabel-hyva-bundle` repo (metapackage, `ci-ok` protection); branch alias `dev-main` = `1.0.x-dev` (openlabel #32, openlabel-hyva #8, bundle #1) | merged |
+| S5 | README install gate (fresh store, README commands only, quick-start spec) + Hyvä 1.5.2 leg | openlabel-dev-env #7, full E2E run on the branch |
+| S6 | README for 1.0, mkdocs site (strict in CI, Pages on tags), install/CLI pages, tracker entry draft | merged (#33) |
+| S7 | CHANGELOG 1.0.0-rc1, tags + GitHub pre-releases on openlabel, openlabel-hyva, bundle; Notion build log; milestone report | next |
+
+## M4 decisions
+
+- GraphQL: one entry per placement; `text` is plain text with variables rendered (no HTML); `name` kept as listed in the Brief (Iman: Q4 not answered, recommendation applied); store from the `Store` header, group from the customer token (`customer_group_id` context attribute, guests NOT LOGGED IN). New core dependencies `magento/module-graph-ql`, `-catalog-graph-ql`, `-customer-graph-ql` (^100.4.6).
+- Export format: JSON only (no YAML: would need a non-core dependency). Store views and customer groups by code, built-in designs by name (`system:<name>`), images embedded as base64. Import validates everything first, then writes in one transaction; without `--replace` it always adds.
+- Smile importer reuses the regular importer; Smile labels become image designs (18 % width) + "attribute is option" labels; re-runs skip labels with the same name.
+- Release: `v1.0.0-rc1` at the end of M4; `v1.0.0` after Iman confirms the recorded real-person tests (Q1 recommendation).
+- Hyvä: 1.4.2 on every PR, 1.5.2 nightly and non-blocking (Q2), 1.3 "best effort" in the README (Q3; portal keys would add a leg).
+- E2E legs: a planning job picks the matrix (PRs: Hyvä 1.4 only; main/nightly/manual: + README leg + Hyvä 1.5).
 
 ## M3 slices
 
@@ -82,7 +105,7 @@ S1 merged as #12, S2–S10 through #21 (all M2 commits, full matrix green); #13�
 
 ## Exact next step
 
-M4 in a new session. Open for Iman: Hyvä 1.3 e2e leg (its `magento2-reset-theme` is not public), recorded real-person UX tests (M2 ≤ 3 min, M3 VoiceOver check). Earlier note: M3 S2: open the PR, then S3 in `openlabel-hyva` (listing slot: Product\\Image plugin, collection preload, list-item cache tags). Earlier note kept for M2: M3 · Hyvä render, in a new session. Before that: Iman reviews PR #12 (S1); then retarget the S10 PR to `main` and close #13–#20 as in M1, and Iman runs the recorded ≤ 3 min custom-label test. Ledger: `openlabel-dev-env/modules/M2-ledger.md`.
+M4 S7: after the E2E run on openlabel-dev-env #7 is green, merge #6 and #7, then CHANGELOG `[1.0.0-rc1]` and tags on openlabel, openlabel-hyva, openlabel-hyva-bundle, Pages, build log, milestone report. Open for Iman: recorded real-person UX tests (M2 ≤ 3 min custom label, M3 VoiceOver), then `v1.0.0`; Packagist.
 
 ## M1 decisions (also in the Notion build log at close-out)
 
@@ -112,13 +135,14 @@ M4 in a new session. Open for Iman: Hyvä 1.3 e2e leg (its `magento2-reset-theme
 | openlabel (after M2) | 203 | 153 (1 skipped: perf) | PHPCS zero errors, PHPStan 6 clean, coverage gate ≥ 85 % now also over `Model/Css` and `Model/Image` |
 | openlabel (after M3) | 245 / 667 | 173 (1 skipped on PRs: perf budget) — full matrix green, run 38118188377 | PHPCS zero errors, PHPStan 6 clean, coverage Variable 88.0, Condition 97.9, Resolver 100, Rule 100, Css 91.7, Image 90.5 % |
 | openlabel-hyva (after M3) | 24 | 5 | PHPCS clean, PHPStan 6 clean |
+| openlabel (M4, local) | 286 | + GraphQl 7, ImportExport 6, Smile 3 | coverage gate now also over `Model/GraphQl` |
 | openlabel-dev-env | — | — | Playwright 63 (25 admin incl. login setup, 1 theme fallback, 37 storefront desktop + mobile); Lighthouse gate on/off |
 
 ## Open questions for Iman
 
 - Packagist: register `iranimij/module-base` after the `v1.0.0` tag (CI pre-install scripts fall back to a VCS repository until then) and mark the two old packages abandoned (composer.json already carries the field).
 - Hyvä 1.3 end-to-end leg: Hyvä 1.3 needs `hyva-themes/magento2-reset-theme`, which is not in Hyvä's public GitHub repositories. Options: your portal keys as a GitHub secret on openlabel-dev-env (adds a 1.3 leg), or test 1.4 only and state "1.3: best effort" in the README. CI runs Hyvä 1.4.2 from the public OSL repositories (your choice, 2026-10-11).
-- Hyvä 1.5.x is out (theme 1.5.2, theme-module 1.5.2); the fixture is on theme 1.4.2. Add a 1.5 leg in M4?
+- Hyvä 1.5: nightly non-blocking leg added in M4 (recommendation applied; confirm or make it a gate).
 - Recorded real-person tests: M2 custom label ≤ 3 min; M3 VoiceOver/NVDA reading "Sale -25%" with the product name (the accessible name is asserted automatically).
 
 ## Known failing or skipped tests
