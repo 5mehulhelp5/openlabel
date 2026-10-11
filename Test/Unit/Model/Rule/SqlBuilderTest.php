@@ -8,7 +8,11 @@ declare(strict_types=1);
 
 namespace Iranimij\OpenLabel\Test\Unit\Model\Rule;
 
+use Iranimij\OpenLabel\Model\Condition\AbstractBuiltIn;
 use Iranimij\OpenLabel\Model\Rule\SqlBuilder;
+use Magento\Framework\DB\Adapter\AdapterInterface;
+use Magento\Rule\Model\Condition\Sql\Builder;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Magento\Eav\Api\AttributeRepositoryInterface;
 use Magento\Rule\Model\Condition\AbstractCondition;
 use Magento\Rule\Model\Condition\Combine;
@@ -49,6 +53,93 @@ class SqlBuilderTest extends TestCase
     public function testNoJoinsForAnEmptyTree(): void
     {
         self::assertSame([], $this->tables($this->combine([])));
+    }
+
+    /**
+     * @dataProvider builtInSql
+     */
+    #[DataProvider('builtInSql')]
+    public function testBuiltInSql(?string $guard, string $operator, string $value, string $prefix, string $expected): void
+    {
+        self::assertSame($expected, $this->sql($this->builtIn($guard, $operator, $value), $prefix));
+    }
+
+    /**
+     * @return array<string, array{?string, string, string, string, string}>
+     */
+    public static function builtInSql(): array
+    {
+        return [
+            'guard and comparison' => ['g.id IS NOT NULL', '>=', '5', '', "((g.id IS NOT NULL) AND (x.field) >= '5')"],
+            'no guard' => [null, '==', '0', '', "((x.field) = '0')"],
+            'is not' => [null, '!=', '3', '', "((x.field) <> '3')"],
+            'greater' => [null, '>', '3', '', "((x.field) > '3')"],
+            'less or equal' => [null, '<=', '3', '', "((x.field) <= '3')"],
+            'less' => [null, '<', '3', '', "((x.field) < '3')"],
+            'is one of' => [null, '()', '1, 2', '', "((x.field) IN ('1', '2'))"],
+            'is not one of' => ['g', '!()', '1;2', '', "((g) AND (x.field) NOT IN ('1', '2'))"],
+            'unknown operator never matches' => [null, '<=>', '1', '', '(1 = 0)'],
+            'empty value never matches' => [null, '==', '', '', '(1 = 0)'],
+            'group "is FALSE" prefix' => [null, '==', '1', ' NOT ', " NOT ((x.field) = '1')"],
+        ];
+    }
+
+    private function sql(AbstractBuiltIn $condition, string $prefix): string
+    {
+        $builder = new SqlBuilder($this->createStub(ExpressionFactory::class), $this->createStub(AttributeRepositoryInterface::class));
+        $connection = $this->createStub(AdapterInterface::class);
+        $connection->method('quoteInto')->willReturnCallback(static function (string $text, mixed $value): string {
+            $quoted = is_array($value)
+                ? implode(', ', array_map(static fn ($v): string => "'" . $v . "'", $value))
+                : "'" . $value . "'";
+
+            return str_replace('?', $quoted, $text);
+        });
+        $property = new \ReflectionProperty(Builder::class, '_connection');
+        $property->setAccessible(true);
+        $property->setValue($builder, $connection);
+        $method = new \ReflectionMethod($builder, '_getMappedSqlCondition');
+        $method->setAccessible(true);
+
+        return $method->invoke($builder, $condition, $prefix, true);
+    }
+
+    private function builtIn(?string $guard, string $operator, string $value): AbstractBuiltIn
+    {
+        $condition = new class ($guard) extends AbstractBuiltIn {
+            public function __construct(private readonly ?string $guard) // phpcs:ignore Magento2.CodeAnalysis.EmptyBlock
+            {
+            }
+
+            /**
+             * @return array<string, string>
+             */
+            protected function attributeOptions(): array
+            {
+                return ['field' => 'Field'];
+            }
+
+            protected function productValue(\Magento\Catalog\Model\Product $product): mixed
+            {
+                return null;
+            }
+
+            /**
+             * @return \Zend_Db_Expr
+             */
+            public function getMappedSqlField()
+            {
+                return new \Zend_Db_Expr('x.field');
+            }
+
+            public function getSqlGuard(): ?string
+            {
+                return $this->guard;
+            }
+        };
+        $condition->setData(['attribute' => 'field', 'operator' => $operator, 'value' => $value]);
+
+        return $condition;
     }
 
     /**
