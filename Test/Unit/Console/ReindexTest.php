@@ -18,6 +18,7 @@ use Magento\Framework\Indexer\IndexerInterface;
 use Magento\Framework\Indexer\IndexerRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
+use Magento\Framework\App\State;
 use PHPUnit\Framework\TestCase;
 
 class ReindexTest extends TestCase
@@ -31,7 +32,7 @@ class ReindexTest extends TestCase
         $reindexer = $this->createStub(LabelReindexer::class);
         $reindexer->method('countRows')->willReturn(2480);
 
-        $tester = new CommandTester(new Reindex($registry, $reindexer, $this->createStub(LabelRepositoryInterface::class)));
+        $tester = new CommandTester(new Reindex($registry, $reindexer, $this->createStub(LabelRepositoryInterface::class), $this->appState()));
         $exit = $tester->execute([]);
 
         self::assertSame(Command::SUCCESS, $exit);
@@ -48,7 +49,7 @@ class ReindexTest extends TestCase
         $reindexer->expects(self::once())->method('reindexLabel')->with(3)->willReturn(new Diff([1, 2, 3], [2, 3, 4, 5]));
         $reindexer->method('productIds')->willReturn([2, 3, 4, 5]);
 
-        $tester = new CommandTester(new Reindex($this->createStub(IndexerRegistry::class), $reindexer, $repository));
+        $tester = new CommandTester(new Reindex($this->createStub(IndexerRegistry::class), $reindexer, $repository, $this->appState()));
         $exit = $tester->execute(['label_id' => '3']);
 
         self::assertSame(Command::SUCCESS, $exit);
@@ -60,10 +61,24 @@ class ReindexTest extends TestCase
         $repository = $this->createStub(LabelRepositoryInterface::class);
         $repository->method('getById')->willThrowException(new NoSuchEntityException(__('Label with ID "9" does not exist.')));
 
-        $tester = new CommandTester(new Reindex($this->createStub(IndexerRegistry::class), $this->createStub(LabelReindexer::class), $repository));
+        $tester = new CommandTester(new Reindex($this->createStub(IndexerRegistry::class), $this->createStub(LabelReindexer::class), $repository, $this->appState()));
         $exit = $tester->execute(['label_id' => '9']);
 
         self::assertSame(Command::FAILURE, $exit);
         self::assertStringContainsString('Label with ID "9" does not exist.', $tester->getDisplay());
+    }
+
+    private function appState(): State
+    {
+        $state = $this->createMock(State::class);
+        $state->method('emulateAreaCode')->willReturnCallback(
+            static function (string $area, callable $callback, array $params = []) {
+                self::assertSame('adminhtml', $area);
+
+                return $callback(...$params);
+            }
+        );
+
+        return $state;
     }
 }

@@ -12,6 +12,8 @@ use Iranimij\OpenLabel\Api\LabelRepositoryInterface;
 use Iranimij\OpenLabel\Model\Indexer\LabelReindexer;
 use Iranimij\OpenLabel\Model\Indexer\Scheduler;
 use Magento\Framework\Indexer\IndexerRegistry;
+use Magento\Framework\App\Area;
+use Magento\Framework\App\State;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,11 +31,13 @@ class Reindex extends Command
      * @param IndexerRegistry $indexerRegistry
      * @param LabelReindexer $labelReindexer
      * @param LabelRepositoryInterface $labelRepository
+     * @param State $appState
      */
     public function __construct(
         private readonly IndexerRegistry $indexerRegistry,
         private readonly LabelReindexer $labelReindexer,
-        private readonly LabelRepositoryInterface $labelRepository
+        private readonly LabelRepositoryInterface $labelRepository,
+        private readonly State $appState
     ) {
         parent::__construct();
     }
@@ -52,6 +56,20 @@ class Reindex extends Command
      * @inheritDoc
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        // Condition trees load UI component definitions, which need an area once the config cache is empty.
+        return (int) $this->appState->emulateAreaCode(
+            Area::AREA_ADMINHTML,
+            fn (): int => $this->runCommand($input, $output)
+        );
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
+    private function runCommand(InputInterface $input, OutputInterface $output): int
     {
         $start = microtime(true);
         $labelId = $input->getArgument(self::ARGUMENT_LABEL);

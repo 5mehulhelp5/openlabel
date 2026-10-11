@@ -29,4 +29,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 - `docs/hyva-integration.md`: verified Hyvä 1.4.2 hook points, events and container-query rules.
 
 ### Fixed
+- `openlabel:reindex` and `openlabel:preview` run in the adminhtml area: right after a cache flush they failed with "Area code is not set" while building a label's condition tree.
 - Label and design changes now also clean the application cache (theme block caches such as Hyvä's one-hour product card cache), not only the page cache; a design save cleans `openlabel_design_<id>` even when only a store text changed. Found by the M3 storefront purge spec.

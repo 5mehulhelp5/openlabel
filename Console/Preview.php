@@ -11,6 +11,8 @@ namespace Iranimij\OpenLabel\Console;
 use Iranimij\OpenLabel\Api\LabelRepositoryInterface;
 use Iranimij\OpenLabel\Model\Indexer\IndexReader;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\App\Area;
+use Magento\Framework\App\State;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -30,11 +32,13 @@ class Preview extends Command
      * @param LabelRepositoryInterface $labelRepository
      * @param IndexReader $indexReader
      * @param StoreManagerInterface $storeManager
+     * @param State $appState
      */
     public function __construct(
         private readonly LabelRepositoryInterface $labelRepository,
         private readonly IndexReader $indexReader,
-        private readonly StoreManagerInterface $storeManager
+        private readonly StoreManagerInterface $storeManager,
+        private readonly State $appState
     ) {
         parent::__construct();
     }
@@ -54,6 +58,20 @@ class Preview extends Command
      * @inheritDoc
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        // Condition trees load UI component definitions, which need an area once the config cache is empty.
+        return (int) $this->appState->emulateAreaCode(
+            Area::AREA_ADMINHTML,
+            fn (): int => $this->runCommand($input, $output)
+        );
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
+    private function runCommand(InputInterface $input, OutputInterface $output): int
     {
         try {
             $labelId = (int) $input->getArgument(self::ARGUMENT_LABEL);

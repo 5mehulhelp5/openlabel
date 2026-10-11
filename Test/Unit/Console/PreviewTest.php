@@ -16,6 +16,7 @@ use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
+use Magento\Framework\App\State;
 use PHPUnit\Framework\TestCase;
 
 class PreviewTest extends TestCase
@@ -27,7 +28,7 @@ class PreviewTest extends TestCase
         $reader->method('countProducts')->willReturn(25);
         $reader->method('skus')->willReturn(array_slice($skus, 0, 20));
 
-        $tester = new CommandTester(new Preview($this->repository('Sale'), $reader, $this->storeManager()));
+        $tester = new CommandTester(new Preview($this->repository('Sale'), $reader, $this->storeManager(), $this->appState()));
         $exit = $tester->execute(['label_id' => '3']);
 
         $display = $tester->getDisplay();
@@ -45,7 +46,7 @@ class PreviewTest extends TestCase
         $reader->method('countProducts')->willReturn(0);
         $reader->method('skus')->willReturn([]);
 
-        $tester = new CommandTester(new Preview($this->repository('Sale'), $reader, $this->storeManager()));
+        $tester = new CommandTester(new Preview($this->repository('Sale'), $reader, $this->storeManager(), $this->appState()));
         $tester->execute(['label_id' => '3', '--store' => '1']);
 
         self::assertStringContainsString('matches 0 products', $tester->getDisplay());
@@ -72,5 +73,19 @@ class PreviewTest extends TestCase
         $storeManager->method('getDefaultStoreView')->willReturn($store);
 
         return $storeManager;
+    }
+
+    private function appState(): State
+    {
+        $state = $this->createMock(State::class);
+        $state->method('emulateAreaCode')->willReturnCallback(
+            static function (string $area, callable $callback, array $params = []) {
+                self::assertSame('adminhtml', $area);
+
+                return $callback(...$params);
+            }
+        );
+
+        return $state;
     }
 }
