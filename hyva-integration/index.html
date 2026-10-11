@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://iranimij.github.io/openlabel/hyva-integration/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Hyvä integration - OpenLabel</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Hyv\u00e4 integration";
+        var mkdocs_page_input_path = "hyva-integration.md";
+        var mkdocs_page_url = "/openlabel/hyva-integration/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> OpenLabel
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../install/">Install and upgrade</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../admin/">Admin</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../storefront/">Storefront</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cli/">CLI</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../graphql/">GraphQL</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../import-export/">Export and import</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developers</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../engine/">The engine</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Hyvä integration</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#1-product-listing-category-search-widgets-sliders">1. Product listing (category, search, widgets, sliders)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-product-page-gallery">2. Product page gallery</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-events-and-layout-handles">3. Events and layout handles</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-container-queries-fe3">4. Container queries (FE3)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#5-custom-theme-fallback">5. Custom theme fallback</a>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OpenLabel</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Developers</li>
+      <li class="breadcrumb-item active">Hyvä integration</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/iranimij/openlabel/edit/main/docs/hyva-integration.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="hyva-integration">Hyvä integration<a class="headerlink" href="#hyva-integration" title="Permanent link">&para;</a></h1>
+<p>Verified on <strong>Hyvä default theme 1.4.2 with theme-module 1.5.2</strong> on Magento Open Source 2.4.9 (M0, 2026-10-09). Re-verify on every Hyvä minor release; the Playwright spec <code>playwright/tests/hyva-hooks.spec.ts</code> in <code>openlabel-dev-env</code> fails when any fact below changes.</p>
+<h2 id="1-product-listing-category-search-widgets-sliders">1. Product listing (category, search, widgets, sliders)<a class="headerlink" href="#1-product-listing-category-search-widgets-sliders" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Fact</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Item renderer block</td>
+<td><code>product_list_item</code>, class <code>Magento\Catalog\Block\Product\View</code>, template <code>Magento_Catalog::product/list/item.phtml</code>, declared in <code>Magento_Catalog/layout/catalog_list_item.xml</code></td>
+</tr>
+<tr>
+<td>Renders through</td>
+<td><code>Hyva\Theme\ViewModel\ProductListItem::getItemHtml()</code> / <code>getItemHtmlWithRenderer()</code>; used by <code>product/list.phtml</code>, <code>product/slider/product-slider.phtml</code> (related, upsell, cross-sell), <code>Magento_CatalogWidget::product/widget/content/grid.phtml</code>, <code>Magento_PageBuilder::catalog/product/widget/content/carousel.phtml</code>, the cart form and the order item lists</td>
+</tr>
+<tr>
+<td>Child blocks available in <code>item.phtml</code></td>
+<td><code>details.renderers</code>, <code>addto</code> (<code>catalog.list.item.addto</code>, a <code>ProductList\Item\Container</code>), <code>wishlist</code>, <code>stockstatus</code>. <strong>All render below the image.</strong></td>
+</tr>
+<tr>
+<td>Image markup</td>
+<td><code>&lt;a class="product photo product-item-photo block mx-auto mb-3"&gt;</code> (not <code>relative</code>) containing exactly one <code>&lt;img&gt;</code> produced by <code>Magento\Catalog\Block\Product\Image</code> with template <code>Magento_Catalog::product/list/image.phtml</code>; <code>width</code>/<code>height</code> attributes present; <code>x-data="initProductItemImage"</code> and <code>@update-gallery-&lt;productId&gt;.window</code> for hover and swatch image swap</td>
+</tr>
+<tr>
+<td>Non-HTML hook</td>
+<td><code>additional_item_renderer_processors</code> argument on <code>product_list_item</code>: objects with <code>beforeListItemToHtml($itemRendererBlock, $product)</code> run right before <code>toHtml()</code></td>
+</tr>
+<tr>
+<td>Block cache</td>
+<td>Every item is block-cached for <code>hyva_theme_catalog/developer/cache/product_list_item_block_cache_lifetime</code> (default 3600 s) unless <code>..._enabled</code> is off. Cache key: product id, view mode, template, store, currency, hide flags, category id, customer group, image area, custom image attributes, tax rates. Cache tags: <code>$product-&gt;getIdentities()</code></td>
+</tr>
+<tr>
+<td>Absolutely positioned elements on the card</td>
+<td>None over the image. Wishlist, compare, add-to-cart and stock status sit in a flex row under the product info; swatch radio inputs are absolute but sit under their buttons below the image.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>There is no child-block call inside the image anchor</strong>, so a layout-only injection is impossible without overriding <code>item.phtml</code>. OpenLabel therefore uses an <code>after</code> plugin on <code>Magento\Catalog\Block\Product\Image::toHtml()</code> that is active only when the block template is <code>Magento_Catalog::product/list/image.phtml</code>. The plugin wraps the output:</p>
+<pre><code class="language-html">&lt;span class=&quot;ol-anchor&quot;&gt;            &lt;!-- position:relative; display:block (no containment, see section 4) --&gt;
+  &lt;img ...&gt;                          &lt;!-- untouched Hyvä output --&gt;
+  &lt;span class=&quot;ol-stack ol-pos-ts&quot;&gt;…labels…&lt;/span&gt;
+&lt;/span&gt;
+</code></pre>
+<p>One plugin covers every surface that renders through the item template. The labels are resolved once per page by the <code>Labels</code> view model (one SELECT for all product ids of the collection) and read from the memoized result per item.</p>
+<p>Cache: the <code>additional_item_renderer_processors</code> hook is used to append <code>openlabel_&lt;label_id&gt;</code> tags to each item's block cache tags, so a label save or reindex invalidates the right cards. Because items are block-cached for up to one hour, a label whose time window opens or closes can take up to one hour to appear or disappear even without Varnish; the hourly transition cron cleans the tags.</p>
+<p>Default starter positions (all corners are free): Sale → top start (<code>ol-pos-ts</code>), New → top end (<code>ol-pos-te</code>), Low stock → bottom start (<code>ol-pos-bs</code>).</p>
+<h2 id="2-product-page-gallery">2. Product page gallery<a class="headerlink" href="#2-product-page-gallery" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Fact</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Block</td>
+<td><code>product.media</code>, class <code>Magento\Catalog\Block\Product\View\Gallery</code>, template <code>Magento_Catalog::product/view/gallery.phtml</code>, rendered by <code>Magento_Catalog::product/product-detail-page.phtml</code> via <code>getChildHtml('product.media')</code></td>
+</tr>
+<tr>
+<td>Container</td>
+<td><code>&lt;div id="gallery-main" class="relative mb-6" aria-live="polite"&gt;</code></td>
+</tr>
+<tr>
+<td>Contents</td>
+<td>an <code>invisible</code> placeholder <code>&lt;img width height&gt;</code> that reserves the aspect ratio (CLS-safe), Alpine <code>absolute inset-0</code> images (<code>x-show="active === index"</code>), an <code>absolute inset-0</code> fullscreen button, YouTube/Vimeo overlays</td>
+</tr>
+<tr>
+<td>Fullscreen</td>
+<td>the wrapper two levels up gets <code>fixed top-0 left-0 z-50</code> while <code>fullscreen</code> is true</td>
+</tr>
+<tr>
+<td>Child blocks in <code>gallery.phtml</code></td>
+<td>none</td>
+</tr>
+</tbody>
+</table>
+<p>OpenLabel declares a child block <code>openlabel.product.labels</code> under <code>product.media</code> in <code>hyva_catalog_product_view.xml</code> and uses an <code>after</code> plugin on <code>Gallery::toHtml()</code> that inserts the child HTML directly after the <code>id="gallery-main"</code> opening tag and adds <code>ol-anchor</code> to that element's class list. The plugin skips when the output already contains <code>ol-stack</code> (custom theme that calls the child block itself). The stack uses <code>z-index: var(--ol-z, 5)</code> to sit above the gallery images and is hidden in fullscreen mode (<code>.fixed .ol-stack { display: none }</code>). <code>pointer-events: none</code> keeps the fullscreen button clickable.</p>
+<h2 id="3-events-and-layout-handles">3. Events and layout handles<a class="headerlink" href="#3-events-and-layout-handles" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Purpose</th>
+<th>Name</th>
+<th>Payload</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Swatch change, product page</td>
+<td><code>configurable-selection-changed</code> (window <code>CustomEvent</code>)</td>
+<td><code>detail.productId</code>, <code>detail.optionId</code>, <code>detail.value</code>, <code>detail.productIndex</code> (selected simple id or <code>undefined</code>), <code>detail.selectedValues</code>, <code>detail.candidates</code>, <code>detail.skuCandidates</code></td>
+</tr>
+<tr>
+<td>Swatch change, listing</td>
+<td><code>listing-configurable-selection-changed</code></td>
+<td>same shape</td>
+</tr>
+<tr>
+<td>Gallery swap, product page</td>
+<td><code>update-gallery</code> / <code>reset-gallery</code></td>
+<td>image list</td>
+</tr>
+<tr>
+<td>Gallery swap, listing</td>
+<td><code>update-gallery-&lt;productId&gt;</code></td>
+<td>image</td>
+</tr>
+<tr>
+<td>Layout handles</td>
+<td>Hyvä adds <code>hyva_&lt;handle&gt;</code> for every handle (<code>Hyva\Theme\Observer\AddLayoutHandles</code>), so <code>hyva_catalog_category_view</code>, <code>hyva_catalogsearch_result_index</code>, <code>hyva_catalog_product_view</code> and <code>hyva_default</code> are valid</td>
+<td></td>
+</tr>
+<tr>
+<td>CSP</td>
+<td>every inline <code>&lt;script&gt;</code> is followed by <code>$hyvaCsp-&gt;registerInlineScript()</code> (<code>Hyva\Theme\ViewModel\HyvaCsp</code>)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>The 1.1 variant switch listens to <code>configurable-selection-changed</code> and keys on <code>detail.productIndex</code>.</p>
+<h2 id="4-container-queries-fe3">4. Container queries (FE3)<a class="headerlink" href="#4-container-queries-fe3" title="Permanent link">&para;</a></h2>
+<p><strong>Do not put <code>container-type: inline-size</code> on Hyvä's image anchor.</strong> <code>a.product-item-photo</code> is <code>block mx-auto</code> inside a <code>flex flex-col</code> card, so it is shrink-to-fit: its width comes from the image. Inline-size containment removes that size source and the anchor collapses to 0 × 0 (verified; the Playwright spec keeps a test for this). The same applies to any wrapper OpenLabel inserts inside the anchor.</p>
+<p>The listing container is therefore the <strong>product card</strong> (<code>.product-item</code>, <code>w-full</code> in the grid): <code>.product-item { container-type: inline-size }</code> causes no layout shift (verified on desktop and mobile), and label sizes in <code>cqw</code> relate to the card width, which on Hyvä equals the image column. The <code>.ol-anchor</code> wrapper stays <code>position: relative; display: block</code> without containment.</p>
+<p>On the product page <code>#gallery-main</code> is a block with a definite width (<code>w-full</code> parent), so <code>#gallery-main { container-type: inline-size }</code> is safe (verified).</p>
+<p>Absolutely positioned elements on the card (FE5): only the swatch radio inputs (<code>input.absolute.product-option-value-input</code>, visually under the swatch buttons, below the image) and <code>sr-only</code> helpers. Nothing overlaps the image area, so all four corners are free for labels.</p>
+<h2 id="5-custom-theme-fallback">5. Custom theme fallback<a class="headerlink" href="#5-custom-theme-fallback" title="Permanent link">&para;</a></h2>
+<p>Themes that override <code>product/list/image.phtml</code> with another template name or rename <code>#gallery-main</code> render the labels themselves: one <code>getChildHtml('openlabel.product.labels')</code> call in the gallery, one <code>LabelRenderer::getStacksHtml()</code> call in the listing image. Exact snippets: <a href="../storefront/#custom-themes">storefront.md</a>. The plugins detect the <code>ol-stack</code> marker and never render twice.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../engine/" class="btn btn-neutral float-left" title="The engine"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/iranimij/openlabel" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../engine/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

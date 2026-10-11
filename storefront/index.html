@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://iranimij.github.io/openlabel/storefront/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Storefront - OpenLabel</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Storefront";
+        var mkdocs_page_input_path = "storefront.md";
+        var mkdocs_page_url = "/openlabel/storefront/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> OpenLabel
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../install/">Install and upgrade</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../admin/">Admin</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Storefront</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#what-the-shoppers-browser-gets">What the shopper's browser gets</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#markup-contract-stable-from-10">Markup contract (stable from 1.0)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#right-to-left-stores">Right-to-left stores</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#caching">Caching</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#custom-themes">Custom themes</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cli/">CLI</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../graphql/">GraphQL</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../import-export/">Export and import</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../engine/">The engine</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../hyva-integration/">Hyvä integration</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OpenLabel</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Storefront</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/iranimij/openlabel/edit/main/docs/storefront.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="storefront">Storefront<a class="headerlink" href="#storefront" title="Permanent link">&para;</a></h1>
+<p>How labels reach the shop (milestone M3). Theme specifics for Hyvä are in <a href="../hyva-integration/">hyva-integration.md</a>.</p>
+<h2 id="what-the-shoppers-browser-gets">What the shopper's browser gets<a class="headerlink" href="#what-the-shoppers-browser-gets" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>HTML only.</strong> Labels are rendered on the server inside the cached page. OpenLabel adds no JavaScript and no inline styles, so a strict Content Security Policy needs no exception.</li>
+<li><strong>One stylesheet per store view</strong>, <code>pub/media/openlabel/&lt;store_id&gt;/openlabel.&lt;hash&gt;.css</code> (about 4 KB for the 15 built-in designs; ≤ 20 KB for 100 designs). It holds the structural <code>ol-*</code> rules, one custom-property line per design and per placement with offsets, and the sanitized custom CSS. The file name changes with its content, so the web server can cache it for a year (Magento's sample nginx and Apache configs already do for <code>pub/media</code>).</li>
+<li><strong>No theme build needed.</strong> Nothing depends on Tailwind: labels are positioned and styled by that stylesheet, also on a theme that was never rebuilt after installing OpenLabel. <code>bin/magento hyva:config:generate</code> still lists the module for theme builds that want to scan it.</li>
+</ul>
+<p>The stylesheet is rebuilt after every design or label save, by <strong>Stores › Configuration › Iranimij › OpenLabel › Regenerate CSS</strong>, and by:</p>
+<pre><code class="language-bash">bin/magento openlabel:css:regenerate
+</code></pre>
+<p>Run it after copying a database or <code>pub/media</code> between environments. On a fresh install the file is written on the first storefront request. Previous files stay two days so pages still in Varnish keep their stylesheet. If your media URL is on another host (a CDN), allow that host in your <code>style-src</code> CSP policy.</p>
+<h2 id="markup-contract-stable-from-10">Markup contract (stable from 1.0)<a class="headerlink" href="#markup-contract-stable-from-10" title="Permanent link">&para;</a></h2>
+<pre><code class="language-html">&lt;span class=&quot;ol-anchor&quot;&gt;                                   &lt;!-- position: relative wrapper around the image --&gt;
+  &lt;img …&gt;                                                  &lt;!-- the theme's image, untouched --&gt;
+  &lt;span class=&quot;ol-stack ol-stack--v ol-pos-ts ol-p-12&quot;&gt;     &lt;!-- one per occupied position --&gt;
+    &lt;span class=&quot;ol-label ol-label--text ol-d-3 ol-shape-pill&quot;&gt;Sale -25%&lt;/span&gt;
+  &lt;/span&gt;
+&lt;/span&gt;
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ol-stack</code>, <code>ol-stack--v</code> / <code>--h</code></td>
+<td>positioned container of one corner, vertical or horizontal stacking</td>
+</tr>
+<tr>
+<td><code>ol-pos-ts te tc ms mc me bs bc be</code></td>
+<td>position with logical sides (start/end): mirrors in right-to-left stores</td>
+</tr>
+<tr>
+<td><code>ol-pos-tl tr ml mr bl br</code></td>
+<td>placements set to "keep left/right in RTL"</td>
+</tr>
+<tr>
+<td><code>ol-p-&lt;placement_id&gt;</code></td>
+<td>offsets and gap of that placement (custom properties)</td>
+</tr>
+<tr>
+<td><code>ol-label</code>, <code>ol-label--text</code> / <code>--image</code> / <code>--shape</code>, <code>ol-d-&lt;design_id&gt;</code>, <code>ol-shape-*</code></td>
+<td>the badge</td>
+</tr>
+<tr>
+<td><code>data-ol-label="&lt;label_id&gt;"</code></td>
+<td>only with <strong>Debug mode</strong> on</td>
+</tr>
+</tbody>
+</table>
+<p>Custom properties: <code>--ol-bg --ol-fg --ol-border --ol-bw --ol-w --ol-rot --ol-op --ol-fs-min --ol-fs-cq --ol-fs-max --ol-gap --ol-ox --ol-oy --ol-z</code>. All rules use a single class, without <code>!important</code>, so a theme overrides them with two classes, for example <code>.product-item .ol-stack { --ol-z: 20; }</code>.</p>
+<p>Labels have <code>pointer-events: none</code>: clicks, hover image swaps and swatches work through them. Text sizes use container queries on the product card and the gallery, with an 11 px floor on small cards and phones.</p>
+<h2 id="right-to-left-stores">Right-to-left stores<a class="headerlink" href="#right-to-left-stores" title="Permanent link">&para;</a></h2>
+<p>Positions mirror automatically when the page direction is right-to-left. Magento and Hyvä do not set it by themselves; RTL themes declare it in their layout, for example <code>app/design/frontend/&lt;Vendor&gt;/&lt;theme&gt;/Magento_Theme/layout/default.xml</code>:</p>
+<pre><code class="language-xml">&lt;page xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:noNamespaceSchemaLocation=&quot;urn:magento:framework:View/Layout/etc/page_configuration.xsd&quot;&gt;
+    &lt;html&gt;
+        &lt;attribute name=&quot;dir&quot; value=&quot;rtl&quot;/&gt;
+    &lt;/html&gt;
+&lt;/page&gt;
+</code></pre>
+<h2 id="caching">Caching<a class="headerlink" href="#caching" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Pages vary by customer group in Magento's full page cache and in Varnish, so group-limited labels are rendered on the server like all others: one cached copy per visiting group, which is core behaviour.</li>
+<li>Pages showing a label are tagged <code>openlabel_&lt;label_id&gt;</code> and <code>openlabel_design_&lt;design_id&gt;</code>, and with <code>cat_p_&lt;id&gt;</code> of every product card OpenLabel looked at. Saving a label, a design, or reindexing purges exactly those pages and the theme's cached product cards (Hyvä caches each card for an hour).</li>
+<li>A label whose schedule starts or ends shows up or disappears within one hour (hourly cron), with Varnish or the built-in cache.</li>
+<li>Performance budget, checked in CI: one extra query for a 36-product listing, one for a product page.</li>
+</ul>
+<h2 id="custom-themes">Custom themes<a class="headerlink" href="#custom-themes" title="Permanent link">&para;</a></h2>
+<p>The Hyvä package finds its slots automatically on Hyvä 1.4 (end-to-end tests on 1.4.2 for every change; 1.3 is supported on a best-effort basis and not tested in CI). Hyvä 1.5 rebuilt the product gallery (<code>#gallery-main</code> is now the scrolling image track), so on 1.5 listings work but product-page labels do not yet; a nightly 1.5 run tracks it. A theme that changes the product image template of listings or the gallery container renders the labels itself:</p>
+<p><strong>Product page.</strong> Inside your gallery container (it must be <code>position: relative</code>):</p>
+<pre><code class="language-php">&lt;?= $block-&gt;getChildHtml('openlabel.product.labels') ?&gt;
+</code></pre>
+<p><strong>Listings.</strong> Inside your image link, after the image, wrapped in a positioned element:</p>
+<pre><code class="language-php">&lt;?php $labelRenderer = $viewModels-&gt;require(\Iranimij\OpenLabel\ViewModel\LabelRenderer::class); ?&gt;
+&lt;span class=&quot;ol-anchor&quot;&gt;
+    &lt;?= $image-&gt;toHtml() ?&gt;
+    &lt;?= $labelRenderer-&gt;getStacksHtml($product, 'listing', 'lazy') ?&gt;
+&lt;/span&gt;
+</code></pre>
+<p>OpenLabel sees the <code>ol-stack</code> marker and does not render the labels a second time. The fallback is tested on a copy of Hyvä default whose gallery container is renamed (<code>openlabel-dev-env</code>, <code>playwright/tests/fallback</code>).</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../admin/" class="btn btn-neutral float-left" title="Admin"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../cli/" class="btn btn-neutral float-right" title="CLI">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/iranimij/openlabel" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../admin/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../cli/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

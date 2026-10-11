@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://iranimij.github.io/openlabel/graphql/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>GraphQL - OpenLabel</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "GraphQL";
+        var mkdocs_page_input_path = "graphql.md";
+        var mkdocs_page_url = "/openlabel/graphql/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> OpenLabel
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../install/">Install and upgrade</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../admin/">Admin</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../storefront/">Storefront</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cli/">CLI</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">GraphQL</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#rules">Rules</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#caching">Caching</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../import-export/">Export and import</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../engine/">The engine</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../hyva-integration/">Hyvä integration</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OpenLabel</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">GraphQL</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/iranimij/openlabel/edit/main/docs/graphql.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="graphql">GraphQL<a class="headerlink" href="#graphql" title="Permanent link">&para;</a></h1>
+<p>OpenLabel adds one field to <code>ProductInterface</code>, so every product type in every product query has it:</p>
+<pre><code class="language-graphql">{
+  products(filter: { sku: { eq: &quot;24-MB04&quot; } }) {
+    items {
+      sku
+      openlabel_labels {
+        id name type text image_url alt position area css_class bg_color text_color priority
+      }
+    }
+  }
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code>, <code>name</code></td>
+<td>Label ID and admin name</td>
+</tr>
+<tr>
+<td><code>type</code></td>
+<td>Design type: <code>text</code>, <code>image</code> or <code>shape</code></td>
+</tr>
+<tr>
+<td><code>text</code></td>
+<td>Text for the store view with variables filled in, as plain text (<code>{BR}</code> becomes a line break). <code>null</code> for image labels</td>
+</tr>
+<tr>
+<td><code>image_url</code>, <code>alt</code></td>
+<td>Image labels only</td>
+</tr>
+<tr>
+<td><code>position</code></td>
+<td><code>tl tc tr ml mc mr bl bc br</code></td>
+</tr>
+<tr>
+<td><code>area</code></td>
+<td><code>listing</code> or <code>product</code></td>
+</tr>
+<tr>
+<td><code>css_class</code></td>
+<td>The <code>ol-*</code> classes the storefront uses; load the generated stylesheet to reuse them</td>
+</tr>
+<tr>
+<td><code>bg_color</code>, <code>text_color</code></td>
+<td>Hex colours of the design</td>
+</tr>
+<tr>
+<td><code>priority</code></td>
+<td>0 is the highest</td>
+</tr>
+</tbody>
+</table>
+<h2 id="rules">Rules<a class="headerlink" href="#rules" title="Permanent link">&para;</a></h2>
+<ul>
+<li>One entry per placement: a label shown on listings and on the product page appears twice, once per <code>area</code>.</li>
+<li>The store view comes from the <code>Store</code> header, the customer group from the customer token (guests are NOT LOGGED IN).
+  Only enabled labels inside their time window and allowed for that group are returned; conditions are never exposed.</li>
+<li>Configurable, grouped and bundle products return the labels of matching children when the label has "apply to
+  parents" on, like the storefront.</li>
+<li>All products of one query cost one label query (batch resolver), however many products the query returns.</li>
+<li>With the module disabled for a store view the field returns an empty list.</li>
+</ul>
+<h2 id="caching">Caching<a class="headerlink" href="#caching" title="Permanent link">&para;</a></h2>
+<p>GET queries are cacheable. Responses carry the tags <code>openlabel_&lt;label_id&gt;</code> and <code>openlabel_design_&lt;design_id&gt;</code>, which
+label and design saves clean, plus the usual product tags. Customers' queries vary by customer group through Magento's
+<code>X-Magento-Cache-Id</code>: send the value of the previous response back, as Magento's own clients do, and Varnish serves
+logged-in customers from the cache too.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../cli/" class="btn btn-neutral float-left" title="CLI"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../import-export/" class="btn btn-neutral float-right" title="Export and import">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/iranimij/openlabel" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../cli/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../import-export/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

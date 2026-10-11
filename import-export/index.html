@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://iranimij.github.io/openlabel/import-export/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Export and import - OpenLabel</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Export and import";
+        var mkdocs_page_input_path = "import-export.md";
+        var mkdocs_page_url = "/openlabel/import-export/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> OpenLabel
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../install/">Install and upgrade</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../admin/">Admin</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../storefront/">Storefront</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cli/">CLI</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../graphql/">GraphQL</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Export and import</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#what-the-file-contains">What the file contains</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#how-an-import-behaves">How an import behaves</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#moving-from-the-smile-product-label-module">Moving from the Smile product label module</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../engine/">The engine</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../hyva-integration/">Hyvä integration</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OpenLabel</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Export and import</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/iranimij/openlabel/edit/main/docs/import-export.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="export-and-import">Export and import<a class="headerlink" href="#export-and-import" title="Permanent link">&para;</a></h1>
+<p>Keep labels in git, copy them from staging to production, or share a set of labels with another shop.</p>
+<pre><code class="language-bash">bin/magento openlabel:export var/openlabel.json            # every label
+bin/magento openlabel:export var/sale.json --labels=3,7    # some labels
+bin/magento openlabel:export &gt; labels.json                 # to stdout
+
+bin/magento openlabel:import var/openlabel.json --dry-run  # check only
+bin/magento openlabel:import var/openlabel.json            # add the labels
+bin/magento openlabel:import var/openlabel.json --replace  # update labels and designs with the same name
+</code></pre>
+<h2 id="what-the-file-contains">What the file contains<a class="headerlink" href="#what-the-file-contains" title="Permanent link">&para;</a></h2>
+<p>One JSON document: <code>{"format": "openlabel", "version": 1, "designs": [...], "labels": [...]}</code>.</p>
+<ul>
+<li><strong>Labels:</strong> name, status, priority, schedule (UTC), condition tree, apply to parents, hide lower priority,
+  and the placements with their per-area design.</li>
+<li><strong>Designs:</strong> every design the exported labels use, with all store-view texts and the custom CSS. Image designs
+  carry the image file (base64), so the file is self-contained.</li>
+<li><strong>Built-in designs</strong> are referenced by name (<code>system:&lt;name&gt;</code>) and are never copied: the importing shop uses its
+  own.</li>
+<li><strong>Store views and customer groups</strong> are referenced by code (<code>default</code>, <code>General</code>, <code>Wholesale</code>), not by id, so
+  a file works in a shop whose ids differ. The admin store view is <code>admin</code>.</li>
+</ul>
+<h2 id="how-an-import-behaves">How an import behaves<a class="headerlink" href="#how-an-import-behaves" title="Permanent link">&para;</a></h2>
+<p>All or nothing. The whole file is checked against the shop first, and nothing is written when anything is wrong;
+the command lists what to fix:</p>
+<pre><code class="language-text">Nothing was imported. Fix these and run again:
+  - labels[0] &quot;Sale&quot;: this shop has no store view with code &quot;de&quot;.
+</code></pre>
+<p>Checked before anything is written: store view and customer group codes, design references, condition classes
+(only OpenLabel's and those registered in its condition pool), the same rules as the admin forms, images (type,
+size, SVG sanitizing, as for uploads) and custom CSS (sanitized as in the design form). Then designs, images and
+labels are written in one database transaction, and each label is indexed as it is saved.</p>
+<ul>
+<li>Without <code>--replace</code>, labels and designs are always added, so importing the same file twice gives two copies.</li>
+<li>With <code>--replace</code>, a label or design with the same name is updated instead; built-in designs are never changed.</li>
+<li>An image that already exists with the same content is reused; a different file with the same name gets a new
+  name, so existing designs never change their picture.</li>
+</ul>
+<h2 id="moving-from-the-smile-product-label-module">Moving from the Smile product label module<a class="headerlink" href="#moving-from-the-smile-product-label-module" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash">bin/magento openlabel:import-smile --dry-run
+bin/magento openlabel:import-smile
+</code></pre>
+<p>The command reads the <code>smile_productlabel</code> tables directly, so it works even after the Smile module was disabled
+(keep its tables and <code>pub/media/smile_productlabel/imagelabel/</code> until you are done). Every Smile label becomes:</p>
+<ul>
+<li>an image design <code>Smile: &lt;name&gt;</code> with the label's image and alt text (18 % of the image width; adjust it in the
+  design form),</li>
+<li>a label with the same name, status and store views, the condition "<attribute> is <option>", and a placement on
+  listings and/or the product page at the same corner (<code>top-left</code> → top left, <code>lower-right</code> → bottom right, …).</li>
+</ul>
+<p>Labels whose name already exists in OpenLabel are skipped, so you can run the command again after fixing a
+problem. A Smile label whose image file or attribute is missing is reported and skipped; everything else goes
+through the same checks and the same single transaction as <code>openlabel:import</code>. Importers for paid modules are not
+part of 1.0.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../graphql/" class="btn btn-neutral float-left" title="GraphQL"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../engine/" class="btn btn-neutral float-right" title="The engine">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/iranimij/openlabel" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../graphql/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../engine/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

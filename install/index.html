@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://iranimij.github.io/openlabel/install/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Install and upgrade - OpenLabel</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Install and upgrade";
+        var mkdocs_page_input_path = "install.md";
+        var mkdocs_page_url = "/openlabel/install/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> OpenLabel
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Install and upgrade</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#install">Install</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#after-installing">After installing</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#upgrade">Upgrade</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#uninstall">Uninstall</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../admin/">Admin</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../storefront/">Storefront</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cli/">CLI</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../graphql/">GraphQL</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../import-export/">Export and import</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../engine/">The engine</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../hyva-integration/">Hyvä integration</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OpenLabel</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Install and upgrade</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/iranimij/openlabel/edit/main/docs/install.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="install-and-upgrade">Install and upgrade<a class="headerlink" href="#install-and-upgrade" title="Permanent link">&para;</a></h1>
+<h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Magento Open Source, Mage-OS or Adobe Commerce 2.4.7, 2.4.8 or 2.4.9, PHP 8.2 to 8.4.</li>
+<li>For the storefront on Hyvä: the Hyvä default theme 1.4 (1.3: best effort; 1.5: listings only for now, see
+  <a href="../storefront/#custom-themes">Custom themes</a>). Other themes: see
+  <a href="../storefront/#custom-themes">Custom themes</a>.</li>
+<li>MSI is optional.</li>
+</ul>
+<h2 id="install">Install<a class="headerlink" href="#install" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash">composer require iranimij/openlabel-hyva-bundle
+bin/magento setup:upgrade
+bin/magento openlabel:reindex
+</code></pre>
+<p>The bundle installs <code>iranimij/openlabel</code> (core), <code>iranimij/openlabel-hyva</code> (Hyvä storefront) and
+<code>iranimij/module-base</code> (the "Iranimij" configuration tab). Without Hyvä, require <code>iranimij/openlabel</code> only.</p>
+<p>In production mode also run, as for any module:</p>
+<pre><code class="language-bash">bin/magento setup:di:compile
+bin/magento setup:static-content:deploy
+bin/magento cache:flush
+</code></pre>
+<p>No theme build is needed: the storefront CSS is generated by OpenLabel into
+<code>pub/media/openlabel/&lt;store_id&gt;/openlabel.&lt;hash&gt;.css</code> on first use and after every label or design change.</p>
+<h2 id="after-installing">After installing<a class="headerlink" href="#after-installing" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Catalog › OpenLabel › Labels:</strong> create a first label from a starter (<a href="../admin/">Admin</a>).</li>
+<li><strong>Stores › Configuration › Iranimij › OpenLabel:</strong> enable or disable per store view, default max labels per
+  position, debug mode, "Regenerate CSS".</li>
+<li><strong>Indexer:</strong> <code>openlabel_product</code> runs after the price and stock indexers. "Update by schedule" is recommended
+  as for every indexer; the hourly and daily OpenLabel cron jobs need Magento's cron.</li>
+</ul>
+<h2 id="upgrade">Upgrade<a class="headerlink" href="#upgrade" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash">composer update iranimij/openlabel-hyva-bundle --with-dependencies
+bin/magento setup:upgrade
+bin/magento openlabel:reindex
+</code></pre>
+<p>Upgrade notes for each version are in the <a href="https://github.com/iranimij/openlabel/blob/main/CHANGELOG.md">CHANGELOG</a>. Everything in <code>Api/</code> follows semantic
+versioning: no breaking change within 1.x.</p>
+<h2 id="uninstall">Uninstall<a class="headerlink" href="#uninstall" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash">bin/magento module:uninstall -r Iranimij_OpenLabelHyva Iranimij_OpenLabel
+</code></pre>
+<p>Removes the modules, the <code>openlabel_*</code> tables and OpenLabel's configuration. With a plain Composer remove, run
+<code>bin/magento setup:upgrade</code> afterwards; the tables stay until you drop them.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../admin/" class="btn btn-neutral float-right" title="Admin">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/iranimij/openlabel" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../admin/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

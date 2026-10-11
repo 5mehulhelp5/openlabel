@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://iranimij.github.io/openlabel/admin/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Admin - OpenLabel</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Admin";
+        var mkdocs_page_input_path = "admin.md";
+        var mkdocs_page_url = "/openlabel/admin/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> OpenLabel
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../install/">Install and upgrade</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Admin</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#first-label-in-one-click">First label in one click</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#labels-grid">Labels grid</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#label-form">Label form</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#designs">Designs</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#settings">Settings</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#permissions">Permissions</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../storefront/">Storefront</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cli/">CLI</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../graphql/">GraphQL</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../import-export/">Export and import</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../engine/">The engine</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../hyva-integration/">Hyvä integration</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OpenLabel</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Admin</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/iranimij/openlabel/edit/main/docs/admin.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="admin">Admin<a class="headerlink" href="#admin" title="Permanent link">&para;</a></h1>
+<p>Milestone M2. Everything lives under <strong>Catalog › OpenLabel</strong>: <strong>Labels</strong> (when and where) and <strong>Designs</strong> (how it looks). Designs are reusable: make one "red pill" and use it in many labels.</p>
+<h2 id="first-label-in-one-click">First label in one click<a class="headerlink" href="#first-label-in-one-click" title="Permanent link">&para;</a></h2>
+<p>While there are no labels, the Labels grid shows three starters. Each creates an enabled label with a built-in design, applies it to configurable, grouped and bundle parents, and places it on the category listing and the product page:</p>
+<table>
+<thead>
+<tr>
+<th>Starter</th>
+<th>Shows on</th>
+<th>Position</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sale -{SAVE_PERCENT}%</td>
+<td>every discounted product</td>
+<td>top start</td>
+</tr>
+<tr>
+<td>New (30 days)</td>
+<td>products created in the last 30 days</td>
+<td>top end</td>
+</tr>
+<tr>
+<td>Only {STOCK_QTY} left</td>
+<td>products with 5 or fewer pieces left (salable quantity)</td>
+<td>bottom start</td>
+</tr>
+</tbody>
+</table>
+<p>The positions were checked free of collisions on the Hyvä 1.4 product card. A second click within a minute does not create a duplicate. The starter's message tells you how many products match.</p>
+<h2 id="labels-grid">Labels grid<a class="headerlink" href="#labels-grid" title="Permanent link">&para;</a></h2>
+<p>Columns: status, name, design preview, where it shows ("Listing TR, Product TL"), matched products (distinct products in the index), active now (with the schedule in the shop timezone), from/to, priority and store views. Filter by name, status, store view or "active now". Click a row to edit name, status, priority or dates inline; mass actions enable, disable or delete. Every change reindexes the label and cleans the cached pages it affects.</p>
+<h2 id="label-form">Label form<a class="headerlink" href="#label-form" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Section</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Basics</td>
+<td>Name (admin only), switch it on or off, pick a design from thumbnails (or create one in a new tab and press "Refresh designs"), priority (lower number wins), "hide other labels", "show on configurable, grouped and bundle products".</td>
+</tr>
+<tr>
+<td>Show when</td>
+<td>Switches for the common cases — On sale (minimum discount %), New (days), Low stock (pieces left), Out of stock, Well rated (stars) — and the advanced rule tree for anything else (any product attribute, category, SKU, attribute set, type). A product must match the switches <strong>and</strong> the tree. Nothing switched on means every product.</td>
+</tr>
+<tr>
+<td>Show where</td>
+<td>One row per placement: page (category/search/widgets or product page), position with the 3×3 picker (arrow keys work), a different design for this page, max labels in that corner, stacking, gap, offsets and "keep left/right in RTL".</td>
+</tr>
+<tr>
+<td>Who and when</td>
+<td>Store views ("All Store Views" = everywhere), customer groups (empty = everyone), start and end in the shop timezone. A date without a time ends at the end of that day. Stored in UTC.</td>
+</tr>
+<tr>
+<td>Matched products</td>
+<td>After the first save: how many products match in the default store view, the first 50 with thumbnails, what to check when nothing matches, and <strong>Reindex now</strong>.</td>
+</tr>
+</tbody>
+</table>
+<p>The <strong>live preview</strong> panel (bottom right, can be hidden) renders the chosen design on a sample product with the same structural CSS as the shop: every placement of the selected page, variables filled with sample values ({SAVE_PERCENT} → 25), desktop and mobile widths, a warning when text contrast is below 4.5:1, and "Preview as" a customer group.</p>
+<p>Save, Save &amp; Continue and Save &amp; Duplicate (creates a disabled copy). Problems are listed above the form without a page reload, each saying what to do, for example "Pick at least one placement so the label appears somewhere."</p>
+<h2 id="designs">Designs<a class="headerlink" href="#designs" title="Permanent link">&para;</a></h2>
+<p>Choose <strong>Text</strong>, <strong>Image</strong> or <strong>Shape</strong>; the form shows only what that type needs.</p>
+<ul>
+<li><strong>Text and shape:</strong> label text with a variable picker and a 24-character counter, colours with a live contrast badge (green ≥ 4.5:1, amber ≥ 3:1, red below), border, shape (rectangle, pill, circle, ribbon, corner) and rotation presets.</li>
+<li><strong>Image:</strong> PNG, JPG, GIF, WebP or SVG up to 1 MB (a warning above 50 KB). The real content type is checked; SVGs are cleaned (no scripts, event handlers, external references or entities). Width and height are stored so images never shift the layout. Alternative text is required.</li>
+<li><strong>Size:</strong> percent of the product image width (default) or pixels.</li>
+<li><strong>Text per store view:</strong> each store view uses the default text unless you untick "Use the default text".</li>
+<li><strong>Custom CSS:</strong> only for users with the "Edit custom CSS of designs" permission; <code>@media</code>, <code>@supports</code> and <code>@container</code> blocks are kept; other at-rules (such as <code>@import</code>), expressions, script URLs and escapes are removed before it is saved.</li>
+</ul>
+<p>The 15 built-in designs are locked: open one and press <strong>Duplicate to edit</strong>. They pass WCAG AA contrast. Designs used by labels and built-in designs cannot be deleted.</p>
+<h2 id="settings">Settings<a class="headerlink" href="#settings" title="Permanent link">&para;</a></h2>
+<p>Stores › Configuration › Iranimij › OpenLabel:</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Enable OpenLabel</td>
+<td>Yes</td>
+<td>Per store view. Labels stay indexed while disabled.</td>
+</tr>
+<tr>
+<td>Default max labels per position</td>
+<td>3</td>
+<td>For new placements (1–10).</td>
+</tr>
+<tr>
+<td>Label indexer</td>
+<td>—</td>
+<td>Shows the current mode; "Update by Schedule" is recommended.</td>
+</tr>
+<tr>
+<td>Debug mode</td>
+<td>No</td>
+<td>Adds <code>data-ol-label</code> attributes to the shop markup (render package, M3).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="permissions">Permissions<a class="headerlink" href="#permissions" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>ACL resource</th>
+<th>Allows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Iranimij_OpenLabel::labels</code></td>
+<td>Labels grid, form, starters, matched products, reindex</td>
+</tr>
+<tr>
+<td><code>Iranimij_OpenLabel::designs</code></td>
+<td>Designs grid, form, uploads</td>
+</tr>
+<tr>
+<td><code>Iranimij_OpenLabel::custom_css</code></td>
+<td>Editing custom CSS of designs</td>
+</tr>
+<tr>
+<td><code>Iranimij_OpenLabel::config</code></td>
+<td>The settings section</td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../install/" class="btn btn-neutral float-left" title="Install and upgrade"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../storefront/" class="btn btn-neutral float-right" title="Storefront">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/iranimij/openlabel" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../install/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../storefront/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

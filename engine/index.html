@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://iranimij.github.io/openlabel/engine/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>The engine - OpenLabel</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "The engine";
+        var mkdocs_page_input_path = "engine.md";
+        var mkdocs_page_url = "/openlabel/engine/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> OpenLabel
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../install/">Install and upgrade</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../admin/">Admin</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../storefront/">Storefront</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cli/">CLI</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../graphql/">GraphQL</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../import-export/">Export and import</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developers</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">The engine</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#data-model">Data model</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#conditions">Conditions</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#indexer">Indexer</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#variables">Variables</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#resolver">Resolver</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#cli">CLI</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../hyva-integration/">Hyvä integration</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OpenLabel</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Developers</li>
+      <li class="breadcrumb-item active">The engine</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/iranimij/openlabel/edit/main/docs/engine.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="the-engine-m1">The engine (M1)<a class="headerlink" href="#the-engine-m1" title="Permanent link">&para;</a></h1>
+<p>How OpenLabel decides which label shows on which product. Everything below the admin and the storefront:
+schema, rule conditions, the indexer, variables, the resolver and the CLI. Written during milestone M1; the
+admin (M2), Hyvä rendering (M3) and GraphQL / import (M4) build on it.</p>
+<h2 id="data-model">Data model<a class="headerlink" href="#data-model" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Holds</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>openlabel_label</code></td>
+<td>the <em>when and where</em>: name, status, priority (0 = highest), store views, customer groups, <code>valid_from</code> / <code>valid_to</code> (UTC), the serialized condition tree, the default design, <code>apply_to_parent</code>, <code>hide_lower_priority</code></td>
+</tr>
+<tr>
+<td><code>openlabel_design</code></td>
+<td>the <em>how it looks</em>: type (text, image, shape), colours, size, rotation, custom CSS, <code>is_system</code></td>
+</tr>
+<tr>
+<td><code>openlabel_design_store</code></td>
+<td>text, alt text and tooltip per store view (store 0 = default, other stores fall back to it)</td>
+</tr>
+<tr>
+<td><code>openlabel_placement</code></td>
+<td>one <em>where</em> per label: area (<code>listing</code>, <code>product</code>), position (<code>tl … br</code>), optional design override, offsets, <code>max_labels</code>, stacking, gap</td>
+</tr>
+<tr>
+<td><code>openlabel_index</code></td>
+<td>the result: (<code>label_id</code>, <code>product_id</code>, <code>store_id</code>, <code>customer_group_id</code>) with the label's priority and window copied in; <code>customer_group_id = -1</code> means every group</td>
+</tr>
+</tbody>
+</table>
+<p>Repositories: <code>LabelRepositoryInterface</code> saves a label with its placements, <code>DesignRepositoryInterface</code> saves a
+design with its store texts. Both validate and answer with actionable messages. A design that labels still
+use cannot be deleted. Everything in <code>Api/</code> follows semantic versioning from 1.0.</p>
+<h2 id="conditions">Conditions<a class="headerlink" href="#conditions" title="Permanent link">&para;</a></h2>
+<p>A label's conditions are a core <code>Magento\Rule</code> tree (ALL / ANY, nested) stored as JSON in
+<code>conditions_serialized</code>. Leaves are either the native product-attribute condition (every attribute,
+category, SKU, attribute set; store-scoped attributes are evaluated per store view) or one of the built-ins:</p>
+<table>
+<thead>
+<tr>
+<th>Built-in</th>
+<th>Attributes</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>On sale</td>
+<td><code>on_sale</code> (yes/no), <code>discount_percent</code> (rounded half up), <code>discount_amount</code></td>
+<td>price index of the store's website and the customer group, so special prices and catalog price rules both count</td>
+</tr>
+<tr>
+<td>Is new</td>
+<td><code>news_dates</code> (inside <em>Set Product as New</em> dates, default scope), <code>days_since_created</code>, <code>days_since_updated</code></td>
+<td>product entity</td>
+</tr>
+<tr>
+<td>Stock</td>
+<td><code>is_salable</code> (yes/no), <code>salable_qty</code></td>
+<td>MSI stock of the website's sales channel, legacy stock status without MSI; quantity applies to simple, virtual and downloadable products only</td>
+</tr>
+<tr>
+<td>Price range</td>
+<td><code>final_price</code>, <code>price</code></td>
+<td>price index</td>
+</tr>
+<tr>
+<td>Rating</td>
+<td><code>rating</code> (stars)</td>
+<td>review summary of the store view</td>
+</tr>
+<tr>
+<td>Review count</td>
+<td><code>review_count</code></td>
+<td>review summary of the store view</td>
+</tr>
+</tbody>
+</table>
+<p>Matching happens in SQL: the tree is attached to a product collection with the core
+<code>Magento\Rule\Model\Condition\Sql\Builder</code>; built-ins contribute joins and expressions. PHP <code>validate()</code> exists
+on every condition for previews and tests. Custom conditions: extend
+<code>Iranimij\OpenLabel\Model\Condition\AbstractBuiltIn</code> and register the class in the
+<code>Iranimij\OpenLabel\Model\Condition\ConditionPool</code> <code>types</code> argument.</p>
+<p>Two consequences worth knowing:</p>
+<ul>
+<li>Price-based conditions read the price index. Depending on the Magento version and <em>Display Out of Stock
+  Products</em>, the price index may omit out-of-stock products; those then get no price labels.</li>
+<li>Disabled products never match. Children of configurable, grouped and bundle products do, which is what
+  <code>apply_to_parent</code> builds on.</li>
+</ul>
+<h2 id="indexer">Indexer<a class="headerlink" href="#indexer" title="Permanent link">&para;</a></h2>
+<p><code>openlabel_product</code> (Index Management › <em>OpenLabel Products</em>) depends on the price and stock indexers.</p>
+<ul>
+<li><strong>Full reindex</strong> builds into <code>openlabel_index_replica</code>, computes the products that gained or lost a label,
+  swaps the tables atomically and cleans the full page cache for exactly those products. A lock prevents
+  two full reindexes from overlapping.</li>
+<li><strong>Partial reindex</strong> (Update on Save, or the changelog in Update by Schedule) rebuilds the rows of the
+  changed products plus their configurable / grouped / bundle parents and siblings.</li>
+<li><strong>Per label</strong>: saving a label rebuilds its rows at once, whatever the indexer mode, and cleans the cache
+  for the diff plus the <code>openlabel_&lt;id&gt;</code> tag. Deleting a label drops its rows. <code>openlabel:reindex &lt;id&gt;</code> and
+  the daily cron do the same.</li>
+<li><strong>Rows</strong>: one per store view the label is limited to (all active store views otherwise). One row per
+  allowed customer group when the label is limited to groups or uses a price condition, otherwise one row with
+  <code>customer_group_id = -1</code>. With <code>apply_to_parent</code>, a parent gets a row when any child matches; the row
+  remembers the lowest matching child in <code>parent_product_id</code>.</li>
+<li><strong>Triggers</strong>: mview subscriptions on the product, category, website, relation, stock item and review
+  summary tables; plugins on the price indexer (<code>Rows</code>, <code>Full</code>), the stock indexer and review aggregation
+  so price, stock and review changes arrive even though index tables are never subscribed (that would flood
+  the changelog). A full price or stock reindex invalidates the OpenLabel index.</li>
+<li><strong>Time</strong>: <code>valid_from</code> / <code>valid_to</code> are copied into the index and filtered at resolve time, so no cron
+  activates labels. Two small crons remain: hourly, clean the cache of labels whose window opened or closed
+  during the last hour (a label can therefore appear up to one hour late on cached pages); daily, rebuild
+  labels whose conditions depend on the date ("is new", days since created).</li>
+<li><strong>Known 1.0 limitation</strong>: on multi-source MSI shops, source-item changes that bypass the legacy stock
+  item reach the index on the next product save, stock indexer run or full reindex.</li>
+</ul>
+<h2 id="variables">Variables<a class="headerlink" href="#variables" title="Permanent link">&para;</a></h2>
+<p>Label text may contain variables, substituted at render time from the already loaded product (no extra
+queries for prices and stock):</p>
+<p><code>{SAVE_PERCENT}</code> <code>{SAVE_AMOUNT}</code> <code>{PRICE}</code> <code>{SPECIAL_PRICE}</code> <code>{FINAL_PRICE}</code> <code>{STOCK_QTY}</code> <code>{NEW_FOR}</code> <code>{SKU}</code>
+<code>{ATTR:code}</code> <code>{BR}</code> <code>{SPECIAL_ENDS_IN}</code> <code>{SPECIAL_END_DATE}</code> <code>{RATING}</code> <code>{REVIEW_COUNT}</code> <code>{SOLD_LAST_30D}</code></p>
+<p>Numbers, currency amounts and dates are formatted for the store's locale. Values are escaped; the text itself
+may use <code>b strong i em br span small sup sub</code> (attributes other than <code>class</code>, <code>id</code>, <code>title</code>, <code>style</code> are
+removed). Unknown variables stay literal so typos are visible. A zero number renders as "0" and is reported as
+empty, which the 1.1 "hide label when a variable is zero/empty" flag will use. <code>{RATING}</code>, <code>{REVIEW_COUNT}</code> and
+<code>{SOLD_LAST_30D}</code> load their data once per listing through <code>VariablePreloadInterface</code>; <code>{SPECIAL_ENDS_IN}</code>
+treats <code>special_to_date</code> as valid through that day. Custom variables implement
+<code>Iranimij\OpenLabel\Api\VariableProcessorInterface</code> and are registered in the
+<code>Iranimij\OpenLabel\Model\Variable\Pool</code> <code>processors</code> argument.</p>
+<h2 id="resolver">Resolver<a class="headerlink" href="#resolver" title="Permanent link">&para;</a></h2>
+<p><code>Iranimij\OpenLabel\Api\LabelResolverInterface::getForProducts(int[] $productIds, int $storeId, int $customerGroupId)</code>
+runs <strong>one SELECT</strong> over the index joined with labels, placements, designs and store texts, filtered by status,
+UTC time window and <code>customer_group_id IN (-1, group)</code>, then arranges the rows: priority order, <code>hide_lower_priority</code>
+(a matching label with the flag suppresses labels with a higher priority number on that product), and the
+per-stack limit (a stack is one area + position; its limit is the <code>max_labels</code> of its highest-priority label).</p>
+<p>Templates use <code>Iranimij\OpenLabel\ViewModel\Labels</code>: call <code>getForProducts()</code> once with every product id of the
+page, then <code>getStacks($productId, 'listing')</code> per item. Results are memoized per request; the customer group
+comes from the HTTP context, which the full page cache already varies on. When <code>openlabel/general/enabled</code>
+is off for the store, the view model returns nothing without a query.</p>
+<p>Budget, enforced by integration tests with a query counter: a listing of 36 products costs one query, a
+product page costs one query.</p>
+<h2 id="cli">CLI<a class="headerlink" href="#cli" title="Permanent link">&para;</a></h2>
+<pre><code>bin/magento openlabel:reindex            # full rebuild through the indexer (lock, swap, cache diff)
+bin/magento openlabel:reindex 3          # one label, prints the diff
+bin/magento openlabel:preview 3 --store=1 # matched count and the first 20 SKUs from the index
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../import-export/" class="btn btn-neutral float-left" title="Export and import"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../hyva-integration/" class="btn btn-neutral float-right" title="Hyvä integration">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/iranimij/openlabel" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../import-export/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../hyva-integration/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
