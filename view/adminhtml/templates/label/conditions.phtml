@@ -16,6 +16,9 @@ $id = (string) $element->getHtmlId();
         <p class="note ol-rule-tree__note">
             <?= $escaper->escapeHtml(__('For anything the switches above do not cover: any product attribute, category, SKU, attribute set or product type. A product must match the switches and these conditions.')) ?>
         </p>
+        <p class="note ol-rule-tree__note" data-role="ol-rule-tree-hint">
+            <?= $escaper->escapeHtml(__('Click an underlined word to change it: "is" for the comparison (greater than, less than, is one of…), "..." for the value, "ALL" and "TRUE" for how conditions combine.')) ?>
+        </p>
         <div class="rule-tree-wrapper">
             <?= $element->getChildrenHtml() ?>
         </div>

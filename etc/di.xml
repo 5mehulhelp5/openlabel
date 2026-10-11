@@ -104,4 +104,33 @@
             <argument name="resourceModel" xsi:type="string">Iranimij\OpenLabel\Model\ResourceModel\Design</argument>
         </arguments>
     </type>
+    <!-- Logging channel "openlabel" (var/log/openlabel.log): indexing and save errors with their cause. -->
+    <virtualType name="Iranimij\OpenLabel\Logger\Handler" type="Magento\Framework\Logger\Handler\Base">
+        <arguments>
+            <argument name="fileName" xsi:type="string">/var/log/openlabel.log</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Iranimij\OpenLabel\Logger" type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="name" xsi:type="string">openlabel</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="file" xsi:type="object">Iranimij\OpenLabel\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="Iranimij\OpenLabel\Plugin\LabelRepositoryPlugin">
+        <arguments>
+            <argument name="logger" xsi:type="object">Iranimij\OpenLabel\Logger</argument>
+        </arguments>
+    </type>
+    <type name="Iranimij\OpenLabel\Controller\Adminhtml\Label\Save">
+        <arguments>
+            <argument name="logger" xsi:type="object">Iranimij\OpenLabel\Logger</argument>
+        </arguments>
+    </type>
+    <type name="Iranimij\OpenLabel\Model\ImportExport\Importer">
+        <arguments>
+            <argument name="logger" xsi:type="object">Iranimij\OpenLabel\Logger</argument>
+        </arguments>
+    </type>
 </config>

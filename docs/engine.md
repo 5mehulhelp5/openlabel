@@ -33,8 +33,24 @@ category, SKU, attribute set; store-scoped attributes are evaluated per store vi
 | Rating | `rating` (stars) | review summary of the store view |
 | Review count | `review_count` | review summary of the store view |
 
-Matching happens in SQL: the tree is attached to a product collection with the core
-`Magento\Rule\Model\Condition\Sql\Builder`; built-ins contribute joins and expressions. PHP `validate()` exists
+**Operators.** Numeric built-ins offer *is*, *is not*, *equals or greater than*, *greater than*, *equals or less
+than*, *less than*, *is one of* and *is not one of* (e.g. "days since created is less than 30", "salable quantity
+is one of 1, 2, 3"). Yes/no built-ins offer *is* and *is not*. Native attributes keep Magento's operators for their
+type (text: contains, is one of…; dates: is, on or after, on or before; category: is, is not, is one of…). Every
+condition is tested with every operator it offers (`Test/Integration/Model/Condition/OperatorMatrixTest`).
+
+**Missing data never matches**, whatever the operator, *is not* included: a product without a price index row
+for price conditions, without a rating for `rating`, without a stock row (and composites) for `salable_qty`, and a
+product without a value for a product attribute condition (e.g. "news from date on or before 2020-01-01" does not
+pick up products without that date). A product without reviews has `review_count` 0, so "review count is 0" finds
+products nobody reviewed yet. This holds on every supported Magento version: 2.4.7 and 2.4.8 would otherwise
+treat missing values as 0.
+
+Matching happens in SQL: the tree is attached to a product collection with `Iranimij\OpenLabel\Model\Rule\SqlBuilder`,
+the core rule builder with two changes. It keeps the joins of every condition when it recurses into nested groups
+(the core one drops those collected before a nested group, which broke quick switches combined with advanced
+conditions). And it writes the SQL of every condition itself (the core operators, without the `IFNULL(field, 0)` of 2.4.7 and
+2.4.8), so the rules above hold on every Magento version. PHP `validate()` exists
 on every condition for previews and tests. Custom conditions: extend
 `Iranimij\OpenLabel\Model\Condition\AbstractBuiltIn` and register the class in the
 `Iranimij\OpenLabel\Model\Condition\ConditionPool` `types` argument.
@@ -43,6 +59,8 @@ Two consequences worth knowing:
 
 - Price-based conditions read the price index. Depending on the Magento version and *Display Out of Stock
   Products*, the price index may omit out-of-stock products; those then get no price labels.
+- Errors while matching are logged to `var/log/openlabel.log` (with the label and its conditions); the admin shows
+  the cause and keeps the label saved.
 - Disabled products never match. Children of configurable, grouped and bundle products do, which is what
   `apply_to_parent` builds on.
 

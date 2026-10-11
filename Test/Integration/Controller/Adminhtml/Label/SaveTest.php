@@ -10,6 +10,7 @@ namespace Iranimij\OpenLabel\Test\Integration\Controller\Adminhtml\Label;
 
 use Iranimij\OpenLabel\Api\Data\LabelInterface;
 use Iranimij\OpenLabel\Api\LabelRepositoryInterface;
+use Iranimij\OpenLabel\Model\Indexer\LabelIndexingException;
 use Iranimij\OpenLabel\Model\ResourceModel\Label\CollectionFactory;
 use Iranimij\OpenLabel\Test\Fixture\Design as DesignFixture;
 use Iranimij\OpenLabel\Test\Fixture\Label as LabelFixture;
@@ -119,6 +120,52 @@ class SaveTest extends AbstractBackendController
     /**
      * @param array<string, mixed> $data
      */
+    #[DataFixture(DesignFixture::class, [], 'design')]
+    #[DataFixture(LabelFixture::class, ['design_id' => '$design.design_id$', 'name' => 'Saved but not matched'], 'label')]
+    public function testIndexingErrorKeepsTheSavedLabelOpenWithTheCause(): void
+    {
+        $label = DataFixtureStorageManager::getStorage()->get('label');
+        $this->replaceRepositorySave(new LabelIndexingException((int) $label->getLabelId(), new \RuntimeException('Unknown column x')));
+
+        $this->post($this->form('Saved but not matched') + ['label_id' => $label->getLabelId()]);
+
+        self::assertRedirect(self::stringContains('openlabel/label/edit/id/' . $label->getLabelId()));
+        $this->assertSessionMessages(self::containsEqual(
+            'The label was saved, but its products could not be matched: Unknown column x Details are in var/log/openlabel.log.'
+        ));
+    }
+
+    #[DataFixture(DesignFixture::class, [], 'design')]
+    public function testUnexpectedErrorIsLoggedAndShownInsteadOfAnErrorPage(): void
+    {
+        $this->replaceRepositorySave(new \RuntimeException('database went away'));
+
+        $this->post($this->form('Broken'));
+
+        $this->assertSessionMessages(self::containsEqual(
+            'The label could not be saved: database went away Details are in var/log/openlabel.log.'
+        ));
+        self::assertRedirect(self::stringContains('openlabel/label/new'));
+    }
+
+    private function replaceRepositorySave(\Exception $exception): void
+    {
+        $repository = $this->createStub(LabelRepositoryInterface::class);
+        $repository->method('save')->willThrowException($exception);
+        $repository->method('getById')->willReturnCallback(
+            fn (int $id) => $this->_objectManager->create(\Iranimij\OpenLabel\Model\Label::class)->setData('label_id', $id)
+        );
+        $this->_objectManager->addSharedInstance($repository, LabelRepositoryInterface::class);
+        $this->_objectManager->addSharedInstance($repository, \Iranimij\OpenLabel\Model\LabelRepository::class);
+    }
+
+    protected function tearDown(): void
+    {
+        $this->_objectManager->removeSharedInstance(LabelRepositoryInterface::class);
+        $this->_objectManager->removeSharedInstance(\Iranimij\OpenLabel\Model\LabelRepository::class);
+        parent::tearDown();
+    }
+
     private function post(array $data): void
     {
         $this->getRequest()->setMethod(HttpRequest::METHOD_POST);

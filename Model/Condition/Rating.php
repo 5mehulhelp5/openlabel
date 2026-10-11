@@ -39,6 +39,17 @@ class Rating extends AbstractBuiltIn
     }
 
     /**
+     * A product without a rating has no "stars": it never matches a rating condition ("rating < 3" means rated
+     * poorly, not "not rated").
+     *
+     * @return string
+     */
+    public function getSqlGuard(): ?string
+    {
+        return self::REVIEW_ALIAS . '.rating_summary IS NOT NULL';
+    }
+
+    /**
      * @inheritDoc
      */
     protected function productValue(Product $product): mixed

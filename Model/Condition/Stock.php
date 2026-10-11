@@ -84,35 +84,29 @@ class Stock extends AbstractBuiltIn
         if ((string) $this->getAttribute() !== self::SALABLE_QTY) {
             return self::ALIAS . '.' . $stock->getSalableColumn();
         }
-        $types = "'" . implode("','", self::QUANTITY_TYPES) . "'";
 
-        return new \Zend_Db_Expr(sprintf(
-            'IF(e.type_id IN (%s), %s.%s, %s)',
-            $types,
-            self::ALIAS,
-            $stock->getQtyColumn(),
-            $this->compositeSentinel()
-        ));
+        return self::ALIAS . '.' . $stock->getQtyColumn();
     }
 
     /**
-     * A value for composite products that never satisfies the comparison. NULL is not enough: from 2.4.8 the core
-     * Sql Builder wraps numeric fields in IFNULL(field, 0), which would turn composites into "quantity 0".
+     * Products without a stock row never match; salable quantity applies to simple, virtual and downloadable
+     * products only (composites through "apply to parents").
      *
      * @return string
      */
-    private function compositeSentinel(): string
+    public function getSqlGuard(): ?string
     {
-        $operator = (string) $this->getOperator();
-        if (in_array($operator, ['<', '<='], true)) {
-            return '1000000000000';
-        }
-        $value = $this->getValue();
-        if (in_array($operator, ['!=', '!()'], true) && is_numeric($value)) {
-            return (string) (float) $value;
+        $stock = $this->stockDataResolver->get();
+        if ((string) $this->getAttribute() !== self::SALABLE_QTY) {
+            return self::ALIAS . '.' . $stock->getSalableColumn() . ' IS NOT NULL';
         }
 
-        return '-1';
+        return sprintf(
+            "e.type_id IN ('%s') AND %s.%s IS NOT NULL",
+            implode("','", self::QUANTITY_TYPES),
+            self::ALIAS,
+            $stock->getQtyColumn()
+        );
     }
 
     /**

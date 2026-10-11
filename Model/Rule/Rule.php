@@ -21,7 +21,6 @@ use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Rule\Model\AbstractModel;
 use Magento\Rule\Model\Action\Collection as ActionCollection;
 use Magento\Rule\Model\Action\CollectionFactory as ActionCollectionFactory;
-use Magento\Rule\Model\Condition\Sql\Builder as SqlBuilder;
 
 /**
  * The condition tree of one label, evaluated in SQL against a product collection for one store,

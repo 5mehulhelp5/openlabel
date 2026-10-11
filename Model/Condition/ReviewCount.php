@@ -28,11 +28,15 @@ class ReviewCount extends AbstractBuiltIn
     }
 
     /**
-     * @inheritDoc
+     * The core Sql Builder accepts expressions only as Zend_Db_Expr instances, hence the widened return type.
+     *
+     * @return \Zend_Db_Expr
+     * @phpstan-ignore method.childReturnType, method.childReturnType (AbstractCondition and ConditionInterface both declare string)
      */
     public function getMappedSqlField()
     {
-        return self::REVIEW_ALIAS . '.reviews_count';
+        // No summary row means no reviews: "review count = 0" finds products nobody reviewed yet.
+        return new \Zend_Db_Expr('COALESCE(' . self::REVIEW_ALIAS . '.reviews_count, 0)');
     }
 
     /**

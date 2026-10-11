@@ -290,3 +290,8 @@
 "Rebuilt automatically after every design or label save. Use this after copying the database or media folder from another environment.","Rebuilt automatically after every design or label save. Use this after copying the database or media folder from another environment."
 "The OpenLabel stylesheet was rebuilt for %1 store view(s).","The OpenLabel stylesheet was rebuilt for %1 store view(s)."
 "The stylesheet could not be written: %1","The stylesheet could not be written: %1"
+"The label could not be saved: %1 Details are in var/log/openlabel.log.","The label could not be saved: %1 Details are in var/log/openlabel.log."
+"The label was saved, but its products could not be matched: %1 Details are in var/log/openlabel.log.","The label was saved, but its products could not be matched: %1 Details are in var/log/openlabel.log."
+"Invalid field","Invalid field"
+"Unknown condition operator","Unknown condition operator"
+"Click an underlined word to change it: ""is"" for the comparison (greater than, less than, is one of…), ""..."" for the value, ""ALL"" and ""TRUE"" for how conditions combine.","Click an underlined word to change it: ""is"" for the comparison (greater than, less than, is one of…), ""..."" for the value, ""ALL"" and ""TRUE"" for how conditions combine."

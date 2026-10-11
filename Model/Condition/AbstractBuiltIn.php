@@ -140,6 +140,32 @@ abstract class AbstractBuiltIn extends AbstractCondition
     }
 
     /**
+     * SQL that is true when the product has the data this condition compares (a price index row, a rating, a
+     * stock row). Without it the condition never matches, whatever the operator, "is not" included. Applied by
+     * Model\Rule\SqlBuilder, so it behaves the same on every Magento version.
+     *
+     * @return string|null null when the value always exists
+     */
+    public function getSqlGuard(): ?string
+    {
+        return null;
+    }
+
+    /**
+     * Yes/no conditions offer "is" and "is not" only (the core "is undefined" means nothing here); numeric ones
+     * offer every comparison and "is one of" / "is not one of".
+     *
+     * @return array<string, string[]>
+     */
+    public function getDefaultOperatorInputByType()
+    {
+        $types = parent::getDefaultOperatorInputByType();
+        $types['select'] = ['==', '!='];
+
+        return $types;
+    }
+
+    /**
      * Hook for joins that need the collection itself; built-ins declare joins via getTablesToJoin().
      *
      * @param ProductCollection $productCollection

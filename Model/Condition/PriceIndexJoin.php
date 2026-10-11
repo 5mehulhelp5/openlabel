@@ -35,6 +35,16 @@ trait PriceIndexJoin
     }
 
     /**
+     * Products without a price index row (e.g. out of stock on some Magento versions) never match a price condition.
+     *
+     * @return string
+     */
+    public function getSqlGuard(): ?string
+    {
+        return self::PRICE_ALIAS . '.entity_id IS NOT NULL';
+    }
+
+    /**
      * @return bool
      */
     public function requiresCustomerGroup(): bool
