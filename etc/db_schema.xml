@@ -119,7 +119,8 @@
             <column name="product_id"/>
         </index>
     </table>
-    <table name="openlabel_index_replica" resource="default" engine="innodb" comment="OpenLabel index replica (full reindex swap)">
+    <!-- Same comment as openlabel_index: the full reindex swaps the two tables by renaming them. -->
+    <table name="openlabel_index_replica" resource="default" engine="innodb" comment="OpenLabel index: which label applies to which product">
         <column xsi:type="int" name="label_id" unsigned="true" nullable="false" comment="Label ID"/>
         <column xsi:type="int" name="product_id" unsigned="true" nullable="false" comment="Product ID"/>
         <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false" comment="Store view ID"/>
