@@ -9,7 +9,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 - Hyvä 1.5 is supported and tested end to end on every change, like 1.4 (product-page labels via openlabel-hyva).
 
 ### Fixed
+- Saving a label that combines a quick switch (on sale, new, stock, rating) with an advanced condition (e.g. a category) failed with "Unknown column ol_price.price": the core rule SQL builder drops the joins it collected before a nested condition group. OpenLabel now uses its own builder subclass for its rules.
+- Built-in conditions behave the same on Magento 2.4.7 to 2.4.9 for every operator: products without the compared data (no price index row, no rating, no stock row) never match, "is not" included; products without reviews count as 0 reviews. Yes/no conditions offer "is" and "is not" only.
 - Admin live preview: the sample image box is reserved up front, so the preview card (and the labels, sized relative to it) no longer collapses while the image is being laid out after "Preview as" or a design change.
+
+### Added
+- Logging channel `openlabel` (`var/log/openlabel.log`): indexing errors after a save (with the label and its conditions) and failed imports. The admin shows "The label was saved, but its products could not be matched: …" and keeps the label open instead of Magento's error page.
 
 ## [1.0.0-rc2] - 2026-10-11
 

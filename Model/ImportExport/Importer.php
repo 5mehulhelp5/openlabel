@@ -27,6 +27,7 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Filesystem;
 use Magento\Framework\Serialize\Serializer\Json;
+use Psr\Log\LoggerInterface;
 
 /**
  * Imports an OpenLabel export file in two phases: first everything is checked against this shop (store and group
@@ -57,6 +58,7 @@ class Importer
      * @param Filesystem $filesystem
      * @param ResourceConnection $resource
      * @param Json $json
+     * @param LoggerInterface $logger openlabel.log
      */
     public function __construct(
         private readonly FileFormat $fileFormat,
@@ -75,7 +77,8 @@ class Importer
         private readonly SearchCriteriaBuilder $searchCriteriaBuilder,
         private readonly Filesystem $filesystem,
         private readonly ResourceConnection $resource,
-        private readonly Json $json
+        private readonly Json $json,
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -125,13 +128,14 @@ class Importer
             $connection->commit();
         } catch (\Throwable $e) {
             $connection->rollBack();
+            $this->logger->error('Import rolled back: ' . $e->getMessage(), ['exception' => $e]);
             $media = $this->filesystem->getDirectoryWrite(DirectoryList::MEDIA);
             foreach ($written as $file) {
                 $media->delete($file);
             }
             $this->cssRegenerator->regenerateAll();
 
-            return new ImportResult([sprintf('Nothing was imported: %s', $e->getMessage())]);
+            return new ImportResult([sprintf('Nothing was imported: %s Details are in var/log/openlabel.log.', $e->getMessage())]);
         }
 
         return new ImportResult([], ...array_merge($counts, ['labelIds' => $labelIds]));

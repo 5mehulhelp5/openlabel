@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Iranimij\OpenLabel\Controller\Adminhtml\Label;
 
 use Iranimij\OpenLabel\Api\LabelRepositoryInterface;
+use Iranimij\OpenLabel\Model\Indexer\LabelIndexingException;
 use Iranimij\OpenLabel\Model\Label\Duplicator;
 use Iranimij\OpenLabel\Model\Label\FormMapper;
 use Iranimij\OpenLabel\Model\LabelFactory;
@@ -19,6 +20,7 @@ use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Validation\ValidationException;
+use Psr\Log\LoggerInterface;
 
 /**
  * Saves the label form (Save, Save & Continue, Save & Duplicate). The repository reindexes the label on save.
@@ -35,6 +37,7 @@ class Save extends Action implements HttpPostActionInterface
      * @param FormMapper $formMapper
      * @param Duplicator $duplicator
      * @param DataPersistorInterface $dataPersistor
+     * @param LoggerInterface $logger openlabel.log
      */
     public function __construct(
         Context $context,
@@ -42,7 +45,8 @@ class Save extends Action implements HttpPostActionInterface
         private readonly LabelFactory $labelFactory,
         private readonly FormMapper $formMapper,
         private readonly Duplicator $duplicator,
-        private readonly DataPersistorInterface $dataPersistor
+        private readonly DataPersistorInterface $dataPersistor,
+        private readonly LoggerInterface $logger
     ) {
         parent::__construct($context);
     }
@@ -66,6 +70,12 @@ class Save extends Action implements HttpPostActionInterface
             $label = $this->labelRepository->save($label);
             $this->dataPersistor->clear(self::PERSISTOR_KEY);
             $this->messageManager->addSuccessMessage((string) __('The label was saved.'));
+        } catch (LabelIndexingException $e) {
+            // Saved, but its products could not be matched (logged): stay on the label so it can be fixed.
+            $this->dataPersistor->clear(self::PERSISTOR_KEY);
+            $this->messageManager->addErrorMessage($e->getMessage());
+
+            return $redirect->setPath('*/*/edit', ['id' => $e->getLabelId()]);
         } catch (ValidationException $e) {
             foreach ($e->getErrors() ?: [$e] as $error) {
                 $this->messageManager->addErrorMessage($error->getMessage());
@@ -74,6 +84,17 @@ class Save extends Action implements HttpPostActionInterface
             return $this->back($redirect, $id, $data);
         } catch (LocalizedException $e) {
             $this->messageManager->addErrorMessage($e->getMessage());
+
+            return $this->back($redirect, $id, $data);
+        } catch (\Exception $e) {
+            $this->logger->error(
+                sprintf('Saving label #%d failed: %s', $id, $e->getMessage()),
+                ['label_id' => $id, 'exception' => $e]
+            );
+            $this->messageManager->addErrorMessage((string) __(
+                'The label could not be saved: %1 Details are in var/log/openlabel.log.',
+                $e->getMessage()
+            ));
 
             return $this->back($redirect, $id, $data);
         }

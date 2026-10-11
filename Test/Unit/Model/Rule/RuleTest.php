@@ -22,7 +22,7 @@ use Magento\Framework\Api\ExtensionAttributesFactory;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use Magento\Rule\Model\Action\Collection as ActionCollection;
 use Magento\Rule\Model\Action\CollectionFactory as ActionCollectionFactory;
-use Magento\Rule\Model\Condition\Sql\Builder;
+use Iranimij\OpenLabel\Model\Rule\SqlBuilder as Builder;
 use PHPUnit\Framework\TestCase;
 
 class RuleTest extends TestCase

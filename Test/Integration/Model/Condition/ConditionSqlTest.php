@@ -81,6 +81,36 @@ class ConditionSqlTest extends TestCase
         $om->get(StockSetter::class)->apply([$stockIds['ol-out'] => [0.0, false], $stockIds['ol-low'] => [3.0, true]]);
     }
 
+    /**
+     * Quick switches sit at the root and the advanced tree is a nested group (QuickConditions); the core rule SQL
+     * builder dropped the switches' joins when it recursed into the group ("Unknown column ol_price.price").
+     */
+    public function testQuickSwitchesKeepTheirJoinsNextToANestedAdvancedTree(): void
+    {
+        $nested = ['type' => Combine::class, 'aggregator' => 'all', 'value' => '1', 'conditions' => [
+            ['type' => ProductCondition::class, 'attribute' => 'sku', 'operator' => '{}', 'value' => 'sale'],
+        ]];
+
+        self::assertSame(['ol-sale20'], $this->match([$this->builtIn(OnSale::class, 'discount_percent', '>=', '10'), $nested]));
+        self::assertSame(['ol-sale20'], $this->match([$nested, $this->builtIn(OnSale::class, 'discount_percent', '>=', '10')]));
+    }
+
+    public function testSeveralSwitchesWithTheirOwnJoinsAroundNestedGroups(): void
+    {
+        $deep = ['type' => Combine::class, 'aggregator' => 'all', 'value' => '1', 'conditions' => [
+            ['type' => Combine::class, 'aggregator' => 'all', 'value' => '1', 'conditions' => [
+                ['type' => ProductCondition::class, 'attribute' => 'sku', 'operator' => '{}', 'value' => 'ol-'],
+            ]],
+        ]];
+
+        self::assertSame(['ol-sale20'], $this->match([
+            $this->builtIn(OnSale::class, 'discount_percent', '>=', '10'),
+            $deep,
+            $this->builtIn(Stock::class, 'is_salable', '==', '1'),
+            $this->builtIn(Rating::class, 'rating', '>=', '4'),
+        ], group: 0));
+    }
+
     public function testOnSaleFindsSpecialPriceProductsForEveryGroup(): void
     {
         self::assertSame(['ol-sale20', 'ol-sale5'], $this->match($this->builtIn(OnSale::class, 'on_sale', '==', '1'), group: 0));
