@@ -11,6 +11,7 @@ namespace Iranimij\OpenLabel\Test\Fixture;
 use Iranimij\OpenLabel\Api\Data\DesignInterface;
 use Iranimij\OpenLabel\Api\Data\DesignInterfaceFactory;
 use Iranimij\OpenLabel\Api\DesignRepositoryInterface;
+use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DataObject;
 use Magento\TestFramework\Fixture\RevertibleDataFixtureInterface;
 
@@ -33,10 +34,12 @@ class Design implements RevertibleDataFixtureInterface
     /**
      * @param DesignInterfaceFactory $designFactory
      * @param DesignRepositoryInterface $designRepository
+     * @param ResourceConnection $resource
      */
     public function __construct(
         private readonly DesignInterfaceFactory $designFactory,
-        private readonly DesignRepositoryInterface $designRepository
+        private readonly DesignRepositoryInterface $designRepository,
+        private readonly ResourceConnection $resource
     ) {
     }
 
@@ -60,6 +63,18 @@ class Design implements RevertibleDataFixtureInterface
      */
     public function revert(DataObject $data): void
     {
-        $this->designRepository->deleteById((int) $data->getData('design_id'));
+        // A test that errored leaves its labels behind (the framework reverts fixtures before tearDown); remove them
+        // so the real error is reported instead of an aborted run.
+        $designId = (int) $data->getData('design_id');
+        $connection = $this->resource->getConnection();
+        $labelIds = $connection->fetchCol(
+            $connection->select()->from($this->resource->getTableName('openlabel_label'), ['label_id'])
+                ->where('design_id = ?', $designId)
+        );
+        if ($labelIds !== []) {
+            $connection->delete($this->resource->getTableName('openlabel_index'), ['label_id IN (?)' => $labelIds]);
+            $connection->delete($this->resource->getTableName('openlabel_label'), ['label_id IN (?)' => $labelIds]);
+        }
+        $this->designRepository->deleteById($designId);
     }
 }

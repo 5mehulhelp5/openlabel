@@ -81,6 +81,7 @@ class LabelData
         $html = $this->renderer->render($text, $product, $context)->getHtml();
         $html = (string) preg_replace('#<br\s*/?>#i', "\n", $html);
 
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction -- plain text for JSON, never written into HTML
         return trim(html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
     }
 
