@@ -182,7 +182,7 @@
 <li>Performance budget, checked in CI: one extra query for a 36-product listing, one for a product page.</li>
 </ul>
 <h2 id="custom-themes">Custom themes<a class="headerlink" href="#custom-themes" title="Permanent link">&para;</a></h2>
-<p>The Hyvä package finds its slots automatically on Hyvä 1.4 (end-to-end tests on 1.4.2 for every change; 1.3 is supported on a best-effort basis and not tested in CI). Hyvä 1.5 rebuilt the product gallery (<code>#gallery-main</code> is now the scrolling image track), so on 1.5 listings work but product-page labels do not yet; a nightly 1.5 run tracks it. A theme that changes the product image template of listings or the gallery container renders the labels itself:</p>
+<p>The Hyvä package finds its slots automatically on Hyvä 1.4 and 1.5 (end-to-end tests on 1.4.2 and 1.5.2 for every change; 1.3 is supported on a best-effort basis and not tested in CI). On Hyvä 1.5, whose <code>#gallery-main</code> is the scrolling image track, the product-page labels go into the gallery's positioned wrapper (<code>#gallery &gt; .relative</code>) right before the track, so they stay on the visible image while the shopper swipes.</p>
 <p><strong>Product page.</strong> Inside your gallery container (it must be <code>position: relative</code>):</p>
 <pre><code class="language-php">&lt;?= $block-&gt;getChildHtml('openlabel.product.labels') ?&gt;
 </code></pre>

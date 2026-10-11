@@ -83,6 +83,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#5-custom-theme-fallback">5. Custom theme fallback</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#hyva-15-verified-on-default-theme-152-2026-10-11">Hyvä 1.5 (verified on default theme 1.5.2, 2026-10-11)</a>
+    </li>
     </ul>
                   </li>
               </ul>
@@ -243,6 +245,22 @@
 <p>Absolutely positioned elements on the card (FE5): only the swatch radio inputs (<code>input.absolute.product-option-value-input</code>, visually under the swatch buttons, below the image) and <code>sr-only</code> helpers. Nothing overlaps the image area, so all four corners are free for labels.</p>
 <h2 id="5-custom-theme-fallback">5. Custom theme fallback<a class="headerlink" href="#5-custom-theme-fallback" title="Permanent link">&para;</a></h2>
 <p>Themes that override <code>product/list/image.phtml</code> with another template name or rename <code>#gallery-main</code> render the labels themselves: one <code>getChildHtml('openlabel.product.labels')</code> call in the gallery, one <code>LabelRenderer::getStacksHtml()</code> call in the listing image. Exact snippets: <a href="../storefront/#custom-themes">storefront.md</a>. The plugins detect the <code>ol-stack</code> marker and never render twice.</p>
+<h2 id="hyva-15-verified-on-default-theme-152-2026-10-11">Hyvä 1.5 (verified on default theme 1.5.2, 2026-10-11)<a class="headerlink" href="#hyva-15-verified-on-default-theme-152-2026-10-11" title="Permanent link">&para;</a></h2>
+<p>Hyvä 1.5 rebuilt the product gallery as a snap slider:</p>
+<ul>
+<li><code>#gallery</code> (a <code>&lt;section&gt;</code>, a grid column of the product page) → <code>div.relative</code> (positioned wrapper with the
+  navigation buttons and the <code>gallery.additional</code> container) → <code>#gallery-main[data-track]</code>, the horizontally
+  scrolling track with one slide per image.</li>
+<li><strong>Slot:</strong> <code>Plugin\GalleryPlugin</code> recognises the track by <code>data-track</code> and inserts the label stacks right before
+  it, inside the positioned wrapper. Labels stay on the visible image while the shopper swipes; inside the track
+  they would scroll away with the first slide.</li>
+<li><strong>Container-query root:</strong> <code>#gallery</code> (only when it holds labels, <code>:has</code>). Containment must not go on the track
+  or the wrapper: the wrapper is a shrink-to-fit flex item on desktop, and inline-size containment collapses the
+  whole gallery to zero width (found by the 1.5 end-to-end leg). On 1.3/1.4 the root stays <code>#gallery-main</code>.</li>
+<li>Listings are unchanged in 1.5: the image link of the product card is the slot, the card is the root.</li>
+<li>Swatch selection still dispatches <code>configurable-selection-changed</code>; the swatches are a <code>&lt;fieldset&gt;</code> with a
+  legend instead of a <code>radiogroup</code>.</li>
+</ul>
               
             </div>
           </div><footer>
