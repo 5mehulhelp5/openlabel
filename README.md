@@ -55,7 +55,7 @@ The live preview follows every change. Details: [docs/admin.md](docs/admin.md).
 |---|---|
 | Magento Open Source, Mage-OS, Adobe Commerce | 2.4.7, 2.4.8, 2.4.9 |
 | PHP | 8.2, 8.3, 8.4 |
-| Hyvä default theme | 1.4.x (tested on every change), 1.5.x (tested nightly), 1.3.x (best effort, not tested in CI) |
+| Hyvä default theme | 1.4.x (tested on every change); 1.3.x best effort (not tested in CI); 1.5.x: listings work, product-page labels not yet (Hyvä 1.5 rebuilt the gallery; tracked nightly) |
 | MSI | optional: stock conditions use the website's MSI stock when present, legacy stock otherwise |
 
 Other themes: the core package (`iranimij/openlabel`) works with any theme through two documented calls; see
