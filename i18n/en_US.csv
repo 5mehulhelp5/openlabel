@@ -294,3 +294,4 @@
 "The label was saved, but its products could not be matched: %1 Details are in var/log/openlabel.log.","The label was saved, but its products could not be matched: %1 Details are in var/log/openlabel.log."
 "Invalid field","Invalid field"
 "Unknown condition operator","Unknown condition operator"
+"Click an underlined word to change it: ""is"" for the comparison (greater than, less than, is one of…), ""..."" for the value, ""ALL"" and ""TRUE"" for how conditions combine.","Click an underlined word to change it: ""is"" for the comparison (greater than, less than, is one of…), ""..."" for the value, ""ALL"" and ""TRUE"" for how conditions combine."

@@ -450,3 +450,17 @@ body:has(.ol-preview:not(.ol-preview--collapsed)) #anchor-content {
     color: #555;
     margin: 2rem 0 0;
 }
+
+// Rule tree: the operator ("is"), value ("...") and aggregator ("ALL", "TRUE") are links in Magento's tree but look
+// like plain text; show them as links so merchants find the comparisons (greater than, less than, is one of…).
+.ol-rule-tree .rule-param > a.label {
+    border-bottom: 1px dotted currentColor;
+    color: #007bdb;
+    text-decoration: none;
+
+    &:hover,
+    &:focus {
+        border-bottom-style: solid;
+        color: #006bb4;
+    }
+}
