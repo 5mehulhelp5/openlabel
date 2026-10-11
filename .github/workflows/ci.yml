@@ -169,10 +169,17 @@ jobs:
           magento_version: ${{ matrix.magento }}
           magento_pre_install_script: .github/ci/pre-install.sh
 
+  docs:
+    name: Docs (mkdocs --strict)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: pipx run --spec "mkdocs==1.6.1" mkdocs build --strict
+
   ci-ok:
     name: ci-ok
     if: always()
-    needs: [phpcs, phpstan, unit, integration, coverage]
+    needs: [phpcs, phpstan, unit, integration, coverage, docs]
     runs-on: ubuntu-latest
     steps:
       - name: Fail if any job failed or was skipped

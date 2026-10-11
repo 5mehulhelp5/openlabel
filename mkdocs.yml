@@ -1,0 +1,26 @@
+site_name: OpenLabel
+site_description: Product labels for Magento 2 and Hyvä. Free, MIT, Hyvä-native.
+site_url: https://iranimij.github.io/openlabel/
+repo_url: https://github.com/iranimij/openlabel
+edit_uri: edit/main/docs/
+docs_dir: docs
+strict: true
+exclude_docs: |
+  tracker-entry.md
+nav:
+  - Home: index.md
+  - Install and upgrade: install.md
+  - Admin: admin.md
+  - Storefront: storefront.md
+  - CLI: cli.md
+  - GraphQL: graphql.md
+  - Export and import: import-export.md
+  - Developers:
+      - The engine: engine.md
+      - Hyvä integration: hyva-integration.md
+theme:
+  name: readthedocs
+markdown_extensions:
+  - tables
+  - toc:
+      permalink: true

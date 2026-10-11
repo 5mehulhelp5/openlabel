@@ -1,0 +1,23 @@
+name: Docs site
+
+# Publishes docs/ to GitHub Pages (gh-pages branch) for every release tag, and on demand.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    name: mkdocs gh-deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          pipx run --spec "mkdocs==1.6.1" mkdocs gh-deploy --strict --force --message "docs: site for ${GITHUB_REF_NAME}"
