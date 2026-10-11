@@ -67,3 +67,20 @@ Absolutely positioned elements on the card (FE5): only the swatch radio inputs (
 ## 5. Custom theme fallback
 
 Themes that override `product/list/image.phtml` with another template name or rename `#gallery-main` render the labels themselves: one `getChildHtml('openlabel.product.labels')` call in the gallery, one `LabelRenderer::getStacksHtml()` call in the listing image. Exact snippets: [storefront.md](storefront.md#custom-themes). The plugins detect the `ol-stack` marker and never render twice.
+
+## Hyvä 1.5 (verified on default theme 1.5.2, 2026-10-11)
+
+Hyvä 1.5 rebuilt the product gallery as a snap slider:
+
+- `#gallery` (a `<section>`, a grid column of the product page) → `div.relative` (positioned wrapper with the
+  navigation buttons and the `gallery.additional` container) → `#gallery-main[data-track]`, the horizontally
+  scrolling track with one slide per image.
+- **Slot:** `Plugin\GalleryPlugin` recognises the track by `data-track` and inserts the label stacks right before
+  it, inside the positioned wrapper. Labels stay on the visible image while the shopper swipes; inside the track
+  they would scroll away with the first slide.
+- **Container-query root:** `#gallery` (only when it holds labels, `:has`). Containment must not go on the track
+  or the wrapper: the wrapper is a shrink-to-fit flex item on desktop, and inline-size containment collapses the
+  whole gallery to zero width (found by the 1.5 end-to-end leg). On 1.3/1.4 the root stays `#gallery-main`.
+- Listings are unchanged in 1.5: the image link of the product card is the slot, the card is the root.
+- Swatch selection still dispatches `configurable-selection-changed`; the swatches are a `<fieldset>` with a
+  legend instead of a `radiogroup`.
