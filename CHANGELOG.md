@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## [Unreleased]
 
+### Fixed
+- GraphQL `openlabel_labels`: price variables (`{SAVE_PERCENT}`, `{SAVE_AMOUNT}`, `{PRICE}`, `{SPECIAL_PRICE}`, `{FINAL_PRICE}`, `{SPECIAL_ENDS_IN}`, `{SPECIAL_END_DATE}`) rendered empty in `products` queries that did not ask for prices ("Sale -%"); asking for `openlabel_labels` now loads the price attributes.
+
 ## [1.0.0-rc1] - 2026-10-11
 
 First release candidate of OpenLabel 1.0: engine (M1), admin (M2), Hyvä render (M3), GraphQL, export/import, Smile importer and documentation (M4). Everything in `Api/` follows semantic versioning from 1.0.0. Supported: Magento 2.4.7–2.4.9, PHP 8.2–8.4, Hyvä 1.4 (1.3 best effort; on 1.5 listings work, product-page labels not yet).

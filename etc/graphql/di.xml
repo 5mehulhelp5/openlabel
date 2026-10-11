@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Iman Aboheydary. All rights reserved.
+ * See LICENSE for license details (MIT).
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- GraphQL product collections load only the attributes a query asks for: asking for openlabel_labels loads
+         what the price variables read ({SAVE_PERCENT}, {SAVE_AMOUNT}, {PRICE}, {SPECIAL_PRICE}, {FINAL_PRICE},
+         {SPECIAL_ENDS_IN}, {SPECIAL_END_DATE}). -->
+    <type name="Magento\CatalogGraphQl\Model\Resolver\Products\DataProvider\Product\CollectionProcessor\AttributeProcessor">
+        <arguments>
+            <argument name="fieldToAttributeMap" xsi:type="array">
+                <item name="openlabel_labels" xsi:type="array">
+                    <item name="price" xsi:type="string">price</item>
+                    <item name="special_price" xsi:type="string">special_price</item>
+                    <item name="special_from_date" xsi:type="string">special_from_date</item>
+                    <item name="special_to_date" xsi:type="string">special_to_date</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+</config>
