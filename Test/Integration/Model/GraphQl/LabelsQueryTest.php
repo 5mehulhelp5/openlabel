@@ -18,6 +18,7 @@ use Iranimij\OpenLabel\Test\Fixture\Label as LabelFixture;
 use Iranimij\OpenLabel\Test\Fixture\ScheduledSearchIndex;
 use Iranimij\OpenLabel\Test\Integration\Helper\QueryCounter;
 use Laminas\Http\Headers;
+use Magento\Authorization\Model\CompositeUserContext;
 use Magento\Authorization\Model\UserContextInterface;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
@@ -25,6 +26,7 @@ use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
 use Magento\Catalog\Test\Fixture\Product as ProductFixture;
 use Magento\ConfigurableProduct\Test\Fixture\Attribute as AttributeFixture;
 use Magento\ConfigurableProduct\Test\Fixture\Product as ConfigurableFixture;
+use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Customer\Test\Fixture\Customer as CustomerFixture;
 use Magento\Framework\App\Area;
 use Magento\Framework\App\Request\Http as HttpRequest;
@@ -179,6 +181,7 @@ class LabelsQueryTest extends TestCase
         $this->label(implode(', ', $skus));
         $products = $om->create(ProductCollection::class)->addAttributeToSelect('*')->addAttributeToFilter('sku', ['in' => $skus]);
         $requests = array_map(fn (ProductInterface $product): BatchRequestItemInterface => $this->batchItem($product), array_values($products->getItems()));
+        $this->forgetUser();
         $context = $om->get(ContextFactory::class)->create();
         $field = $om->create(Field::class, ['name' => 'openlabel_labels', 'type' => 'OpenLabelLabel', 'required' => true, 'isList' => true]);
 
@@ -195,6 +198,19 @@ class LabelsQueryTest extends TestCase
         }
         $indexQueries = array_filter($counter->last, static fn (string $sql): bool => str_contains($sql, 'openlabel_index'));
         self::assertCount(1, $indexQueries, implode("\n", $indexQueries));
+    }
+
+    /**
+     * Who is asking is cached per process (user contexts, the customer session, the GraphQL context): forget the
+     * previous request's customer, whose fixture may already be deleted.
+     */
+    private function forgetUser(): void
+    {
+        $om = Bootstrap::getObjectManager();
+        foreach ([UserContextInterface::class, CompositeUserContext::class, TokenUserContext::class, ContextFactory::class] as $class) {
+            $om->removeSharedInstance($class);
+        }
+        $om->get(CustomerSession::class)->setCustomerId(null);
     }
 
     private function batchItem(ProductInterface $product): BatchRequestItemInterface
@@ -281,9 +297,7 @@ class LabelsQueryTest extends TestCase
         $om->removeSharedInstance(WebapiRequest::class);
         $om->removeSharedInstance(GraphQl::class);
         $om->removeSharedInstance(HttpResponse::class);
-        // Who is asking is cached per process: forget the previous request's customer.
-        $om->removeSharedInstance(UserContextInterface::class);
-        $om->removeSharedInstance(TokenUserContext::class);
+        $this->forgetUser();
         /** @var HttpRequest $request */
         $request = $om->get(HttpRequest::class);
         $request->setPathInfo('/graphql');
