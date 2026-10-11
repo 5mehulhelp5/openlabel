@@ -20,6 +20,7 @@ class Validator
     private const MAX_LABELS_RANGE = [1, 10];
     private const GAP_RANGE = [0, 64];
     private const OFFSET_RANGE = [-200, 200];
+    private const CLICK_URL_MAX = 1024;
 
     /**
      * @param LabelInterface $label
@@ -41,6 +42,9 @@ class Validator
         $to = $label->getValidTo();
         if ($from !== null && $to !== null && strtotime($to) <= strtotime($from)) {
             $errors[] = __('The end date must be after the start date.');
+        }
+        if (!$this->isSafeClickUrl($label->getClickUrl())) {
+            $errors[] = __('Enter a link that starts with https://, http:// or /.');
         }
         foreach ($label->getPlacements() as $placement) {
             $errors = array_merge($errors, $this->validatePlacement($placement));
@@ -79,6 +83,24 @@ class Validator
         }
 
         return $errors;
+    }
+
+    /**
+     * Only web links and same-shop paths: no javascript:, data: or protocol-relative "//host" links.
+     *
+     * @param string|null $url
+     * @return bool
+     */
+    private function isSafeClickUrl(?string $url): bool
+    {
+        if ($url === null) {
+            return true;
+        }
+        if (strlen($url) > self::CLICK_URL_MAX) {
+            return false;
+        }
+
+        return (bool) preg_match('#^(?:https?://[^\s/]+(?:/\S*)?|/(?!/)\S*)$#i', $url);
     }
 
     /**

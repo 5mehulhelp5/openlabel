@@ -130,6 +130,9 @@ class Exporter
             'height' => $design->getHeight(),
             'opacity' => $design->getOpacity(),
             'rotation' => $design->getRotation(),
+            'animation' => $design->getAnimation(),
+            'hover_effect' => $design->getHoverEffect(),
+            'sizes' => $design->getSizes(),
             'custom_css' => $design->getCustomCss(),
             'store_texts' => $texts,
             'image' => $this->image($design),
@@ -184,6 +187,9 @@ class Exporter
             'design' => $keys[(int) $label->getDesignId()],
             'apply_to_parent' => $label->isApplyToParent(),
             'hide_lower_priority' => $label->isHideLowerPriority(),
+            'hide_on_zero_variable' => $label->isHideOnZeroVariable(),
+            'click_url' => $label->getClickUrl(),
+            'click_nofollow' => $label->isClickNofollow(),
             'placements' => array_map(
                 static fn (PlacementInterface $placement): array => [
                     'area' => $placement->getArea(),

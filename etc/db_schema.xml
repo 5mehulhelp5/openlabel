@@ -27,6 +27,9 @@
         <column xsi:type="smallint" name="rotation" unsigned="false" nullable="false" default="0" comment="Rotation (degrees)"/>
         <column xsi:type="text" name="custom_css" nullable="true" comment="Sanitized custom CSS"/>
         <column xsi:type="boolean" name="is_system" nullable="false" default="false" comment="Built-in design"/>
+        <column xsi:type="varchar" name="animation" nullable="false" length="16" default="none" comment="Entry animation: none|fade|pop"/>
+        <column xsi:type="varchar" name="hover_effect" nullable="false" length="16" default="none" comment="Hover effect: none|grow|lift"/>
+        <column xsi:type="text" name="sizes" nullable="true" comment="Per-breakpoint size overrides (JSON: sm|md|lg => width, font_size)"/>
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created at"/>
         <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP" comment="Updated at"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
@@ -64,6 +67,9 @@
         <column xsi:type="int" name="design_id" unsigned="true" nullable="false" comment="Default design"/>
         <column xsi:type="boolean" name="apply_to_parent" nullable="false" default="false" comment="Write parent row when any child matches"/>
         <column xsi:type="boolean" name="hide_lower_priority" nullable="false" default="false" comment="Suppress labels with a higher priority number"/>
+        <column xsi:type="boolean" name="hide_on_zero_variable" nullable="false" default="false" comment="Hide when a variable in the text is zero or empty"/>
+        <column xsi:type="varchar" name="click_url" nullable="true" length="1024" comment="Click-through link (https://, http:// or /path)"/>
+        <column xsi:type="boolean" name="click_nofollow" nullable="false" default="false" comment="Add rel=nofollow to the click-through link"/>
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created at"/>
         <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP" comment="Updated at"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
@@ -119,7 +125,8 @@
             <column name="product_id"/>
         </index>
     </table>
-    <table name="openlabel_index_replica" resource="default" engine="innodb" comment="OpenLabel index replica (full reindex swap)">
+    <!-- Same comment as openlabel_index: the full reindex swaps the two tables by renaming them. -->
+    <table name="openlabel_index_replica" resource="default" engine="innodb" comment="OpenLabel index: which label applies to which product">
         <column xsi:type="int" name="label_id" unsigned="true" nullable="false" comment="Label ID"/>
         <column xsi:type="int" name="product_id" unsigned="true" nullable="false" comment="Product ID"/>
         <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false" comment="Store view ID"/>

@@ -21,7 +21,10 @@
             "custom_css": true,
             "is_system": true,
             "created_at": true,
-            "updated_at": true
+            "updated_at": true,
+            "animation": true,
+            "hover_effect": true,
+            "sizes": true
         },
         "index": {
             "OPENLABEL_DESIGN_IS_SYSTEM": true
@@ -59,7 +62,10 @@
             "apply_to_parent": true,
             "hide_lower_priority": true,
             "created_at": true,
-            "updated_at": true
+            "updated_at": true,
+            "hide_on_zero_variable": true,
+            "click_url": true,
+            "click_nofollow": true
         },
         "index": {
             "OPENLABEL_LABEL_STATUS": true

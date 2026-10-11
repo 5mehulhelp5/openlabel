@@ -355,6 +355,78 @@ class Design extends AbstractModel implements DesignInterface, IdentityInterface
     /**
      * @inheritDoc
      */
+    public function getAnimation(): string
+    {
+        $value = (string) $this->getData(self::ANIMATION);
+
+        return $value === '' ? self::ANIMATION_NONE : $value;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setAnimation(string $animation): DesignInterface
+    {
+        return $this->setData(self::ANIMATION, $animation);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getHoverEffect(): string
+    {
+        $value = (string) $this->getData(self::HOVER_EFFECT);
+
+        return $value === '' ? self::HOVER_EFFECT_NONE : $value;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setHoverEffect(string $effect): DesignInterface
+    {
+        return $this->setData(self::HOVER_EFFECT, $effect);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSizes(): array
+    {
+        $raw = $this->getData(self::SIZES);
+        $decoded = is_string($raw) && $raw !== '' ? json_decode($raw, true) : null;
+        if (!is_array($decoded)) {
+            return [];
+        }
+        $sizes = [];
+        foreach ($decoded as $breakpoint => $values) {
+            if (is_array($values)) {
+                $sizes[(string) $breakpoint] = array_map('intval', $values);
+            }
+        }
+
+        return $sizes;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setSizes(array $sizes): DesignInterface
+    {
+        $clean = [];
+        foreach ($sizes as $breakpoint => $values) {
+            $values = array_filter((array) $values, static fn ($value): bool => $value !== null && $value !== '');
+            if ($values !== []) {
+                $clean[(string) $breakpoint] = array_map('intval', $values);
+            }
+        }
+
+        return $this->setData(self::SIZES, $clean === [] ? null : (string) json_encode($clean));
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getCreatedAt(): ?string
     {
         return $this->nullableString(self::CREATED_AT);

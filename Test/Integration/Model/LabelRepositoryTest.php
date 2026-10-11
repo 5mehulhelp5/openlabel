@@ -50,7 +50,8 @@ class LabelRepositoryTest extends TestCase
             ->setStoreIds([1])->setCustomerGroupIds([0, 1])
             ->setValidFrom('2026-11-20 00:00:00')->setValidTo('2026-11-30 23:59:59')
             ->setApplyToParent(true)->setHideLowerPriority(true)
-            ->setConditionsSerialized('{"type":"x"}');
+            ->setConditionsSerialized('{"type":"x"}')
+            ->setHideOnZeroVariable(true)->setClickUrl('https://shop.test/sale')->setClickNofollow(true);
         $label->setPlacements([
             $this->placement(['area' => 'product', 'position' => 'br', 'max_labels' => 2, 'gap' => 8]),
             $this->placement(['area' => 'listing', 'position' => 'tl', 'design_id' => $designId, 'offset_x' => -4]),
@@ -66,6 +67,9 @@ class LabelRepositoryTest extends TestCase
         self::assertTrue($loaded->isApplyToParent());
         self::assertTrue($loaded->isHideLowerPriority());
         self::assertSame('{"type":"x"}', $loaded->getConditionsSerialized());
+        self::assertTrue($loaded->isHideOnZeroVariable());
+        self::assertSame('https://shop.test/sale', $loaded->getClickUrl());
+        self::assertTrue($loaded->isClickNofollow());
         $placements = $loaded->getPlacements();
         self::assertCount(2, $placements);
         self::assertSame(['product', 'listing'], array_map(static fn (PlacementInterface $p) => $p->getArea(), $placements));

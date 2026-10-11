@@ -77,6 +77,9 @@ class ImportExportTest extends TestCase
             'valid_from' => '2026-01-01 00:00:00',
             'valid_to' => '2036-01-01 00:00:00',
             'apply_to_parent' => true,
+            'hide_on_zero_variable' => true,
+            'click_url' => '/sale.html',
+            'click_nofollow' => true,
             'placements' => [
                 ['area' => 'listing', 'position' => 'tr', 'offset_x' => 4, 'gap' => 6, 'max_labels' => 2, 'stacking' => 'horizontal'],
                 ['area' => 'product', 'position' => 'bl', 'design_id' => (int) $image->getDesignId(), 'pin_physical_side' => true],
@@ -88,7 +91,16 @@ class ImportExportTest extends TestCase
             'ol-ie New' => $this->indexRows((int) $new->getLabelId()),
         ];
         $exported = $this->exporter()->export([(int) $sale->getLabelId(), (int) $new->getLabelId()]);
+        self::assertSame(2, $exported['version']);
         self::assertCount(3, $exported['designs'], 'text, image and the built-in design');
+        self::assertSame(
+            ['animation' => 'fade', 'hover_effect' => 'lift', 'sizes' => ['sm' => ['width' => 24, 'font_size' => 11]]],
+            array_intersect_key($exported['designs'][0], array_flip(['animation', 'hover_effect', 'sizes']))
+        );
+        self::assertSame(
+            ['hide_on_zero_variable' => true, 'click_url' => '/sale.html', 'click_nofollow' => true],
+            array_intersect_key($exported['labels'][0], array_flip(['hide_on_zero_variable', 'click_url', 'click_nofollow']))
+        );
         self::assertContains(['key' => 'system:' . $system, 'name' => $system, 'is_system' => true], $exported['designs']);
 
         $this->tearDown();
@@ -106,6 +118,31 @@ class ImportExportTest extends TestCase
         }
         self::assertSame($before, $after);
         self::assertNotEmpty($after['ol-ie Sale']);
+    }
+
+    public function testVersionOneFileImportsWithOneDotOneDefaults(): void
+    {
+        $label = $this->label('ol-ie Old', 'ol-ie-a', (int) $this->textDesign()->getDesignId());
+        $file = $this->roundTrip($this->exporter()->export([(int) $label->getLabelId()]));
+        $this->tearDown();
+        $file['version'] = 1;
+        foreach (['animation', 'hover_effect', 'sizes'] as $key) {
+            unset($file['designs'][0][$key]);
+        }
+        foreach (['hide_on_zero_variable', 'click_url', 'click_nofollow'] as $key) {
+            unset($file['labels'][0][$key]);
+        }
+
+        $result = $this->importer()->import($file);
+
+        self::assertSame([], $result->errors);
+        $om = Bootstrap::getObjectManager();
+        $imported = $om->get(\Iranimij\OpenLabel\Api\LabelRepositoryInterface::class)->getById($result->labelIds[0]);
+        self::assertFalse($imported->isHideOnZeroVariable());
+        self::assertNull($imported->getClickUrl());
+        self::assertFalse($imported->isClickNofollow());
+        $design = $om->get(DesignRepositoryInterface::class)->getById((int) $imported->getDesignId());
+        self::assertSame(['none', 'none', []], [$design->getAnimation(), $design->getHoverEffect(), $design->getSizes()]);
     }
 
     public function testDryRunWritesNothing(): void
@@ -241,7 +278,8 @@ class ImportExportTest extends TestCase
         $om = Bootstrap::getObjectManager();
         $design = $om->get(DesignInterfaceFactory::class)->create();
         $design->setName('ol-ie Text')->setType('text')->setShape('pill')->setBgColor('#e11d48')->setTextColor('#ffffff')
-            ->setSizeMode('percent')->setWidth(18)->setFontSize(14)->setOpacity(100)->setCustomCss('.ol-d-1{letter-spacing:1px}');
+            ->setSizeMode('percent')->setWidth(18)->setFontSize(14)->setOpacity(100)->setCustomCss('.ol-d-1{letter-spacing:1px}')
+            ->setAnimation('fade')->setHoverEffect('lift')->setSizes(['sm' => ['width' => 24, 'font_size' => 11]]);
         $design->setText('Sale -{SAVE_PERCENT}%');
         if ($storeId !== null) {
             $design->setText('Angebot', $storeId);

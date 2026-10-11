@@ -207,6 +207,26 @@ class ProductIndexerTest extends TestCase
         self::assertTrue($connection->isTableExists($this->resource->getTableName('openlabel_index_replica')));
     }
 
+    public function testTheSwapLeavesTheDeclaredSchemaUpToDate(): void
+    {
+        $this->label('Sale', [$this->builtIn(OnSale::class, 'on_sale', '==', '1')]);
+
+        $this->indexer->executeFull();
+        $this->indexer->executeFull();
+
+        $connection = $this->resource->getConnection();
+        $comment = static fn (string $table): string => (string) $connection->fetchOne(
+            'SELECT TABLE_COMMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?',
+            [$table]
+        );
+        $expected = 'OpenLabel index: which label applies to which product';
+        self::assertSame(
+            [$expected, $expected],
+            [$comment($this->resource->getTableName('openlabel_index')), $comment($this->resource->getTableName('openlabel_index_replica'))],
+            'renaming swaps the comments, so both tables carry the same one or setup:db:status reports a diff'
+        );
+    }
+
     public function testFullReindexCleansOnlyChangedProducts(): void
     {
         $label = $this->label('Sale', [$this->builtIn(OnSale::class, 'on_sale', '==', '1')]);
