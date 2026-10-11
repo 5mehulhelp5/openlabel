@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 - Admin live preview: the sample image box is reserved up front, so the preview card (and the labels, sized relative to it) no longer collapses while the image is being laid out after "Preview as" or a design change.
 
 ### Added
+- Matched products explain an empty label ("Why no products?"): the label-level reasons (switched off, not in the default store view, not started, ended) and every condition on its own with its product count, conditions that match nothing alone in red; when each matches but none together, a hint about contradicting conditions (e.g. on sale and out of stock).
 - "Show when" advanced conditions: the clickable parts of the rule tree ("is" for the comparison, "..." for the value, "ALL" / "TRUE") look like links, with a one-line hint; numeric conditions offer is, is not, greater/less (or equal) and is (not) one of there.
 - Logging channel `openlabel` (`var/log/openlabel.log`): indexing errors after a save (with the label and its conditions) and failed imports. The admin shows "The label was saved, but its products could not be matched: …" and keeps the label open instead of Magento's error page.
 

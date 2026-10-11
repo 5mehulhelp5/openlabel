@@ -80,6 +80,27 @@ class MatchedProductsTest extends AbstractBackendController
         self::assertStringContainsString('Use for Promo Rule Conditions', $html);
     }
 
+    #[DataFixture(ScheduledSearchIndex::class)]
+    #[DataFixture(ProductFixture::class, ['sku' => 'ol-matched-why'], 'product')]
+    #[DataFixture(DesignFixture::class, [], 'design')]
+    #[DataFixture(LabelFixture::class, [
+        'design_id' => '$design.design_id$',
+        'status' => 0,
+        'conditions_serialized' => '{"type":"Iranimij\\\\OpenLabel\\\\Model\\\\Rule\\\\Condition\\\\Combine","aggregator":"all","value":"1","conditions":[{"type":"Iranimij\\\\OpenLabel\\\\Model\\\\Rule\\\\Condition\\\\Product","attribute":"sku","operator":"==","value":"ol-matched-why"},{"type":"Iranimij\\\\OpenLabel\\\\Model\\\\Rule\\\\Condition\\\\Product","attribute":"sku","operator":"==","value":"ol-matched-nothing"}]}',
+    ], 'label')]
+    public function testNoMatchShowsWhyPerCondition(): void
+    {
+        $labelId = (int) DataFixtureStorageManager::getStorage()->get('label')->getLabelId();
+        $this->replaceIndex($labelId, []);
+
+        $html = $this->section($labelId);
+
+        self::assertStringContainsString('Why no products?', $html);
+        self::assertStringContainsString('The label is switched off.', $html);
+        self::assertMatchesRegularExpression('#SKU is ol-matched-why</span>\s*<span class="ol-matched__condition-count">\s*1 products#', $html);
+        self::assertMatchesRegularExpression('#SKU is ol-matched-nothing</span>\s*<span class="ol-matched__condition-count">\s*no products: this alone rules everything out#', $html);
+    }
+
     public function testNewLabelAsksToSaveFirst(): void
     {
         self::assertStringContainsString('Save the label to see which products match.', $this->section(0));
