@@ -4,7 +4,35 @@ Fine-grained checkpoint for the OpenLabel build. Updated with every merged PR. T
 
 ## Current milestone
 
-M4 · API, import/export, release: **done** (2026-10-11), released as `v1.0.0` on openlabel, openlabel-hyva and openlabel-hyva-bundle. Recorded real-person tests waived by Iman for now ("no need for human test for now"). M3 · Hyvä render done 2026-10-11 (Hyvä 1.3 leg: best effort, see decisions). M2 done 2026-10-11, M1 2026-10-10, M0 2026-10-09.
+**M5 · Release 1.1 · Superset: in progress** (started 2026-10-12; plan approved by Iman, recommendations Q1–Q7 applied). Previous: M4 · API, import/export, release: **done** (2026-10-11), released as `v1.0.0` on openlabel, openlabel-hyva and openlabel-hyva-bundle. Recorded real-person tests waived by Iman for now ("no need for human test for now"). M3 · Hyvä render done 2026-10-11 (Hyvä 1.3 leg: best effort, see decisions). M2 done 2026-10-11, M1 2026-10-10, M0 2026-10-09.
+
+## M5 slices
+
+Merged by me when CI is green. Order and scope from the approved plan; Hyvä Checkout skipped (no licence, Iman 2026-10-12).
+
+| # | Slice | State |
+|---|---|---|
+| S1 | 1.1 data: label hide-on-zero / click-through / nofollow, design animation / hover / breakpoint sizes, export format 2; fix: `setup:db:status` diff after full reindex | PR #44, full matrix running |
+| S2 | Conditions: bestseller, most viewed, free shipping eligible | next |
+| S3 | Variables `{CATEGORY_NAME}` `{BRAND}` + hide on zero | |
+| S4 | Design 1.1: breakpoint sizes, animation/hover CSS, global CSS, AVIF + size setting, 30+ system designs | |
+| S5 | 21 positions, near price / add to cart / under name (+ openlabel-hyva) | |
+| S6 | Tooltip, click-through (+ openlabel-hyva) | |
+| S7 | Variant-aware labels, countdown (openlabel-hyva) | |
+| S8 | Cart, mini-cart, wishlist, compare, emails, hide on pages | |
+| S9 | Product edit tab + manual assignment (`openlabel_label_product`) | |
+| S10 | REST CRUD + bulk read, GraphQL mutations | |
+| S11 | Remote storage (S3) | |
+| S12 | Label packs FR/ES/NL/IT | |
+| S13 | Close-out, README matrix, 1.1.0 | |
+
+## M5 decisions
+
+- Q1–Q7 unanswered at approval, recommendations applied: new methods on the existing `Api/Data` interfaces (CHANGELOG notes implementers must add them); 1.1.0 on all three repos (rc first); small Alpine piece for the mini-cart; "recently added to category" moved to 1.2; manual assignment in a new `openlabel_label_product` table; FR/ES/NL/IT by me, "community review wanted"; Amasty/Mirasvit named only in the README comparison.
+- New placement areas and positions join `PlacementInterface::AREAS/POSITIONS` only in the slice that renders them (columns are `varchar(16)` already), so nothing can be saved that does not display.
+- `click_url` is `varchar(1024)` (declarative-schema maximum); only https://, http:// and same-shop paths.
+- Design `sizes` is JSON in a text column (`{"sm": {"width": 24, "font_size": 11}}`), width in the design's size mode.
+- `openlabel_index` and its replica carry the same table comment (the full reindex swaps them by renaming).
 
 ## M4 slices
 
@@ -113,7 +141,7 @@ S1 merged as #12, S2–S10 through #21 (all M2 commits, full matrix green); #13�
 
 ## Exact next step
 
-M4 done; 1.1 is not planned yet (the Roadmap has no M5). Open for Iman: recorded real-person UX tests (M2 ≤ 3 min custom label, M3 VoiceOver) whenever wanted; Hyvä compatibility tracker submission (`docs/tracker-entry.md`); optional operator dropdown on the quick switches.
+M5 S1: wait for the full matrix on PR #44, merge, then S2 (conditions) on `feat/m5-s2-conditions`. (Correction: the Roadmap does define M5 = Release 1.1.) Open for Iman: recorded real-person UX tests (M2 ≤ 3 min custom label, M3 VoiceOver) whenever wanted; Hyvä compatibility tracker submission (`docs/tracker-entry.md`); optional operator dropdown on the quick switches.
 
 ## M1 decisions (also in the Notion build log at close-out)
 
