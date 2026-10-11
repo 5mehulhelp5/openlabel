@@ -64,11 +64,6 @@ On the product page `#gallery-main` is a block with a definite width (`w-full` p
 
 Absolutely positioned elements on the card (FE5): only the swatch radio inputs (`input.absolute.product-option-value-input`, visually under the swatch buttons, below the image) and `sr-only` helpers. Nothing overlaps the image area, so all four corners are free for labels.
 
-## 5. Custom theme fallback (documented in M3)
+## 5. Custom theme fallback
 
-If a theme overrides `product/list/image.phtml` or `product/view/gallery.phtml`:
-
-1. Listing: call the view model once inside your image wrapper (exact snippet in M3 docs).
-2. Product page: add `<?= $block->getChildHtml('openlabel.product.labels') ?>` inside your gallery container, which must be `position: relative`.
-
-The plugins detect the `ol-stack` marker and do not render twice.
+Themes that override `product/list/image.phtml` with another template name or rename `#gallery-main` render the labels themselves: one `getChildHtml('openlabel.product.labels')` call in the gallery, one `LabelRenderer::getStacksHtml()` call in the listing image. Exact snippets: [storefront.md](storefront.md#custom-themes). The plugins detect the `ol-stack` marker and never render twice.
