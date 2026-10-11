@@ -292,3 +292,5 @@
 "The stylesheet could not be written: %1","The stylesheet could not be written: %1"
 "The label could not be saved: %1 Details are in var/log/openlabel.log.","The label could not be saved: %1 Details are in var/log/openlabel.log."
 "The label was saved, but its products could not be matched: %1 Details are in var/log/openlabel.log.","The label was saved, but its products could not be matched: %1 Details are in var/log/openlabel.log."
+"Invalid field","Invalid field"
+"Unknown condition operator","Unknown condition operator"

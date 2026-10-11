@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Iranimij\OpenLabel\Model\Rule;
 
 use Iranimij\OpenLabel\Model\Condition\AbstractBuiltIn;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Rule\Model\Condition\Combine;
 use Magento\Rule\Model\Condition\Sql\Builder;
 
@@ -18,12 +19,25 @@ use Magento\Rule\Model\Condition\Sql\Builder;
  * - When it recurses into a nested condition group, the core implementation starts a new list of tables to join and
  *   drops the ones collected before. OpenLabel keeps its quick switches at the root and the advanced tree as a
  *   nested group, so the switches' joins (price index, stock, reviews) were lost and saving such a label failed.
- * - OpenLabel's built-in conditions get their SQL here, "(guard AND field <operator> value)", so missing data never
- *   matches (whatever the operator) and the result is the same on every Magento version (some wrap numeric fields
- *   in IFNULL(field, 0)). Product attribute conditions keep the core behaviour.
+ * - Every condition gets its SQL here, so it means the same on every Magento version (2.4.7 and 2.4.8 wrap each
+ *   field in IFNULL(field, 0), 2.4.9 does not): missing data never matches, whatever the operator. Built-ins add
+ *   a guard, "(guard AND field <operator> value)"; product attribute conditions keep the core operators.
  */
 class SqlBuilder extends Builder
 {
+    private const NATIVE_OPERATORS = [
+        '==' => '= ?',
+        '!=' => '<> ?',
+        '>=' => '>= ?',
+        '>' => '> ?',
+        '<=' => '<= ?',
+        '<' => '< ?',
+        '{}' => 'IN (?)',
+        '!{}' => 'NOT IN (?)',
+        '()' => 'IN (?)',
+        '!()' => 'NOT IN (?)',
+    ];
+
     private const OPERATORS = [
         '==' => '= ?',
         '!=' => '<> ?',
@@ -44,7 +58,7 @@ class SqlBuilder extends Builder
     protected function _getMappedSqlCondition($condition, $value = '', $isDefaultStoreUsed = true): string // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (!$condition instanceof AbstractBuiltIn) {
-            return (string) parent::_getMappedSqlCondition($condition, (string) $value, (bool) $isDefaultStoreUsed);
+            return $this->nativeCondition($condition, (string) $value);
         }
         $operator = (string) $condition->getOperatorForValidate();
         $bind = $condition->getBindArgumentValue();
@@ -83,5 +97,55 @@ class SqlBuilder extends Builder
         }
 
         return $tables;
+    }
+
+    /**
+     * Product attribute conditions (attribute, category, SKU…) with the core operators, but without the
+     * IFNULL(field, 0) that Magento 2.4.7/2.4.8 put around every field: a product without a value never matches,
+     * so "news from date on or before …" or "weight less than 1" do not pick up products that have no value, on
+     * every version (2.4.9 behaves like this already).
+     *
+     * @param mixed $condition
+     * @param string $prefix " NOT " when the surrounding group is "is FALSE"
+     * @return string
+     * @throws LocalizedException
+     */
+    private function nativeCondition(mixed $condition, string $prefix): string
+    {
+        if ($this->_connection === null) {
+            throw new \LogicException('attachConditionToCollection() sets the connection before conditions are mapped.');
+        }
+        $field = $condition->getMappedSqlField();
+        if (empty($field)) {
+            return $prefix . '(1 = -1)';
+        }
+        if (!$field instanceof \Zend_Db_Expr && preg_match('/[^a-z0-9\-_\.\`]/i', (string) $field) > 0) {
+            throw new LocalizedException(__('Invalid field'));
+        }
+        $operator = (string) $condition->getOperatorForValidate();
+        if (!isset(self::NATIVE_OPERATORS[$operator])) {
+            throw new LocalizedException(__('Unknown condition operator'));
+        }
+        $quotedField = (string) $this->_connection->quoteIdentifier($field);
+        $bind = $condition->getBindArgumentValue();
+        if ($condition->getInputType() === 'string' && in_array($operator, ['{}', '!{}'], true)) {
+            $sql = $this->_connection->quoteInto(
+                $quotedField . ($operator === '{}' ? ' LIKE ?' : ' NOT LIKE ?'),
+                '%' . $bind . '%'
+            );
+        } else {
+            $sql = $this->_connection->quoteInto($quotedField . ' ' . self::NATIVE_OPERATORS[$operator], $bind);
+        }
+        // Multiselect values may be stored comma separated: match each selected option inside them too.
+        $attribute = $condition->getAttributeObject();
+        if ($attribute && $attribute->getFrontendInput() === 'multiselect' && is_array($bind)
+            && in_array($operator, ['()', '{}'], true)
+        ) {
+            foreach ($bind as $item) {
+                $sql .= $this->_connection->quoteInto(' OR (FIND_IN_SET(?, ' . $quotedField . ') > 0)', $item);
+            }
+        }
+
+        return $prefix . '(' . $sql . ')';
     }
 }

@@ -11,6 +11,7 @@ namespace Iranimij\OpenLabel\Test\Unit\Model\Rule;
 use Iranimij\OpenLabel\Model\Condition\AbstractBuiltIn;
 use Iranimij\OpenLabel\Model\Rule\SqlBuilder;
 use Magento\Framework\DB\Adapter\AdapterInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Rule\Model\Condition\Sql\Builder;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Magento\Eav\Api\AttributeRepositoryInterface;
@@ -84,10 +85,89 @@ class SqlBuilderTest extends TestCase
         ];
     }
 
-    private function sql(AbstractBuiltIn $condition, string $prefix): string
+    /**
+     * @dataProvider nativeSql
+     * @param string|string[] $value
+     */
+    #[DataProvider('nativeSql')]
+    public function testNativeConditionsHaveNoIfNull(
+        string $field,
+        string $inputType,
+        string $operator,
+        string|array $value,
+        bool $multiselect,
+        string $prefix,
+        string $expected
+    ): void {
+        self::assertSame($expected, $this->sql($this->native($field, $inputType, $operator, $value, $multiselect), $prefix));
+    }
+
+    /**
+     * @return array<string, array{string, string, string, string|string[], bool, string, string}>
+     */
+    public static function nativeSql(): array
+    {
+        return [
+            'equals' => ['price', 'numeric', '==', '5', false, '', "(`price` = '5')"],
+            'less than' => ['price', 'numeric', '<', '5', false, '', "(`price` < '5')"],
+            'on or before (date)' => ['news_from_date', 'date', '<=', '2020-01-01', false, '', "(`news_from_date` <= '2020-01-01')"],
+            'text contains' => ['sku', 'string', '{}', 'bag', false, '', "(`sku` LIKE '%bag%')"],
+            'text does not contain' => ['sku', 'string', '!{}', 'bag', false, '', "(`sku` NOT LIKE '%bag%')"],
+            'is one of' => ['sku', 'string', '()', ['a', 'b'], false, '', "(`sku` IN ('a', 'b'))"],
+            'multiselect is one of' => ['material', 'multiselect', '()', ['3', '4'], true, '',
+                "(`material` IN ('3', '4') OR (FIND_IN_SET('3', `material`) > 0) OR (FIND_IN_SET('4', `material`) > 0))"],
+            'group is FALSE' => ['price', 'numeric', '==', '5', false, ' NOT ', " NOT (`price` = '5')"],
+            'no field never matches' => ['', 'numeric', '==', '5', false, '', '(1 = -1)'],
+        ];
+    }
+
+    public function testInvalidFieldIsRejected(): void
+    {
+        $this->expectException(LocalizedException::class);
+        $this->sql($this->native('price; DROP', 'numeric', '==', '5', false), '');
+    }
+
+    public function testUnknownOperatorIsRejected(): void
+    {
+        $this->expectException(LocalizedException::class);
+        $this->sql($this->native('price', 'numeric', '<=>', '5', false), '');
+    }
+
+    /**
+     * @param string|string[] $value
+     */
+    private function native(string $field, string $inputType, string $operator, string|array $value, bool $multiselect): AbstractCondition
+    {
+        $condition = new class ($inputType) extends AbstractCondition {
+            public function __construct(private readonly string $type) // phpcs:ignore Magento2.CodeAnalysis.EmptyBlock
+            {
+            }
+
+            /**
+             * @return string
+             */
+            public function getInputType()
+            {
+                return $this->type;
+            }
+        };
+        $attribute = $this->createStub(\Magento\Eav\Model\Entity\Attribute\AbstractAttribute::class);
+        $attribute->method('getFrontendInput')->willReturn($multiselect ? 'multiselect' : 'text');
+        $condition->setData([
+            'attribute' => $field,
+            'operator' => $operator,
+            'value_parsed' => $value,
+            'attribute_object' => $attribute,
+        ]);
+
+        return $condition;
+    }
+
+    private function sql(AbstractCondition $condition, string $prefix): string
     {
         $builder = new SqlBuilder($this->createStub(ExpressionFactory::class), $this->createStub(AttributeRepositoryInterface::class));
         $connection = $this->createStub(AdapterInterface::class);
+        $connection->method('quoteIdentifier')->willReturnCallback(static fn (mixed $f): string => '`' . $f . '`');
         $connection->method('quoteInto')->willReturnCallback(static function (string $text, mixed $value): string {
             $quoted = is_array($value)
                 ? implode(', ', array_map(static fn ($v): string => "'" . $v . "'", $value))

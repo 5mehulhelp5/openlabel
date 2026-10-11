@@ -40,13 +40,17 @@ type (text: contains, is one of…; dates: is, on or after, on or before; catego
 condition is tested with every operator it offers (`Test/Integration/Model/Condition/OperatorMatrixTest`).
 
 **Missing data never matches**, whatever the operator, *is not* included: a product without a price index row
-for price conditions, without a rating for `rating`, without a stock row (and composites) for `salable_qty`.
-A product without reviews has `review_count` 0, so "review count is 0" finds products nobody reviewed yet.
+for price conditions, without a rating for `rating`, without a stock row (and composites) for `salable_qty`, and a
+product without a value for a product attribute condition (e.g. "news from date on or before 2020-01-01" does not
+pick up products without that date). A product without reviews has `review_count` 0, so "review count is 0" finds
+products nobody reviewed yet. This holds on every supported Magento version: 2.4.7 and 2.4.8 would otherwise
+treat missing values as 0.
 
 Matching happens in SQL: the tree is attached to a product collection with `Iranimij\OpenLabel\Model\Rule\SqlBuilder`,
 the core rule builder with two changes. It keeps the joins of every condition when it recurses into nested groups
 (the core one drops those collected before a nested group, which broke quick switches combined with advanced
-conditions). And it writes the SQL of the built-ins itself, so the rules above hold on every Magento version. PHP `validate()` exists
+conditions). And it writes the SQL of every condition itself (the core operators, without the `IFNULL(field, 0)` of 2.4.7 and
+2.4.8), so the rules above hold on every Magento version. PHP `validate()` exists
 on every condition for previews and tests. Custom conditions: extend
 `Iranimij\OpenLabel\Model\Condition\AbstractBuiltIn` and register the class in the
 `Iranimij\OpenLabel\Model\Condition\ConditionPool` `types` argument.

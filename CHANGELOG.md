@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ### Fixed
 - Saving a label that combines a quick switch (on sale, new, stock, rating) with an advanced condition (e.g. a category) failed with "Unknown column ol_price.price": the core rule SQL builder drops the joins it collected before a nested condition group. OpenLabel now uses its own builder subclass for its rules.
-- Built-in conditions behave the same on Magento 2.4.7 to 2.4.9 for every operator: products without the compared data (no price index row, no rating, no stock row) never match, "is not" included; products without reviews count as 0 reviews. Yes/no conditions offer "is" and "is not" only.
+- Conditions behave the same on Magento 2.4.7 to 2.4.9 for every operator: products without the compared data (no price index row, no rating, no stock row, no value for a product attribute) never match, "is not" included; 2.4.7 and 2.4.8 used to treat missing values as 0, so e.g. "news from date on or before …" matched products without that date. Products without reviews count as 0 reviews. Yes/no conditions offer "is" and "is not" only.
 - Admin live preview: the sample image box is reserved up front, so the preview card (and the labels, sized relative to it) no longer collapses while the image is being laid out after "Preview as" or a design change.
 
 ### Added
