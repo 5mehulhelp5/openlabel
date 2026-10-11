@@ -8,7 +8,9 @@ declare(strict_types=1);
 
 namespace Iranimij\OpenLabel\Block\Adminhtml\Label\Edit;
 
+use Iranimij\OpenLabel\Api\LabelRepositoryInterface;
 use Iranimij\OpenLabel\Model\Indexer\IndexReader;
+use Iranimij\OpenLabel\Model\Label\ConditionDiagnosis;
 use Magento\Backend\Block\Template;
 use Magento\Backend\Block\Template\Context;
 use Magento\Catalog\Helper\Image;
@@ -32,6 +34,8 @@ class MatchedProducts extends Template
      * @param IndexReader $indexReader
      * @param CollectionFactory $productCollectionFactory
      * @param Image $imageHelper
+     * @param LabelRepositoryInterface $labelRepository
+     * @param ConditionDiagnosis $conditionDiagnosis
      * @param array<string, mixed> $data
      */
     public function __construct(
@@ -39,6 +43,8 @@ class MatchedProducts extends Template
         private readonly IndexReader $indexReader,
         private readonly CollectionFactory $productCollectionFactory,
         private readonly Image $imageHelper,
+        private readonly LabelRepositoryInterface $labelRepository,
+        private readonly ConditionDiagnosis $conditionDiagnosis,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -105,5 +111,37 @@ class MatchedProducts extends Template
     public function getReindexUrl(): string
     {
         return $this->getUrl('openlabel/label/reindex');
+    }
+
+    /**
+     * Why a saved label matches no products: reasons on the label itself, then each condition on its own.
+     *
+     * @return array{reasons: string[], conditions: array<int, array{text: string, count: int, level: int}>}
+     */
+    public function getDiagnosis(): array
+    {
+        try {
+            $label = $this->labelRepository->getById($this->getLabelId());
+        } catch (\Magento\Framework\Exception\NoSuchEntityException) {
+            return ['reasons' => [], 'conditions' => []];
+        }
+        $storeId = $this->getStoreId();
+        $reasons = [];
+        if ($label->getStatus() !== \Iranimij\OpenLabel\Api\Data\LabelInterface::STATUS_ENABLED) {
+            $reasons[] = (string) __('The label is switched off.');
+        }
+        $stores = $label->getStoreIds();
+        if ($stores !== [] && !in_array(0, $stores, true) && !in_array($storeId, $stores, true)) {
+            $reasons[] = (string) __('The label is not shown in the default store view (see "Who and when").');
+        }
+        $now = gmdate('Y-m-d H:i:s');
+        if ($label->getValidFrom() !== null && $label->getValidFrom() > $now) {
+            $reasons[] = (string) __('The label starts later (see "Who and when").');
+        }
+        if ($label->getValidTo() !== null && $label->getValidTo() < $now) {
+            $reasons[] = (string) __('The label has ended (see "Who and when").');
+        }
+
+        return ['reasons' => $reasons, 'conditions' => $this->conditionDiagnosis->diagnose($label, $storeId)];
     }
 }

@@ -464,3 +464,31 @@ body:has(.ol-preview:not(.ol-preview--collapsed)) #anchor-content {
         color: #006bb4;
     }
 }
+
+// "Why no products?" under Matched products.
+.ol-matched__why {
+    margin-top: 1.5rem;
+}
+
+.ol-matched__conditions {
+    list-style: none;
+    margin: .5rem 0 1rem;
+    padding: 0;
+}
+
+.ol-matched__condition {
+    border-bottom: 1px solid #e3e3e3;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    padding: .5rem 0;
+}
+
+.ol-matched__condition--nested {
+    padding-left: 2rem;
+}
+
+.ol-matched__condition--none .ol-matched__condition-count {
+    color: #e22626;
+    font-weight: 600;
+}

@@ -30,6 +30,38 @@ $labelId = $block->getLabelId();
                 <?= $escaper->escapeHtml(__('No products match yet.')) ?>
                 <?= $escaper->escapeHtml(__('Check that the label is switched on for this store view, that its dates have started, and that attributes used in the conditions have "Use for Promo Rule Conditions" set to Yes. After changing products, press "Reindex now".')) ?>
             </div>
+            <?php $diagnosis = $block->getDiagnosis(); ?>
+            <?php if ($diagnosis['reasons'] !== [] || $diagnosis['conditions'] !== []): ?>
+                <div class="ol-matched__why" data-role="ol-matched-why">
+                    <strong><?= $escaper->escapeHtml(__('Why no products?')) ?></strong>
+                    <?php foreach ($diagnosis['reasons'] as $reason): ?>
+                        <p class="ol-matched__reason"><?= $escaper->escapeHtml($reason) ?></p>
+                    <?php endforeach; ?>
+                    <?php if ($diagnosis['conditions'] !== []): ?>
+                        <p class="ol-matched__note">
+                            <?= $escaper->escapeHtml(__('A product must meet all of these. Each one on its own matches:')) ?>
+                        </p>
+                        <ul class="ol-matched__conditions">
+                            <?php foreach ($diagnosis['conditions'] as $row): ?>
+                                <li class="ol-matched__condition<?= $row['level'] > 0 ? ' ol-matched__condition--nested' : '' ?><?= $row['count'] === 0 ? ' ol-matched__condition--none' : '' ?>"
+                                    data-role="ol-matched-condition">
+                                    <span class="ol-matched__condition-text"><?= $escaper->escapeHtml($row['text']) ?></span>
+                                    <span class="ol-matched__condition-count">
+                                        <?= $row['count'] === 0
+                                            ? $escaper->escapeHtml(__('no products: this alone rules everything out'))
+                                            : $escaper->escapeHtml(__('%1 products', number_format($row['count']))) ?>
+                                    </span>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                        <?php if (min(array_column($diagnosis['conditions'], 'count')) > 0): ?>
+                            <p class="ol-matched__note">
+                                <?= $escaper->escapeHtml(__('Each condition matches products, but no product meets all of them together. For example, out-of-stock products have no price while "Display Out of Stock Products" is off, so they are never "on sale".')) ?>
+                            </p>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
         <?php else: ?>
             <p class="ol-matched__note">
                 <?= $escaper->escapeHtml(__('First %1 products:', min($count, $block::LIMIT))) ?>
