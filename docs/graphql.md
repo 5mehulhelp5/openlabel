@@ -36,6 +36,9 @@ OpenLabel adds one field to `ProductInterface`, so every product type in every p
   parents" on, like the storefront.
 - All products of one query cost one label query (batch resolver), however many products the query returns.
 - With the module disabled for a store view the field returns an empty list.
+- Asking for `openlabel_labels` makes the product query load the price attributes the variables need, so
+  `{SAVE_PERCENT}`, `{PRICE}` and friends match the storefront. `{ATTR:code}` shows a value only when the query
+  also asks for that attribute (the storefront has the same rule: the attribute must be loaded on the page).
 
 ## Caching
 
