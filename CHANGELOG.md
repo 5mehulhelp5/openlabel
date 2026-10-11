@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## [Unreleased]
 
+## [1.0.0-rc2] - 2026-10-11
+
 ### Fixed
 - GraphQL `openlabel_labels`: price variables (`{SAVE_PERCENT}`, `{SAVE_AMOUNT}`, `{PRICE}`, `{SPECIAL_PRICE}`, `{FINAL_PRICE}`, `{SPECIAL_ENDS_IN}`, `{SPECIAL_END_DATE}`) rendered empty in `products` queries that did not ask for prices ("Sale -%"); asking for `openlabel_labels` now loads the price attributes.
 
@@ -44,5 +46,6 @@ First release candidate of OpenLabel 1.0: engine (M1), admin (M2), Hyvä render 
 - `openlabel:reindex` and `openlabel:preview` run in the adminhtml area: right after a cache flush they failed with "Area code is not set" while building a label's condition tree.
 - Label and design changes now also clean the application cache (theme block caches such as Hyvä's one-hour product card cache), not only the page cache; a design save cleans `openlabel_design_<id>` even when only a store text changed. Found by the M3 storefront purge spec.
 
-[Unreleased]: https://github.com/iranimij/openlabel/compare/v1.0.0-rc1...HEAD
+[Unreleased]: https://github.com/iranimij/openlabel/compare/v1.0.0-rc2...HEAD
+[1.0.0-rc2]: https://github.com/iranimij/openlabel/compare/v1.0.0-rc1...v1.0.0-rc2
 [1.0.0-rc1]: https://github.com/iranimij/openlabel/releases/tag/v1.0.0-rc1
