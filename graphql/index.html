@@ -172,6 +172,9 @@
   parents" on, like the storefront.</li>
 <li>All products of one query cost one label query (batch resolver), however many products the query returns.</li>
 <li>With the module disabled for a store view the field returns an empty list.</li>
+<li>Asking for <code>openlabel_labels</code> makes the product query load the price attributes the variables need, so
+  <code>{SAVE_PERCENT}</code>, <code>{PRICE}</code> and friends match the storefront. <code>{ATTR:code}</code> shows a value only when the query
+  also asks for that attribute (the storefront has the same rule: the attribute must be loaded on the page).</li>
 </ul>
 <h2 id="caching">Caching<a class="headerlink" href="#caching" title="Permanent link">&para;</a></h2>
 <p>GET queries are cacheable. Responses carry the tags <code>openlabel_&lt;label_id&gt;</code> and <code>openlabel_design_&lt;design_id&gt;</code>, which
