@@ -249,6 +249,58 @@ class Label extends AbstractModel implements LabelInterface, IdentityInterface
     /**
      * @inheritDoc
      */
+    public function isHideOnZeroVariable(): bool
+    {
+        return (bool) $this->getData(self::HIDE_ON_ZERO_VARIABLE);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setHideOnZeroVariable(bool $hide): LabelInterface
+    {
+        return $this->setData(self::HIDE_ON_ZERO_VARIABLE, $hide);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getClickUrl(): ?string
+    {
+        $url = trim((string) $this->getData(self::CLICK_URL));
+
+        return $url === '' ? null : $url;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setClickUrl(?string $url): LabelInterface
+    {
+        $url = trim((string) $url);
+
+        return $this->setData(self::CLICK_URL, $url === '' ? null : $url);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isClickNofollow(): bool
+    {
+        return (bool) $this->getData(self::CLICK_NOFOLLOW);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setClickNofollow(bool $nofollow): LabelInterface
+    {
+        return $this->setData(self::CLICK_NOFOLLOW, $nofollow);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getCreatedAt(): ?string
     {
         return $this->nullableString(self::CREATED_AT);

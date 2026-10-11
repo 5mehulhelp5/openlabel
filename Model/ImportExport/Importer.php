@@ -177,6 +177,9 @@ class Importer
         $design->setHeight(isset($row['height']) ? (int) $row['height'] : null);
         $design->setOpacity((int) ($row['opacity'] ?? 100));
         $design->setRotation((int) ($row['rotation'] ?? 0));
+        $design->setAnimation((string) ($row['animation'] ?? DesignInterface::ANIMATION_NONE));
+        $design->setHoverEffect((string) ($row['hover_effect'] ?? DesignInterface::HOVER_EFFECT_NONE));
+        $design->setSizes(is_array($row['sizes'] ?? null) ? $row['sizes'] : []);
         $design->setIsSystem(false);
         $design->setCustomCss($this->cssSanitizer->sanitize(isset($row['custom_css']) ? (string) $row['custom_css'] : null));
         $texts = [];
@@ -280,6 +283,9 @@ class Importer
         $label->setValidTo(isset($row['valid_to']) ? (string) $row['valid_to'] : null);
         $label->setApplyToParent((bool) ($row['apply_to_parent'] ?? false));
         $label->setHideLowerPriority((bool) ($row['hide_lower_priority'] ?? false));
+        $label->setHideOnZeroVariable((bool) ($row['hide_on_zero_variable'] ?? false));
+        $label->setClickUrl(isset($row['click_url']) ? (string) $row['click_url'] : null);
+        $label->setClickNofollow((bool) ($row['click_nofollow'] ?? false));
         $conditions = is_array($row['conditions'] ?? null) ? $row['conditions'] : [];
         foreach ($this->conditionGuard->errors($conditions) as $error) {
             $errors[] = sprintf('%s: %s', $where, $error);

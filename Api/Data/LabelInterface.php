@@ -27,6 +27,9 @@ interface LabelInterface
     public const DESIGN_ID = 'design_id';
     public const APPLY_TO_PARENT = 'apply_to_parent';
     public const HIDE_LOWER_PRIORITY = 'hide_lower_priority';
+    public const HIDE_ON_ZERO_VARIABLE = 'hide_on_zero_variable';
+    public const CLICK_URL = 'click_url';
+    public const CLICK_NOFOLLOW = 'click_nofollow';
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
     public const PLACEMENTS = 'placements';
@@ -165,6 +168,45 @@ interface LabelInterface
      * @return $this
      */
     public function setHideLowerPriority(bool $hideLowerPriority): self;
+
+    /**
+     * Whether the label is hidden on a product where a variable in its text is zero or empty (since 1.1).
+     *
+     * @return bool
+     */
+    public function isHideOnZeroVariable(): bool;
+
+    /**
+     * @param bool $hide
+     * @return $this
+     */
+    public function setHideOnZeroVariable(bool $hide): self;
+
+    /**
+     * Click-through link: https://, http:// or a path starting with "/" (since 1.1).
+     *
+     * @return string|null null = the label is not a link
+     */
+    public function getClickUrl(): ?string;
+
+    /**
+     * @param string|null $url blank = no link
+     * @return $this
+     */
+    public function setClickUrl(?string $url): self;
+
+    /**
+     * Whether the click-through link carries rel="nofollow" (since 1.1).
+     *
+     * @return bool
+     */
+    public function isClickNofollow(): bool;
+
+    /**
+     * @param bool $nofollow
+     * @return $this
+     */
+    public function setClickNofollow(bool $nofollow): self;
 
     /**
      * @return string|null

@@ -14,12 +14,16 @@ bin/magento openlabel:import var/openlabel.json --replace  # update labels and d
 
 ## What the file contains
 
-One JSON document: `{"format": "openlabel", "version": 1, "designs": [...], "labels": [...]}`.
+One JSON document: `{"format": "openlabel", "version": 2, "designs": [...], "labels": [...]}`.
 
 - **Labels:** name, status, priority, schedule (UTC), condition tree, apply to parents, hide lower priority,
-  and the placements with their per-area design.
-- **Designs:** every design the exported labels use, with all store-view texts and the custom CSS. Image designs
-  carry the image file (base64), so the file is self-contained.
+  hide when a variable is zero, click-through link and its nofollow flag, and the placements with their per-area
+  design.
+- **Designs:** every design the exported labels use, with all store-view texts, the custom CSS, the entry
+  animation, the hover effect and the per-breakpoint sizes. Image designs carry the image file (base64), so the
+  file is self-contained.
+- **Versions:** OpenLabel 1.1 writes version 2 and still reads version 1 files from OpenLabel 1.0; the fields
+  added in 1.1 then take their defaults (no animation, no link, no size overrides).
 - **Built-in designs** are referenced by name (`system:<name>`) and are never copied: the importing shop uses its
   own.
 - **Store views and customer groups** are referenced by code (`default`, `General`, `Wholesale`), not by id, so

@@ -9,7 +9,9 @@ declare(strict_types=1);
 namespace Iranimij\OpenLabel\Model\ImportExport;
 
 /**
- * The OpenLabel export file (JSON): `{"format": "openlabel", "version": 1, "designs": [...], "labels": [...]}`.
+ * The OpenLabel export file (JSON): `{"format": "openlabel", "version": 2, "designs": [...], "labels": [...]}`.
+ * Version 2 (1.1) adds design animation, hover effect and sizes, and label hide-on-zero and click-through fields;
+ * version 1 files are still read, the new fields taking their defaults.
  * Designs carry a `key` (`design:<id>` for the merchant's designs, `system:<name>` for built-in ones) that labels and
  * placements reference; store views and customer groups are referenced by code, so a file moves between shops.
  * This class checks the structure only; the importer checks the contents against the shop.
@@ -17,7 +19,8 @@ namespace Iranimij\OpenLabel\Model\ImportExport;
 class FileFormat
 {
     public const NAME = 'openlabel';
-    public const VERSION = 1;
+    public const VERSION = 2;
+    public const READABLE_VERSIONS = [1, 2];
     public const SYSTEM_PREFIX = 'system:';
     public const DESIGN_PREFIX = 'design:';
 
@@ -30,11 +33,11 @@ class FileFormat
         if (($data['format'] ?? null) !== self::NAME) {
             return ['This is not an OpenLabel export file.'];
         }
-        if ((int) ($data['version'] ?? 0) !== self::VERSION) {
+        if (!in_array((int) ($data['version'] ?? 0), self::READABLE_VERSIONS, true)) {
             return [sprintf(
-                'The file has format version %s; this OpenLabel reads version %d.',
+                'The file has format version %s; this OpenLabel reads versions %s.',
                 (string) ($data['version'] ?? '?'),
-                self::VERSION
+                implode(' and ', self::READABLE_VERSIONS)
             )];
         }
         $errors = [];

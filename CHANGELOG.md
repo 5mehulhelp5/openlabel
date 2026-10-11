@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## [Unreleased]
 
+### Added
+- Data for the 1.1 features (shown in the admin and storefront by the following 1.1 changes): labels get "hide when a variable is zero or empty", a click-through link (https://, http:// or a /path; `javascript:`, `data:` and `//host` links are refused) and its nofollow flag; designs get an entry animation (none, fade, pop), a hover effect (none, grow, lift) and per-breakpoint size overrides (sm, md, lg: width and font size).
+- Export file format version 2 with these fields; version 1 files from OpenLabel 1.0 still import, the new fields taking their defaults.
+
+### Changed
+- **API (minor, new methods):** `Api\Data\LabelInterface` gains `isHideOnZeroVariable()`, `getClickUrl()`, `isClickNofollow()` and their setters; `Api\Data\DesignInterface` gains `getAnimation()`, `getHoverEffect()`, `getSizes()` and their setters, plus the `ANIMATIONS`, `HOVER_EFFECTS` and `BREAKPOINTS` constants. Code that only uses these interfaces is unaffected; classes that implement them must add the methods.
+
+### Fixed
+- After a full reindex `bin/magento setup:db:status` reported the schema as out of date (so deploy pipelines ran `setup:upgrade` every time): swapping the index with its replica swapped their table comments. Both tables now carry the same comment.
+
 ## [1.0.0] - 2026-10-11
 
 OpenLabel 1.0: everything of 1.0.0-rc1 and rc2 plus the changes below. Supported: Magento 2.4.7–2.4.9, PHP 8.2–8.4, Hyvä 1.4 and 1.5 (1.3 best effort).

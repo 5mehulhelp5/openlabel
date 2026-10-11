@@ -61,6 +61,40 @@ class ValidatorTest extends TestCase
     }
 
     /**
+     * @dataProvider clickUrls
+     */
+    #[DataProvider('clickUrls')]
+    public function testClickUrlMustBeAWebLinkOrAPath(?string $url, bool $valid): void
+    {
+        $label = $this->label(['click_url' => $url]);
+
+        self::assertSame(
+            $valid ? [] : ['Enter a link that starts with https://, http:// or /.'],
+            $this->messages($label)
+        );
+    }
+
+    /**
+     * @return array<string, array{string|null, bool}>
+     */
+    public static function clickUrls(): array
+    {
+        return [
+            'none' => [null, true],
+            'empty' => ['', true],
+            'https' => ['https://shop.test/sale', true],
+            'http' => ['http://shop.test/sale', true],
+            'path' => ['/sale.html', true],
+            'javascript' => ['javascript:alert(1)', false],
+            'data' => ['data:text/html,x', false],
+            'protocol relative' => ['//evil.test/x', false],
+            'relative without slash' => ['sale.html', false],
+            'mixed case scheme' => ['JaVaScRiPt:alert(1)', false],
+            'too long' => ['https://shop.test/' . str_repeat('a', 1007), false],
+        ];
+    }
+
+    /**
      * @dataProvider invalidPlacements
      * @param array<string, mixed> $data
      */

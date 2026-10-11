@@ -68,7 +68,54 @@ class ValidatorTest extends TestCase
             'percent too big' => [['size_mode' => 'percent', 'width' => 101], [], 'Width must be between 1 and 100 percent.'],
             'px too small' => [['size_mode' => 'px', 'width' => 7], [], 'Width must be between 8 and 600 px.'],
             'opacity' => [['opacity' => 101], [], 'Opacity must be between 0 and 100.'],
+            'animation' => [['animation' => 'spin'], [], 'Entry animation must be none, fade or pop.'],
+            'hover effect' => [['hover_effect' => 'shake'], [], 'Hover effect must be none, grow or lift.'],
         ];
+    }
+
+    public function testAnimationAndHoverEffectAcceptTheirValues(): void
+    {
+        foreach (['none', 'fade', 'pop'] as $animation) {
+            foreach (['none', 'grow', 'lift'] as $hover) {
+                $design = $this->design(['animation' => $animation, 'hover_effect' => $hover]);
+                self::assertSame([], $this->validator->validate($design), $animation . '/' . $hover);
+            }
+        }
+    }
+
+    /**
+     * @dataProvider invalidSizes
+     * @param array<string, array<string, int>> $sizes
+     */
+    #[DataProvider('invalidSizes')]
+    public function testBreakpointSizesAreChecked(string $sizeMode, array $sizes, string $message): void
+    {
+        $design = $this->design(['size_mode' => $sizeMode, 'width' => $sizeMode === 'px' ? 80 : 18]);
+        $design->setSizes($sizes);
+
+        self::assertSame([$message], array_map('strval', $this->validator->validate($design)));
+    }
+
+    /**
+     * @return array<string, array{string, array<string, array<string, int>>, string}>
+     */
+    public static function invalidSizes(): array
+    {
+        return [
+            'unknown breakpoint' => ['percent', ['xl' => ['width' => 20]], 'Size overrides exist for sm, md and lg only.'],
+            'percent width' => ['percent', ['sm' => ['width' => 0]], 'Width must be between 1 and 100 percent.'],
+            'px width' => ['px', ['lg' => ['width' => 601]], 'Width must be between 8 and 600 px.'],
+            'font size' => ['percent', ['md' => ['font_size' => 7]], 'Font size must be between 8 and 72 px.'],
+            'unknown field' => ['percent', ['sm' => ['colour' => 1]], 'A size override holds width and font size only.'],
+        ];
+    }
+
+    public function testValidBreakpointSizesHaveNoErrors(): void
+    {
+        $design = $this->design();
+        $design->setSizes(['sm' => ['width' => 24, 'font_size' => 11], 'lg' => ['width' => 14]]);
+
+        self::assertSame([], $this->validator->validate($design));
     }
 
     public function testShapeIsOptionalForTextDesigns(): void

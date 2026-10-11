@@ -34,6 +34,9 @@ interface DesignInterface
     public const ROTATION = 'rotation';
     public const CUSTOM_CSS = 'custom_css';
     public const IS_SYSTEM = 'is_system';
+    public const ANIMATION = 'animation';
+    public const HOVER_EFFECT = 'hover_effect';
+    public const SIZES = 'sizes';
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
     /** Store-scoped rows: [store_id => ['text' => ?, 'alt_text' => ?, 'tooltip' => ?]] */
@@ -50,6 +53,15 @@ interface DesignInterface
     public const SIZE_MODE_PX = 'px';
 
     public const DEFAULT_STORE_ID = 0;
+
+    public const ANIMATION_NONE = 'none';
+    public const ANIMATIONS = [self::ANIMATION_NONE, 'fade', 'pop'];
+
+    public const HOVER_EFFECT_NONE = 'none';
+    public const HOVER_EFFECTS = [self::HOVER_EFFECT_NONE, 'grow', 'lift'];
+
+    /** Breakpoints with optional size overrides: small (phones), medium (tablets), large (desktops). */
+    public const BREAKPOINTS = ['sm', 'md', 'lg'];
 
     /**
      * @return int|null
@@ -259,6 +271,45 @@ interface DesignInterface
      * @return $this
      */
     public function setIsSystem(bool $isSystem): self;
+
+    /**
+     * Entry animation, CSS only, off for visitors who prefer reduced motion (since 1.1).
+     *
+     * @return string one of ANIMATIONS
+     */
+    public function getAnimation(): string;
+
+    /**
+     * @param string $animation one of ANIMATIONS
+     * @return $this
+     */
+    public function setAnimation(string $animation): self;
+
+    /**
+     * Effect while the shopper hovers the product card, CSS only (since 1.1).
+     *
+     * @return string one of HOVER_EFFECTS
+     */
+    public function getHoverEffect(): string;
+
+    /**
+     * @param string $effect one of HOVER_EFFECTS
+     * @return $this
+     */
+    public function setHoverEffect(string $effect): self;
+
+    /**
+     * Per-breakpoint size overrides (since 1.1). Width is in the design's size mode; font size in px.
+     *
+     * @return array<string, array<string, int>> e.g. ['sm' => ['width' => 24, 'font_size' => 11]]
+     */
+    public function getSizes(): array;
+
+    /**
+     * @param array<string, array<string, int>> $sizes keys from BREAKPOINTS, values with width and/or font_size
+     * @return $this
+     */
+    public function setSizes(array $sizes): self;
 
     /**
      * @return string|null

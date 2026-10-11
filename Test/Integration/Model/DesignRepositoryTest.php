@@ -54,6 +54,31 @@ class DesignRepositoryTest extends TestCase
         self::assertNull($loaded->getTooltip());
     }
 
+    public function testSaveStoresAnimationHoverEffectAndBreakpointSizes(): void
+    {
+        $design = $this->factory->create();
+        $design->setName('Animated')->setType(DesignInterface::TYPE_TEXT)->setBgColor('#e11d48')->setTextColor('#ffffff')
+            ->setAnimation('pop')->setHoverEffect('grow')
+            ->setSizes(['sm' => ['width' => 24, 'font_size' => 11], 'lg' => ['width' => 12]]);
+        $design->setText('Sale');
+
+        $loaded = $this->repository->getById((int) $this->repository->save($design)->getDesignId());
+
+        self::assertSame('pop', $loaded->getAnimation());
+        self::assertSame('grow', $loaded->getHoverEffect());
+        self::assertSame(['sm' => ['width' => 24, 'font_size' => 11], 'lg' => ['width' => 12]], $loaded->getSizes());
+    }
+
+    public function testInvalidAnimationIsRefused(): void
+    {
+        $design = $this->factory->create();
+        $design->setName('Spinning')->setType(DesignInterface::TYPE_TEXT)->setAnimation('spin');
+        $design->setText('Sale');
+
+        $this->expectException(\Magento\Framework\Validation\ValidationException::class);
+        $this->repository->save($design);
+    }
+
     #[DataFixture(DesignFixture::class, ['store_texts' => [0 => ['text' => 'Sale'], 1 => ['text' => 'Angebot']]], 'design')]
     public function testResaveReplacesStoreTexts(): void
     {

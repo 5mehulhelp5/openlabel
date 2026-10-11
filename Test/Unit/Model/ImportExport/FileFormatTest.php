@@ -38,7 +38,8 @@ class FileFormatTest extends TestCase
     {
         return [
             'not an OpenLabel file' => [['format' => 'other'], 'This is not an OpenLabel export file.'],
-            'newer version' => [['version' => 2], 'The file has format version 2; this OpenLabel reads version 1.'],
+            'newer version' => [['version' => 3], 'The file has format version 3; this OpenLabel reads versions 1 and 2.'],
+            'no version' => [['version' => null], 'The file has format version ?; this OpenLabel reads versions 1 and 2.'],
             'design without key' => [['designs' => [1 => ['key' => '']]], 'designs[1]: a design needs a "key".'],
             'unknown design reference' => [
                 ['labels' => [0 => ['design' => 'design:99']]],
@@ -51,6 +52,15 @@ class FileFormatTest extends TestCase
             'label without name' => [['labels' => [0 => ['name' => '']]], 'labels[0]: a label needs a name.'],
             'conditions not a tree' => [['labels' => [0 => ['conditions' => 'x']]], 'labels[0] "Sale": "conditions" must be a condition tree or null.'],
         ];
+    }
+
+    public function testVersionOneAndTwoFilesAreBothRead(): void
+    {
+        foreach ([1, 2] as $version) {
+            $file = $this->file();
+            $file['version'] = $version;
+            self::assertSame([], (new FileFormat())->errors($file), 'version ' . $version);
+        }
     }
 
     public function testDuplicateDesignKeys(): void
