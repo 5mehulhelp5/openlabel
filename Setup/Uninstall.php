@@ -22,6 +22,7 @@ class Uninstall implements UninstallInterface
         'openlabel_index_replica',
         'openlabel_index',
         'openlabel_placement',
+        'openlabel_label_product',
         'openlabel_design_store',
         'openlabel_label',
         'openlabel_design',
@@ -39,6 +40,8 @@ class Uninstall implements UninstallInterface
                 $connection->dropTable($name);
             }
         }
-        $connection->delete($setup->getTable('core_config_data'), ['path LIKE ?' => 'openlabel/%']);
+        foreach (['openlabel/%', 'openlabel_css/%'] as $path) {
+            $connection->delete($setup->getTable('core_config_data'), ['path LIKE ?' => $path]);
+        }
     }
 }

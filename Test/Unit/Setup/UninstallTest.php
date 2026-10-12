@@ -29,8 +29,11 @@ class UninstallTest extends TestCase
             $dropped[] = $table;
             return true;
         });
-        $connection->expects(self::once())->method('delete')
-            ->with('pfx_core_config_data', ['path LIKE ?' => 'openlabel/%']);
+        $deleted = [];
+        $connection->method('delete')->willReturnCallback(static function (string $table, array $where) use (&$deleted): int {
+            $deleted[] = [$table, $where];
+            return 1;
+        });
 
         (new Uninstall())->uninstall($setup, $this->createMock(ModuleContextInterface::class));
 
@@ -38,9 +41,14 @@ class UninstallTest extends TestCase
             'pfx_openlabel_index_replica',
             'pfx_openlabel_index',
             'pfx_openlabel_placement',
+            'pfx_openlabel_label_product',
             'pfx_openlabel_design_store',
             'pfx_openlabel_label',
             'pfx_openlabel_design',
         ], $dropped);
+        self::assertSame([
+            ['pfx_core_config_data', ['path LIKE ?' => 'openlabel/%']],
+            ['pfx_core_config_data', ['path LIKE ?' => 'openlabel_css/%']],
+        ], $deleted, 'settings of both sections, the global CSS included');
     }
 }

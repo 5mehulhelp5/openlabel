@@ -32,6 +32,17 @@ The **live preview** panel (bottom right, can be hidden) renders the chosen desi
 
 Save, Save & Continue and Save & Duplicate (creates a disabled copy). Problems are listed above the form without a page reload, each saying what to do, for example "Pick at least one placement so the label appears somewhere."
 
+## On the product page (1.1)
+
+Catalog › Products › edit a product › **OpenLabel** (needs the Labels permission):
+
+- **Labels this product shows now**, from the index (any store view and customer group), each linking to its
+  label; "(by hand)" marks the ones assigned here.
+- **Always show these labels**: the product shows them whatever their conditions, within their store views,
+  customer groups and dates. Saving the product reindexes the labels you add or remove.
+
+Assignments are not part of the export file yet; they go with their label or product when either is deleted.
+
 ## Designs
 
 Choose **Text**, **Image** or **Shape**; the form shows only what that type needs.

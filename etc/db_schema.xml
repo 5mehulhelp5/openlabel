@@ -146,4 +146,19 @@
             <column name="product_id"/>
         </index>
     </table>
+    <table name="openlabel_label_product" resource="default" engine="innodb" comment="OpenLabel products assigned to a label by hand">
+        <column xsi:type="int" name="label_id" unsigned="true" nullable="false" comment="Label ID"/>
+        <column xsi:type="int" name="product_id" unsigned="true" nullable="false" comment="Product ID"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="label_id"/>
+            <column name="product_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="OPENLABEL_LABEL_PRODUCT_LABEL_ID_OPENLABEL_LABEL_LABEL_ID"
+                    table="openlabel_label_product" column="label_id" referenceTable="openlabel_label" referenceColumn="label_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="OPENLABEL_LABEL_PRODUCT_PRODUCT_ID_CATALOG_PRODUCT_ENTITY_ENTITY_ID"
+                    table="openlabel_label_product" column="product_id" referenceTable="catalog_product_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <index referenceId="OPENLABEL_LABEL_PRODUCT_PRODUCT_ID" indexType="btree">
+            <column name="product_id"/>
+        </index>
+    </table>
 </schema>

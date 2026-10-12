@@ -70,4 +70,27 @@ class IndexReader
             $connection->select()->from($this->resource->getTableName('openlabel_index'), [new \Zend_Db_Expr('COUNT(*)')])
         );
     }
+
+    /**
+     * Labels a product shows in any store view and customer group (product edit page).
+     *
+     * @param int $productId
+     * @return array<int, string> label id => name
+     */
+    public function labelsOfProduct(int $productId): array
+    {
+        $connection = $this->resource->getConnection();
+        $select = $connection->select()
+            ->distinct()
+            ->from(['i' => $this->resource->getTableName('openlabel_index')], [])
+            ->join(['l' => $this->resource->getTableName('openlabel_label')], 'l.label_id = i.label_id', ['label_id', 'name'])
+            ->where('i.product_id = ?', $productId)
+            ->order(['l.priority', 'l.label_id']);
+        $labels = [];
+        foreach ($connection->fetchAll($select) as $row) {
+            $labels[(int) $row['label_id']] = (string) $row['name'];
+        }
+
+        return $labels;
+    }
 }
