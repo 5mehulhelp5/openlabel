@@ -9,4 +9,7 @@
     <type name="Iranimij\OpenLabel\Api\DesignRepositoryInterface">
         <plugin name="openlabel_webapi_guard" type="Iranimij\OpenLabel\Plugin\Webapi\DesignGuardPlugin" sortOrder="1"/>
     </type>
+    <type name="Magento\Framework\Webapi\ServiceOutputProcessor">
+        <plugin name="openlabel_design_output" type="Iranimij\OpenLabel\Plugin\Webapi\DesignOutputPlugin"/>
+    </type>
 </config>
