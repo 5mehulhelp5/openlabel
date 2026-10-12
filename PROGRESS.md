@@ -18,7 +18,7 @@ Merged by me when CI is green, **but never anything visible on GitHub during wor
 | S4 | Design 1.1: breakpoint sizes, animation/hover CSS, global CSS, AVIF + size setting, 31 system designs | done locally on `feat/m5-s4-design` (stacked on S3) + e2e on openlabel-dev-env `test/m5-s4-design`; unit 388, coverage gate, PHPStan, PHPCS, integration, Playwright design form 8/8 and motion 6/6 green; push after hours |
 | S5 | 21 positions, near price / add to cart / under name (+ openlabel-hyva) | done locally: openlabel `feat/m5-s5-positions` (stacked on S4), openlabel-hyva `feat/m5-s5-positions`, dev-env `test/m5-s5-positions`; unit 411 + hyva 38, integration (openlabel + hyva 8), PHPStan, PHPCS, Playwright positions 8/8 and admin picker/preview 16/16 green; push after hours |
 | S6 | Tooltip, click-through | done locally on `feat/m5-s6-interaction` (stacked on S5) + dev-env `test/m5-s6-interaction`; no openlabel-hyva change needed; unit 415, coverage gate, PHPStan, PHPCS, integration, Playwright interaction 4/4 and admin forms 12/12 green; push after hours |
-| S7 | Variant-aware labels, countdown (openlabel-hyva) | |
+| S7 | Variant-aware labels (product page), countdown | done locally: openlabel `feat/m5-s7-variants-countdown` (stacked on S6), openlabel-hyva `feat/m5-s7-variants-countdown` (stacked on S5), dev-env `test/m5-s7-variants-countdown`; unit 423 + hyva 40, coverage gate, PHPStan, PHPCS, integration (hyva 10), mkdocs strict, Playwright variants 6/6 + positions/interaction/motion 18/18 green; push after hours |
 | S8 | Cart, mini-cart, wishlist, compare, emails, hide on pages | |
 | S9 | Product edit tab + manual assignment (`openlabel_label_product`) | |
 | S10 | REST CRUD + bulk read, GraphQL mutations | |
@@ -48,6 +48,10 @@ Merged by me when CI is green, **but never anything visible on GitHub during wor
 - Tooltip = next sibling `ol-tip` of the label (not a child: ribbon shapes clip children), shown by CSS on hover/focus; id `ol-tip-<placement>-<product>` so cached product cards never repeat ids. CSS only, no Alpine (the plan allowed Alpine for touch; focusable labels open on tap via :focus).
 - Click-through labels are `<a>` except on the product card image (already inside the product link): there they stay spans, not focusable, tooltip on hover only. Shop paths become absolute store URLs.
 - Short hex colours in the generated stylesheet: 100-design stylesheet 19,973 of 20,480 bytes after the tooltip CSS.
+- Variant labels: product page only (Feature Superset: "label follows selected swatch on product page"). All variants' labels are in the page, hidden; the script only toggles `ol-label--hidden` (no markup built in JS, CSP-safe). A variant shows the product's own labels (parent rows from children excluded) plus its own, re-arranged with the core Arranger. A variant is "chosen" when Hyvä's `candidates` has exactly one id; otherwise the product's default set shows.
+- `{COUNTDOWN}` = end of the special price's last day (same rule as `{SPECIAL_ENDS_IN}`); one `setInterval` for the page, stopped on `visibilitychange`. The script (≈ 0.6 KB gzipped) is rendered by `Block\Script` in `before.body.end` only when `LabelRenderer::isScriptNeeded()`; cached product cards set the flag through `collectIdentities()`.
+- Variable markup (`Value::html`) is put back after the allow-list via a private-use placeholder, so `data-ol-end`/`aria-hidden` survive; merchant text is still cleaned.
+- Found and fixed a 1.0 bug: flex labels dropped the space between text and inline markup (`white-space: pre-wrap` on `.ol-label`). CSS budget after S7: 20,194 of 20,480 bytes.
 - Ships free = the store's free-shipping threshold met by the final price, or an active no-coupon cart rule for the website/group with free shipping and no conditions. Cart rules with conditions are ignored (they depend on the cart, not the product).
 
 ## M4 slices
@@ -157,7 +161,7 @@ S1 merged as #12, S2–S10 through #21 (all M2 commits, full matrix green); #13�
 
 ## Exact next step
 
-M5 S7 (variant-aware labels, countdown; openlabel-hyva + openlabel) stacked on S6. After hours, in order: push S2 (coverage fix), PR #45 green → merge; push S3 → PR, full matrix, merge; push S4 + dev-env `test/m5-s4-design` → PRs, full matrix + E2E, merge; push S5 (openlabel, then openlabel-hyva with openlabel-ref, then dev-env `test/m5-s5-positions`) → PRs, full matrix + E2E incl. Hyvä 1.5.2, merge, reset openlabel-ref to main; push S6 + dev-env `test/m5-s6-interaction` → PRs, full matrix + E2E, merge. Open for Iman: recorded real-person UX tests (M2 ≤ 3 min custom label, M3 VoiceOver) whenever wanted; Hyvä compatibility tracker submission (`docs/tracker-entry.md`); optional operator dropdown on the quick switches.
+M5 S8 (cart, mini-cart, wishlist, compare, emails, hide on pages) stacked on S7. After hours, in order: push S2 (coverage fix), PR #45 green → merge; push S3 → PR, full matrix, merge; push S4 + dev-env `test/m5-s4-design` → PRs, full matrix + E2E, merge; push S5 (openlabel, then openlabel-hyva with openlabel-ref, then dev-env `test/m5-s5-positions`) → PRs, full matrix + E2E incl. Hyvä 1.5.2, merge, reset openlabel-ref to main; push S6 + dev-env `test/m5-s6-interaction` → PRs, full matrix + E2E, merge; push S7 (openlabel, openlabel-hyva with openlabel-ref, dev-env) → PRs, full matrix + E2E, merge; reset openlabel-ref to main when the stack is merged. Open for Iman: recorded real-person UX tests (M2 ≤ 3 min custom label, M3 VoiceOver) whenever wanted; Hyvä compatibility tracker submission (`docs/tracker-entry.md`); optional operator dropdown on the quick switches.
 
 ## M1 decisions (also in the Notion build log at close-out)
 

@@ -24,6 +24,9 @@ class Renderer
 {
     private const PATTERN = '/\{([A-Z][A-Z0-9_]*)(?::([A-Za-z0-9_]+))?\}/';
 
+    /** Marks where variable markup goes back after cleaning (a private-use character, never typed or escaped). */
+    private const MARKUP_TOKEN = "\u{E000}";
+
     /**
      * @param Pool $pool
      * @param AllowList $allowList
@@ -91,9 +94,12 @@ class Renderer
     public function render(string $text, ProductInterface $product, Context $context): Rendered
     {
         $empty = [];
+        // Markup from variables is produced by code ({BR}, {COUNTDOWN}): it stays out of the allow-list, which is
+        // there for the merchant's text, and goes back in after cleaning.
+        $markup = [];
         $substituted = (string) preg_replace_callback(
             self::PATTERN,
-            function (array $match) use ($product, $context, &$empty): string {
+            function (array $match) use ($product, $context, &$empty, &$markup): string {
                 $processor = $this->pool->get($match[1]);
                 if ($processor === null) {
                     return $match[0];
@@ -103,13 +109,19 @@ class Renderer
                 if ($value->isEmpty()) {
                     $empty[] = $match[1] . ($argument !== '' ? ':' . $argument : '');
                 }
+                if ($value->type === Value::HTML && !$value->isEmpty()) {
+                    $token = self::MARKUP_TOKEN . count($markup) . self::MARKUP_TOKEN;
+                    $markup[$token] = (string) $value->raw;
+
+                    return $token;
+                }
 
                 return $this->formatForHtml($value, $context);
             },
             $text
         );
 
-        return new Rendered($this->allowList->clean($substituted), $empty);
+        return new Rendered(strtr($this->allowList->clean($substituted), $markup), $empty);
     }
 
     /**

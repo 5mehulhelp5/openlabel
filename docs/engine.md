@@ -107,7 +107,7 @@ queries for prices and stock):
 
 `{SAVE_PERCENT}` `{SAVE_AMOUNT}` `{PRICE}` `{SPECIAL_PRICE}` `{FINAL_PRICE}` `{STOCK_QTY}` `{NEW_FOR}` `{SKU}`
 `{ATTR:code}` `{BR}` `{SPECIAL_ENDS_IN}` `{SPECIAL_END_DATE}` `{RATING}` `{REVIEW_COUNT}` `{SOLD_LAST_30D}`
-`{CATEGORY_NAME}` `{BRAND}`
+`{CATEGORY_NAME}` `{BRAND}` `{COUNTDOWN}`
 
 Numbers, currency amounts and dates are formatted for the store's locale. Values are escaped; the text itself
 may use `b strong i em br span small sup sub` (attributes other than `class`, `id`, `title`, `style` are
@@ -117,6 +117,11 @@ The label is dropped after the priority rules, so it does not free its place in 
 "hide other labels" still applies. `{RATING}`, `{REVIEW_COUNT}`, `{SOLD_LAST_30D}` and `{CATEGORY_NAME}` load
 their data once per listing through `VariablePreloadInterface`; `{SPECIAL_ENDS_IN}` treats `special_to_date` as
 valid through that day.
+
+`{COUNTDOWN}` is the time left until the special price ends ("2d 04:12:09", the end of its last day like
+`{SPECIAL_ENDS_IN}`), ticked every second by the theme script; screen readers read the end date instead.
+Markup produced by variables (`{BR}`, `{COUNTDOWN}`) keeps its attributes; the allow-list cleans the
+merchant's text only.
 
 `{CATEGORY_NAME}` is the category being browsed on a category page. Everywhere else (product page, search,
 widgets, GraphQL) it is the product's deepest active category in the store's tree, never the category the

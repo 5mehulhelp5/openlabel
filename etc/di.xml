@@ -74,6 +74,7 @@
                 <item name="SoldLast30d" xsi:type="object">Iranimij\OpenLabel\Model\Variable\Processor\SoldLast30d</item>
                 <item name="CategoryName" xsi:type="object">Iranimij\OpenLabel\Model\Variable\Processor\CategoryName</item>
                 <item name="Brand" xsi:type="object">Iranimij\OpenLabel\Model\Variable\Processor\Brand</item>
+                <item name="Countdown" xsi:type="object">Iranimij\OpenLabel\Model\Variable\Processor\Countdown</item>
             </argument>
         </arguments>
     </type>

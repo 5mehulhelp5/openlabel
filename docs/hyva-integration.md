@@ -80,6 +80,16 @@ Themes that override `product/list/image.phtml` with another template name or re
   `productPageSlots` argument of the plugin in `etc/frontend/di.xml`.
 - All three render inside the cached card or page, tagged like the image labels; no JavaScript.
 
+## 7. Variants and countdown (1.1)
+
+- `Block\ProductLabels` renders `LabelRenderer::getProductPageStacksHtml()`: for a configurable product the
+  stacks also hold each variant's labels (the product's own labels plus the variant's, arranged by priority),
+  hidden with `ol-label--hidden` and tagged `data-ol-variant`. Parent and variants are resolved with one query.
+- `Block\Script` (`openlabel.script` in `before.body.end`, template `js/labels.phtml`) is rendered only when the
+  page needs it (`LabelRenderer::isScriptNeeded()`, also set by product cards served from the block cache). It
+  listens to `configurable-selection-changed` and ticks `.ol-countdown[data-ol-end]`; the inline script is
+  registered with `$hyvaCsp->registerInlineScript()`.
+
 ## Hyvä 1.5 (verified on default theme 1.5.2, 2026-10-11)
 
 Hyvä 1.5 rebuilt the product gallery as a snap slider:

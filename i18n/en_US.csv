@@ -386,3 +386,5 @@
 "Link","Link"
 "Optional. Where a click on the label goes: a page of this shop such as /sale.html, or https://... On product cards the image already opens the product, so labels there are not links.","Optional. Where a click on the label goes: a page of this shop such as /sale.html, or https://... On product cards the image already opens the product, so labels there are not links."
 "Ask search engines not to follow the link","Ask search engines not to follow the link"
+"Ends %1","Ends %1"
+"Live countdown to the end of the special price","Live countdown to the end of the special price"

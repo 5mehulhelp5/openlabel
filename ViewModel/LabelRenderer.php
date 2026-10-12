@@ -16,6 +16,8 @@ use Iranimij\OpenLabel\Model\Css\DesignRules;
 use Iranimij\OpenLabel\Model\Design;
 use Iranimij\OpenLabel\Model\Design\ImageUrl;
 use Iranimij\OpenLabel\Model\Label;
+use Iranimij\OpenLabel\Model\Resolver\Arranger;
+use Iranimij\OpenLabel\Model\Resolver\Variants;
 use Iranimij\OpenLabel\Model\Variable\Context;
 use Iranimij\OpenLabel\Model\Variable\Renderer;
 use Magento\Catalog\Api\Data\ProductInterface;
@@ -67,6 +69,9 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
 
     private ?Template $block = null;
 
+    /** A rendered label needs the theme script (a countdown, or labels that follow the chosen variant). */
+    private bool $scriptNeeded = false;
+
     /**
      * @param Labels $labels
      * @param Renderer $renderer
@@ -75,6 +80,8 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
      * @param TypedReader $config
      * @param LayoutInterface $layout
      * @param StoreManagerInterface $storeManager
+     * @param Arranger $arranger
+     * @param Variants $variants
      */
     public function __construct(
         private readonly Labels $labels,
@@ -83,7 +90,9 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
         private readonly ImageUrl $imageUrl,
         private readonly TypedReader $config,
         private readonly LayoutInterface $layout,
-        private readonly StoreManagerInterface $storeManager
+        private readonly StoreManagerInterface $storeManager,
+        private readonly Arranger $arranger,
+        private readonly Variants $variants
     ) {
     }
 
@@ -114,6 +123,64 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
         }
 
         return (string) $this->block->setData('stacks', $stacks)->toHtml();
+    }
+
+    /**
+     * Product page stacks. For a configurable product they also carry the labels of each variant, hidden
+     * (`ol-label--hidden`, `data-ol-variant="<child id>"`), so the theme script can show the chosen variant's
+     * labels without a request: the product's own labels plus the variant's, by the usual priority rules.
+     *
+     * @param ProductInterface $product
+     * @param string $loading
+     * @return string
+     */
+    public function getProductPageStacksHtml(ProductInterface $product, string $loading = 'eager'): string
+    {
+        return $this->stacksHtml($this->getProductPageStacks($product, $loading));
+    }
+
+    /**
+     * @param ProductInterface $product
+     * @param string $loading
+     * @return array<int, array{classes: string, labels: array<int, array<string, mixed>>}>
+     */
+    public function getProductPageStacks(ProductInterface $product, string $loading = 'eager'): array
+    {
+        $children = $this->variants->getChildren($product);
+        if ($children === []) {
+            return $this->getStacks($product, PlacementInterface::AREA_PRODUCT, $loading);
+        }
+        $this->labels->remember(array_merge([$product], $children));
+        $own = $this->labels->getForProduct((int) $product->getId());
+        $entries = [];
+        foreach ($this->onPage($own) as $label) {
+            $entries[] = [$label, $product, 0];
+        }
+        $variantEntries = 0;
+        foreach ($children as $child) {
+            $childId = (int) $child->getId();
+            foreach ($this->variantLabels($own, $this->labels->getForProduct($childId)) as $label) {
+                $entries[] = [$label, $child, $childId];
+                $variantEntries++;
+            }
+        }
+        if ($variantEntries === 0) {
+            return $this->getStacks($product, PlacementInterface::AREA_PRODUCT, $loading);
+        }
+        $this->observeProduct((int) $product->getId());
+        $this->scriptNeeded = true;
+
+        return $this->stacksFromEntries($entries, $product, false, $loading);
+    }
+
+    /**
+     * True once a rendered (or cached and tagged) label uses {COUNTDOWN}, or the product page carries variant labels.
+     *
+     * @return bool
+     */
+    public function isScriptNeeded(): bool
+    {
+        return $this->scriptNeeded;
     }
 
     /**
@@ -168,12 +235,32 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
     private function buildStacks(ProductInterface $product, string $area, array $positions, string $loading): array
     {
         $this->observeProduct((int) $product->getId());
-        $stacks = [];
+        $entries = [];
         foreach ($this->labels->getForProduct((int) $product->getId()) as $label) {
             $placement = $label->getPlacement();
             if ($placement->getArea() === $area && in_array($placement->getPosition(), $positions, true)) {
-                $stacks[$placement->getPosition()][] = $label;
+                $entries[] = [$label, $product, null];
             }
+        }
+        // Product cards are links to the product: labels on their image must not be links or focusable themselves.
+        $insideLink = $area === PlacementInterface::AREA_LISTING && array_diff($positions, PlacementInterface::IMAGE_POSITIONS) === [];
+
+        return $this->stacksFromEntries($entries, $product, $insideLink, $loading);
+    }
+
+    /**
+     * @param array<int, array{ResolvedLabelInterface, ProductInterface, int|null}> $entries label, the product it
+     *        is rendered for, and the variant it belongs to (null: no variants, 0: the product as it opens)
+     * @param ProductInterface $product the page's product
+     * @param bool $insideLink
+     * @param string $loading
+     * @return array<int, array{classes: string, labels: array<int, array<string, mixed>>}>
+     */
+    private function stacksFromEntries(array $entries, ProductInterface $product, bool $insideLink, string $loading): array
+    {
+        $stacks = [];
+        foreach ($entries as $entry) {
+            $stacks[$entry[0]->getPlacement()->getPosition()][] = $entry;
         }
         if ($stacks === []) {
             return [];
@@ -182,23 +269,77 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
         $this->preload($product, $context);
         $debug = $this->config->getBool(self::CONFIG_DEBUG);
 
-        // Product cards are links to the product: labels on their image must not be links or focusable themselves.
-        $insideLink = $area === PlacementInterface::AREA_LISTING && array_diff($positions, PlacementInterface::IMAGE_POSITIONS) === [];
         $result = [];
-        foreach ($stacks as $labels) {
+        foreach ($stacks as $stackEntries) {
             $items = [];
-            foreach ($labels as $label) {
-                $item = $this->labelData($label, $product, $context, $loading, $debug, $insideLink);
-                if ($item !== null) {
-                    $items[] = $item;
+            foreach ($stackEntries as [$label, $forProduct, $variant]) {
+                $item = $this->labelData($label, $forProduct, $context, $loading, $debug, $insideLink);
+                if ($item === null) {
+                    continue;
                 }
+                $item['variant'] = $variant;
+                if ($variant !== null && $variant > 0) {
+                    $item['classes'] .= ' ol-label--hidden';
+                }
+                $items[] = $item;
             }
             if ($items !== []) {
-                $result[] = ['classes' => $this->stackClasses($labels[0]->getPlacement()), 'labels' => $items];
+                $result[] = ['classes' => $this->stackClasses($stackEntries[0][0]->getPlacement()), 'labels' => $items];
             }
         }
 
         return $result;
+    }
+
+    /**
+     * @param ResolvedLabelInterface[] $labels
+     * @return ResolvedLabelInterface[] those on or around the product page image
+     */
+    private function onPage(array $labels): array
+    {
+        return array_values(array_filter($labels, static fn (ResolvedLabelInterface $label): bool =>
+            $label->getPlacement()->getArea() === PlacementInterface::AREA_PRODUCT
+            && in_array($label->getPlacement()->getPosition(), PlacementInterface::IMAGE_POSITIONS, true)));
+    }
+
+    /**
+     * A variant shows the product's own labels (not those it only carries because of some child) plus its own,
+     * arranged by priority, "hide other labels" and the stack limits like any product.
+     *
+     * @param ResolvedLabelInterface[] $own labels of the configurable product
+     * @param ResolvedLabelInterface[] $child labels of the variant
+     * @return ResolvedLabelInterface[]
+     */
+    private function variantLabels(array $own, array $child): array
+    {
+        $byKey = [];
+        foreach ($this->onPage($own) as $label) {
+            if ($label->getParentProductId() === null) {
+                $byKey[$label->getLabelId() . '/' . (int) $label->getPlacement()->getPlacementId()] = $label;
+            }
+        }
+        foreach ($this->onPage($child) as $label) {
+            $byKey[$label->getLabelId() . '/' . (int) $label->getPlacement()->getPlacementId()] = $label;
+        }
+        $rows = [];
+        foreach ($byKey as $key => $label) {
+            $rows[] = [
+                'product_id' => 0,
+                'key' => $key,
+                'label_id' => $label->getLabelId(),
+                'priority' => $label->getPriority(),
+                'hide_lower_priority' => $label->isHideLowerPriority() ? 1 : 0,
+                'area' => $label->getPlacement()->getArea(),
+                'position' => $label->getPlacement()->getPosition(),
+                'max_labels' => $label->getPlacement()->getMaxLabels(),
+            ];
+        }
+        $kept = [];
+        foreach ($this->arranger->arrange($rows)[0] ?? [] as $row) {
+            $kept[] = $byKey[$row['key']];
+        }
+
+        return $kept;
     }
 
     /**
@@ -236,6 +377,7 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
         $this->observeProduct($productId);
         $tags = [];
         foreach ($this->labels->getForProduct($productId) as $label) {
+            $this->noteScriptUse($label);
             $tags[] = Label::CACHE_TAG_PREFIX . $label->getLabelId();
             $tags[] = Design::CACHE_TAG . '_' . (int) $label->getDesign()->getDesignId();
         }
@@ -302,6 +444,7 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
         }
         $this->identities[Label::CACHE_TAG_PREFIX . $label->getLabelId()] = true;
         $this->identities[Design::CACHE_TAG . '_' . $designId] = true;
+        $this->noteScriptUse($label);
 
         $classes = $this->designRules->labelClasses($design);
         $image = null;
@@ -339,6 +482,17 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
             'tooltip' => $tooltip,
             'debug_id' => $debug ? $label->getLabelId() : null,
         ];
+    }
+
+    /**
+     * @param ResolvedLabelInterface $label
+     * @return void
+     */
+    private function noteScriptUse(ResolvedLabelInterface $label): void
+    {
+        if (str_contains((string) $label->getText() . (string) $label->getTooltip(), '{COUNTDOWN')) {
+            $this->scriptNeeded = true;
+        }
     }
 
     /**
@@ -415,5 +569,6 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
         $this->identities = [];
         $this->preloaded = [];
         $this->block = null;
+        $this->scriptNeeded = false;
     }
 }

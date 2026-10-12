@@ -36,6 +36,7 @@ class Help
             'REVIEW_COUNT' => [__('Number of approved reviews'), '128'],
             'SOLD_LAST_30D' => [__('Units sold in the last 30 days'), '57'],
             'CATEGORY_NAME' => [__('Category being browsed, or the product\'s main category'), 'Jackets'],
+            'COUNTDOWN' => [__('Live countdown to the end of the special price'), '2d 04:12:09'],
             'BRAND' => [__('Brand (attribute set under Stores › Configuration › OpenLabel)'), 'Acme'],
         ];
         $variables = [];
