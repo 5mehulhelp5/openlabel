@@ -15,7 +15,7 @@ Merged by me when CI is green, **but never anything visible on GitHub during wor
 | S1 | 1.1 data: label hide-on-zero / click-through / nofollow, design animation / hover / breakpoint sizes, export format 2; fix: `setup:db:status` diff after full reindex | merged (#44, full matrix green) |
 | S2 | Conditions: bestseller (units + rank), most viewed (views + rank), ships free; Bestseller quick switch | PR #45: full matrix 18/20, all unit + integration legs green, coverage gate failed (Model/Condition 80.8 %); fix committed locally (98.4 %), push after hours |
 | S3 | Variables `{CATEGORY_NAME}` `{BRAND}` + hide on zero (storefront + GraphQL) | done locally on `feat/m5-s3-variables` (stacked on S2); unit, coverage gate, PHPStan, PHPCS, integration green; push after hours, full matrix |
-| S4 | Design 1.1: breakpoint sizes, animation/hover CSS, global CSS, AVIF + size setting, 30+ system designs | |
+| S4 | Design 1.1: breakpoint sizes, animation/hover CSS, global CSS, AVIF + size setting, 31 system designs | done locally on `feat/m5-s4-design` (stacked on S3) + e2e on openlabel-dev-env `test/m5-s4-design`; unit 388, coverage gate, PHPStan, PHPCS, integration, Playwright design form 8/8 and motion 6/6 green; push after hours |
 | S5 | 21 positions, near price / add to cart / under name (+ openlabel-hyva) | |
 | S6 | Tooltip, click-through (+ openlabel-hyva) | |
 | S7 | Variant-aware labels, countdown (openlabel-hyva) | |
@@ -36,6 +36,11 @@ Merged by me when CI is green, **but never anything visible on GitHub during wor
 - Bestseller and most viewed count per website over fixed windows (7/30/90 days sold, 7/30 days viewed) and rank over 30 days (`RANK()`, MariaDB 10.2+/MySQL 8). Each is one aggregated subquery joined by the SQL builder; no temp table. Products with no activity have no rank, so "top N" never matches them. Labels using them are reindexed by the daily cron.
 - Hide on zero is applied when a label is rendered, after the priority rules: a hidden label does not free its place in a full stack and its "hide other labels" still applies (the arranger runs in the resolver, before variables are known).
 - `{CATEGORY_NAME}` = the browsed category only on category pages (`current_category` without `current_product`); elsewhere the product's deepest active category in the store's tree (cache-safe: never the category the shopper came from). `{BRAND}` = configurable attribute code (`openlabel/variables/brand_attribute`, default `manufacturer`).
+- Breakpoints for size overrides: sm ≤ 639 px, md 640–1023 px, lg ≥ 1024 px (viewport media queries, appended to the design's rule). Motion is CSS only: `ol-anim-*` / `ol-hover-*` classes from `DesignRules::labelClasses()` (shared by the storefront renderer and GraphQL); hover reacts to the card (`:hover > .ol-stack > …`) under `(hover: hover)`; `prefers-reduced-motion: reduce` switches animations and transitions off.
+- Global CSS lives in its own config section `openlabel_css` (ACL `Iranimij_OpenLabel::global_css`), default scope only, sanitized by the backend model and again by the generator.
+- AVIF is validated without image libraries: `ftyp` brand avif/avis plus the first `ispe` box for the size.
+- Built-in designs grow to 31 through `SystemDesignsOneDotOne` (re-runs the idempotent catalog install); the designs grid now sorts newest first so merchant designs are not buried behind them.
+- Local e2e note: the dev store has two manual labels from 2026-10-11 ("Sale -{SAVE_PERCENT}%" #323, "test" #341) on every product; they make the older storefront specs fail locally (stacks full). Left untouched (Iman's data); CI runs on a fresh store.
 - Ships free = the store's free-shipping threshold met by the final price, or an active no-coupon cart rule for the website/group with free shipping and no conditions. Cart rules with conditions are ignored (they depend on the cart, not the product).
 
 ## M4 slices
@@ -145,7 +150,7 @@ S1 merged as #12, S2–S10 through #21 (all M2 commits, full matrix green); #13�
 
 ## Exact next step
 
-M5 S4 (design 1.1) on `feat/m5-s4-design`, stacked on S3. After hours: push S2 (coverage fix) and check PR #45, merge; then push S3, open its PR, full matrix, merge. Open for Iman: recorded real-person UX tests (M2 ≤ 3 min custom label, M3 VoiceOver) whenever wanted; Hyvä compatibility tracker submission (`docs/tracker-entry.md`); optional operator dropdown on the quick switches.
+M5 S5 (21 positions, near price / add to cart / under name; openlabel + openlabel-hyva) on `feat/m5-s5-positions`, stacked on S4. After hours, in order: push S2 (coverage fix), PR #45 green → merge; push S3 → PR, full matrix, merge; push S4 + dev-env `test/m5-s4-design` → PRs, full matrix + E2E, merge. Open for Iman: recorded real-person UX tests (M2 ≤ 3 min custom label, M3 VoiceOver) whenever wanted; Hyvä compatibility tracker submission (`docs/tracker-entry.md`); optional operator dropdown on the quick switches.
 
 ## M1 decisions (also in the Notion build log at close-out)
 
