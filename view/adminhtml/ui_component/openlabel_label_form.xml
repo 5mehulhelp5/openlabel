@@ -346,6 +346,44 @@
                 </settings>
             </field>
         </container>
+        <container name="bestseller_group" component="Magento_Ui/js/form/components/group" sortOrder="60">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Bestseller</item>
+                    <item name="breakLine" xsi:type="boolean">false</item>
+                    <item name="additionalClasses" xsi:type="string">ol-quick-toggle</item>
+                </item>
+            </argument>
+            <field name="bestseller" formElement="checkbox" sortOrder="10">
+                <settings>
+                    <label translate="true">Bestseller</label>
+                    <dataType>boolean</dataType>
+                    <dataScope>quick.bestseller</dataScope>
+                </settings>
+                <formElements>
+                    <checkbox>
+                        <settings>
+                            <prefer>toggle</prefer>
+                            <valueMap>
+                                <map name="false" xsi:type="string">0</map>
+                                <map name="true" xsi:type="string">1</map>
+                            </valueMap>
+                        </settings>
+                    </checkbox>
+                </formElements>
+            </field>
+            <field name="bestseller_top" formElement="input" sortOrder="20">
+                <settings>
+                    <label translate="true">Among the top (last 30 days)</label>
+                    <notice translate="true">Ranked by units sold in this website in the last 30 days; updated daily.</notice>
+                    <dataType>number</dataType>
+                    <dataScope>quick.bestseller_top</dataScope>
+                    <validation>
+                        <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                    </validation>
+                </settings>
+            </field>
+        </container>
         <htmlContent name="advanced_conditions" sortOrder="100">
             <block class="Iranimij\OpenLabel\Block\Adminhtml\Label\Edit\Conditions" name="openlabel_label_conditions"/>
         </htmlContent>

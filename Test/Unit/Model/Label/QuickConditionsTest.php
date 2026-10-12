@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Iranimij\OpenLabel\Test\Unit\Model\Label;
 
+use Iranimij\OpenLabel\Model\Condition\Bestseller;
 use Iranimij\OpenLabel\Model\Condition\IsNew;
 use Iranimij\OpenLabel\Model\Condition\OnSale;
 use Iranimij\OpenLabel\Model\Condition\Rating;
@@ -48,6 +49,7 @@ class QuickConditionsTest extends TestCase
             'low_stock' => '1', 'low_stock_qty' => '5',
             'out_of_stock' => '1',
             'rating' => '1', 'rating_min' => '4',
+            'bestseller' => '1', 'bestseller_top' => '10',
         ], null);
 
         $tree = json_decode((string) $json, true);
@@ -60,6 +62,7 @@ class QuickConditionsTest extends TestCase
             [Stock::class, 'salable_qty', '<=', '5'],
             [Stock::class, 'is_salable', '==', '0'],
             [Rating::class, 'rating', '>=', '4'],
+            [Bestseller::class, 'sales_rank_30d', '<=', '10'],
         ], $leaves);
     }
 
@@ -85,7 +88,7 @@ class QuickConditionsTest extends TestCase
 
     public function testRoundTrip(): void
     {
-        $quick = ['on_sale' => '1', 'on_sale_min' => '15', 'low_stock' => '1', 'low_stock_qty' => '3'];
+        $quick = ['on_sale' => '1', 'on_sale_min' => '15', 'low_stock' => '1', 'low_stock_qty' => '3', 'bestseller' => '1', 'bestseller_top' => '5'];
         $json = (string) $this->quick()->compose($quick, $this->advanced());
 
         [$values, $advanced] = $this->quick()->decompose($json);
@@ -96,6 +99,7 @@ class QuickConditionsTest extends TestCase
         self::assertSame('3', $values['low_stock_qty']);
         self::assertSame('0', $values['is_new']);
         self::assertSame('0', $values['out_of_stock']);
+        self::assertSame(['1', '5'], [$values['bestseller'], $values['bestseller_top']]);
         self::assertSame($this->advanced()['conditions'], $advanced['conditions']);
         self::assertSame($json, $this->quick()->compose($values, $advanced), 'saving again changes nothing');
     }
@@ -117,6 +121,7 @@ class QuickConditionsTest extends TestCase
         [$values, $advanced] = $this->quick()->decompose(null);
 
         self::assertSame('0', $values['rating']);
+        self::assertSame(['0', '10'], [$values['bestseller'], $values['bestseller_top']], 'top 10 offered when switched on');
         self::assertNull($advanced);
     }
 }

@@ -12,8 +12,8 @@ Merged by me when CI is green. Order and scope from the approved plan; Hyvä Che
 
 | # | Slice | State |
 |---|---|---|
-| S1 | 1.1 data: label hide-on-zero / click-through / nofollow, design animation / hover / breakpoint sizes, export format 2; fix: `setup:db:status` diff after full reindex | PR #44, full matrix running |
-| S2 | Conditions: bestseller, most viewed, free shipping eligible | next |
+| S1 | 1.1 data: label hide-on-zero / click-through / nofollow, design animation / hover / breakpoint sizes, export format 2; fix: `setup:db:status` diff after full reindex | merged (#44, full matrix green) |
+| S2 | Conditions: bestseller (units + rank), most viewed (views + rank), ships free; Bestseller quick switch | PR open, full matrix |
 | S3 | Variables `{CATEGORY_NAME}` `{BRAND}` + hide on zero | |
 | S4 | Design 1.1: breakpoint sizes, animation/hover CSS, global CSS, AVIF + size setting, 30+ system designs | |
 | S5 | 21 positions, near price / add to cart / under name (+ openlabel-hyva) | |
@@ -33,6 +33,8 @@ Merged by me when CI is green. Order and scope from the approved plan; Hyvä Che
 - `click_url` is `varchar(1024)` (declarative-schema maximum); only https://, http:// and same-shop paths.
 - Design `sizes` is JSON in a text column (`{"sm": {"width": 24, "font_size": 11}}`), width in the design's size mode.
 - `openlabel_index` and its replica carry the same table comment (the full reindex swaps them by renaming).
+- Bestseller and most viewed count per website over fixed windows (7/30/90 days sold, 7/30 days viewed) and rank over 30 days (`RANK()`, MariaDB 10.2+/MySQL 8). Each is one aggregated subquery joined by the SQL builder; no temp table. Products with no activity have no rank, so "top N" never matches them. Labels using them are reindexed by the daily cron.
+- Ships free = the store's free-shipping threshold met by the final price, or an active no-coupon cart rule for the website/group with free shipping and no conditions. Cart rules with conditions are ignored (they depend on the cart, not the product).
 
 ## M4 slices
 
@@ -141,7 +143,7 @@ S1 merged as #12, S2–S10 through #21 (all M2 commits, full matrix green); #13�
 
 ## Exact next step
 
-M5 S1: wait for the full matrix on PR #44, merge, then S2 (conditions) on `feat/m5-s2-conditions`. (Correction: the Roadmap does define M5 = Release 1.1.) Open for Iman: recorded real-person UX tests (M2 ≤ 3 min custom label, M3 VoiceOver) whenever wanted; Hyvä compatibility tracker submission (`docs/tracker-entry.md`); optional operator dropdown on the quick switches.
+M5 S2: wait for the full matrix on the S2 PR, merge, then S3 (variables `{CATEGORY_NAME}` `{BRAND}` + hide on zero) on `feat/m5-s3-variables`. Open for Iman: recorded real-person UX tests (M2 ≤ 3 min custom label, M3 VoiceOver) whenever wanted; Hyvä compatibility tracker submission (`docs/tracker-entry.md`); optional operator dropdown on the quick switches.
 
 ## M1 decisions (also in the Notion build log at close-out)
 

@@ -8,7 +8,10 @@ declare(strict_types=1);
 
 namespace Iranimij\OpenLabel\Test\Integration\Model\Condition;
 
+use Iranimij\OpenLabel\Model\Condition\Bestseller;
+use Iranimij\OpenLabel\Model\Condition\FreeShipping;
 use Iranimij\OpenLabel\Model\Condition\IsNew;
+use Iranimij\OpenLabel\Model\Condition\MostViewed;
 use Iranimij\OpenLabel\Model\Condition\OnSale;
 use Iranimij\OpenLabel\Model\Condition\PriceRange;
 use Iranimij\OpenLabel\Model\Condition\Rating;
@@ -26,6 +29,7 @@ use Magento\Catalog\Test\Fixture\Product as ProductFixture;
 use Magento\ConfigurableProduct\Test\Fixture\Attribute as AttributeFixture;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Serialize\Serializer\Json;
+use Magento\TestFramework\Fixture\Config;
 use Magento\TestFramework\Fixture\DataFixture;
 use Magento\TestFramework\Fixture\DataFixtureStorageManager;
 use Magento\TestFramework\Fixture\DbIsolation;
@@ -66,6 +70,17 @@ class OperatorMatrixTest extends TestCase
         'salable_qty' => ['ol-op-a' => 3, 'ol-op-b' => 7, 'ol-op-c' => 100, 'ol-op-d' => 0],
         'rating' => ['ol-op-a' => 4.5, 'ol-op-b' => 3, 'ol-op-c' => null, 'ol-op-d' => null],
         'review_count' => ['ol-op-a' => 5, 'ol-op-b' => 1, 'ol-op-c' => 0, 'ol-op-d' => 0],
+        // Sales: a 5 units 3 days ago, b 2 units 20 days ago + 10 units 60 days ago, d 1 unit in a canceled order.
+        'sold_last_7d' => ['ol-op-a' => 5, 'ol-op-b' => 0, 'ol-op-c' => 0, 'ol-op-d' => 0],
+        'sold_last_30d' => ['ol-op-a' => 5, 'ol-op-b' => 2, 'ol-op-c' => 0, 'ol-op-d' => 0],
+        'sold_last_90d' => ['ol-op-a' => 5, 'ol-op-b' => 12, 'ol-op-c' => 0, 'ol-op-d' => 0],
+        'sales_rank_30d' => ['ol-op-a' => 1, 'ol-op-b' => 2, 'ol-op-c' => null, 'ol-op-d' => null],
+        // Product views: a once, b three times (all this week), d once 40 days ago.
+        'views_last_7d' => ['ol-op-a' => 1, 'ol-op-b' => 3, 'ol-op-c' => 0, 'ol-op-d' => 0],
+        'views_last_30d' => ['ol-op-a' => 1, 'ol-op-b' => 3, 'ol-op-c' => 0, 'ol-op-d' => 0],
+        'view_rank_30d' => ['ol-op-a' => 2, 'ol-op-b' => 1, 'ol-op-c' => null, 'ol-op-d' => null],
+        // Free-shipping threshold 100 on the final price.
+        'free_shipping' => ['ol-op-a' => 0, 'ol-op-b' => 0, 'ol-op-c' => 1],
     ];
 
     protected function setUp(): void
@@ -86,6 +101,8 @@ class OperatorMatrixTest extends TestCase
             ['entity_pk_value' => $ids['ol-op-a'], 'entity_type' => 1, 'reviews_count' => 5, 'rating_summary' => 90, 'store_id' => 1],
             ['entity_pk_value' => $ids['ol-op-b'], 'entity_type' => 1, 'reviews_count' => 1, 'rating_summary' => 60, 'store_id' => 1],
         ]);
+        $this->addOrders($ids);
+        $this->addViews($ids);
         // Last, so no save touches them again: days since created / updated.
         foreach ([
             'ol-op-a' => [10, 10],
@@ -118,6 +135,22 @@ class OperatorMatrixTest extends TestCase
         $this->assertNumeric(PriceRange::class, 'price', '100', '50, 200', ['ol-op-a', 'ol-op-b', 'ol-op-c']);
     }
 
+    protected function tearDown(): void
+    {
+        $resource = Bootstrap::getObjectManager()->get(ResourceConnection::class);
+        $connection = $resource->getConnection();
+        $ids = array_values($this->ids());
+        $orderIds = $connection->fetchCol(
+            $connection->select()->from($resource->getTableName('sales_order_item'), ['order_id'])
+                ->where('product_id IN (?)', $ids)
+        );
+        if ($orderIds !== []) {
+            $connection->delete($resource->getTableName('sales_order'), ['entity_id IN (?)' => $orderIds]);
+        }
+        $connection->delete($resource->getTableName('report_event'), ['object_id IN (?)' => $ids, 'event_type_id = ?' => 1]);
+        $connection->delete($resource->getTableName('salesrule'), ['name = ?' => 'ol-op free shipping']);
+    }
+
     public function testIsNew(): void
     {
         $this->assertBoolean(IsNew::class, 'news_dates');
@@ -137,6 +170,46 @@ class OperatorMatrixTest extends TestCase
         $this->assertNumeric(ReviewCount::class, 'review_count', '1', '0, 5');
     }
 
+    public function testBestseller(): void
+    {
+        $this->assertNumeric(Bestseller::class, 'sold_last_7d', '5', '0, 5');
+        $this->assertNumeric(Bestseller::class, 'sold_last_30d', '2', '0, 5');
+        $this->assertNumeric(Bestseller::class, 'sold_last_90d', '12', '5, 12');
+        $this->assertNumeric(Bestseller::class, 'sales_rank_30d', '1', '1, 2');
+    }
+
+    public function testMostViewed(): void
+    {
+        $this->assertNumeric(MostViewed::class, 'views_last_7d', '1', '0, 3');
+        $this->assertNumeric(MostViewed::class, 'views_last_30d', '3', '1, 3');
+        $this->assertNumeric(MostViewed::class, 'view_rank_30d', '2', '1');
+    }
+
+    #[Config('carriers/freeshipping/active', '1', 'store', 'default')]
+    #[Config('carriers/freeshipping/free_shipping_subtotal', '100', 'store', 'default')]
+    public function testFreeShipping(): void
+    {
+        // Out-of-stock d: the price index keeps it on 2.4.8+ only, so its answer differs by version.
+        $this->assertBoolean(FreeShipping::class, 'free_shipping', ['ol-op-a', 'ol-op-b', 'ol-op-c']);
+    }
+
+    #[Config('carriers/freeshipping/active', '0', 'store', 'default')]
+    #[Config('carriers/freeshipping/free_shipping_subtotal', '100', 'store', 'default')]
+    public function testFreeShippingNeedsTheCarrier(): void
+    {
+        $universe = ['ol-op-a', 'ol-op-b', 'ol-op-c'];
+        self::assertSame([], $this->match($this->builtIn(FreeShipping::class, 'free_shipping', '==', '1'), $universe));
+        self::assertSame($universe, $this->match($this->builtIn(FreeShipping::class, 'free_shipping', '==', '0'), $universe));
+    }
+
+    public function testFreeShippingFromACartRuleForEveryone(): void
+    {
+        $this->addFreeShippingCartRule();
+        $universe = ['ol-op-a', 'ol-op-b', 'ol-op-c'];
+
+        self::assertSame($universe, $this->match($this->builtIn(FreeShipping::class, 'free_shipping', '==', '1'), $universe));
+    }
+
     public function testBuiltInsOfferTheseOperators(): void
     {
         foreach ([
@@ -149,6 +222,9 @@ class OperatorMatrixTest extends TestCase
             [Rating::class, 'rating', self::NUMERIC],
             [ReviewCount::class, 'review_count', self::NUMERIC],
             [PriceRange::class, 'final_price', self::NUMERIC],
+            [Bestseller::class, 'sales_rank_30d', self::NUMERIC],
+            [MostViewed::class, 'views_last_30d', self::NUMERIC],
+            [FreeShipping::class, 'free_shipping', self::BOOLEAN],
         ] as [$class, $attribute, $operators]) {
             $condition = Bootstrap::getObjectManager()->create($class);
             $condition->setAttribute($attribute);
@@ -199,6 +275,63 @@ class OperatorMatrixTest extends TestCase
         ] as [$field, $operator, $value, $expected]) {
             self::assertSame($expected, $this->match($this->native($field, $operator, $value), $all), $field . ' ' . $operator . ' ' . $value);
         }
+    }
+
+    /**
+     * @param array<string, int> $ids sku => product id
+     */
+    private function addOrders(array $ids): void
+    {
+        $resource = Bootstrap::getObjectManager()->get(ResourceConnection::class);
+        $connection = $resource->getConnection();
+        foreach ([
+            ['ol-op-a', 5, 3, 'complete'],
+            ['ol-op-b', 2, 20, 'processing'],
+            ['ol-op-b', 10, 60, 'complete'],
+            ['ol-op-d', 1, 2, 'canceled'],
+        ] as [$sku, $qty, $daysAgo, $state]) {
+            $created = new \Zend_Db_Expr(sprintf('DATE_SUB(UTC_TIMESTAMP(), INTERVAL %d DAY)', $daysAgo));
+            $connection->insert($resource->getTableName('sales_order'), [
+                'state' => $state, 'status' => $state, 'store_id' => 1, 'created_at' => $created,
+            ]);
+            $orderId = (int) $connection->lastInsertId($resource->getTableName('sales_order'));
+            $connection->insert($resource->getTableName('sales_order_item'), [
+                'order_id' => $orderId, 'store_id' => 1, 'product_id' => $ids[$sku], 'sku' => $sku,
+                'product_type' => 'simple', 'qty_ordered' => $qty, 'created_at' => $created,
+            ]);
+        }
+    }
+
+    /**
+     * @param array<string, int> $ids sku => product id
+     */
+    private function addViews(array $ids): void
+    {
+        $resource = Bootstrap::getObjectManager()->get(ResourceConnection::class);
+        $rows = [];
+        foreach ([['ol-op-a', 1], ['ol-op-b', 2], ['ol-op-b', 3], ['ol-op-b', 4], ['ol-op-d', 40]] as [$sku, $daysAgo]) {
+            $rows[] = [
+                'logged_at' => new \Zend_Db_Expr(sprintf('DATE_SUB(UTC_TIMESTAMP(), INTERVAL %d DAY)', $daysAgo)),
+                'event_type_id' => 1, 'object_id' => $ids[$sku], 'subject_id' => 1, 'subtype' => 1, 'store_id' => 1,
+            ];
+        }
+        foreach ($rows as $row) {
+            $resource->getConnection()->insert($resource->getTableName('report_event'), $row);
+        }
+    }
+
+    /**
+     * An active cart rule without coupon and without conditions that gives free shipping to every group.
+     */
+    private function addFreeShippingCartRule(): void
+    {
+        $om = Bootstrap::getObjectManager();
+        $rule = $om->create(\Magento\SalesRule\Model\Rule::class);
+        $rule->setName('ol-op free shipping')->setIsActive(1)->setWebsiteIds([1])
+            ->setCustomerGroupIds([0, 1, 2, 3])->setCouponType(\Magento\SalesRule\Model\Rule::COUPON_TYPE_NO_COUPON)
+            ->setSimpleFreeShipping(\Magento\OfflineShipping\Model\SalesRule\Rule::FREE_SHIPPING_ADDRESS)
+            ->setSimpleAction('by_percent')->setDiscountAmount(0)->setStopRulesProcessing(0);
+        $rule->save();
     }
 
     /**

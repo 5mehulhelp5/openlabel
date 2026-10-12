@@ -23,7 +23,7 @@ Columns: status, name, design preview, where it shows ("Listing TR, Product TL")
 | Section | What it does |
 |---|---|
 | Basics | Name (admin only), switch it on or off, pick a design from thumbnails (or create one in a new tab and press "Refresh designs"), priority (lower number wins), "hide other labels", "show on configurable, grouped and bundle products". |
-| Show when | Switches for the common cases — On sale (minimum discount %), New (days), Low stock (pieces left), Out of stock, Well rated (stars) — and the advanced rule tree for anything else (any product attribute, category, SKU, attribute set, type). A product must match the switches **and** the tree. Nothing switched on means every product. |
+| Show when | Switches for the common cases — On sale (minimum discount %), New (days), Low stock (pieces left), Out of stock, Well rated (stars), Bestseller (among the top N by units sold in the last 30 days) — and the advanced rule tree for anything else (any product attribute, category, SKU, attribute set, type). A product must match the switches **and** the tree. Nothing switched on means every product. |
 | Show where | One row per placement: page (category/search/widgets or product page), position with the 3×3 picker (arrow keys work), a different design for this page, max labels in that corner, stacking, gap, offsets and "keep left/right in RTL". |
 | Who and when | Store views ("All Store Views" = everywhere), customer groups (empty = everyone), start and end in the shop timezone. A date without a time ends at the end of that day. Stored in UTC. |
 | Matched products | After the first save: how many products match in the default store view, the first 50 with thumbnails, what to check when nothing matches, and **Reindex now**. |

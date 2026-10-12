@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Iranimij\OpenLabel\Model\Rule;
 
 use Iranimij\OpenLabel\Model\Condition\AbstractBuiltIn;
+use Magento\Eav\Model\Entity\Collection\AbstractCollection;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Rule\Model\Condition\Combine;
 use Magento\Rule\Model\Condition\Sql\Builder;
@@ -22,6 +23,8 @@ use Magento\Rule\Model\Condition\Sql\Builder;
  * - Every condition gets its SQL here, so it means the same on every Magento version (2.4.7 and 2.4.8 wrap each
  *   field in IFNULL(field, 0), 2.4.9 does not): missing data never matches, whatever the operator. Built-ins add
  *   a guard, "(guard AND field <operator> value)"; product attribute conditions keep the core operators.
+ * - A built-in may join a bounded subquery (e.g. units sold in the last 30 days) by giving a Zend_Db_Expr as the
+ *   table "name"; the core builder only takes table names.
  */
 class SqlBuilder extends Builder
 {
@@ -75,6 +78,25 @@ class SqlBuilder extends Builder
         $guard = $condition->getSqlGuard();
 
         return (string) $value . ($guard === null ? '(' . $sql . ')' : '((' . $guard . ') AND ' . $sql . ')');
+    }
+
+    /**
+     * @param AbstractCollection $collection
+     * @param Combine $combine
+     * @return Builder
+     */
+    protected function _joinTablesToCollection(AbstractCollection $collection, Combine $combine): Builder // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        foreach ($this->_getCombineTablesToJoin($combine) as $alias => $joinTable) {
+            $name = $joinTable['name'];
+            $collection->getSelect()->joinLeft(
+                [$alias => $name instanceof \Zend_Db_Expr ? $name : $collection->getResource()->getTable($name)],
+                $joinTable['condition'],
+                $joinTable['columns'] ?? '*'
+            );
+        }
+
+        return $this;
     }
 
     /**
