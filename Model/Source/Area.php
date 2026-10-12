@@ -24,6 +24,11 @@ class Area implements OptionSourceInterface
         $labels = [
             'listing' => __('Category, search and widgets'),
             'product' => __('Product page'),
+            'cart' => __('Shopping cart'),
+            'minicart' => __('Mini cart'),
+            'wishlist' => __('Wish list'),
+            'compare' => __('Compare products'),
+            'email' => __('Order emails'),
         ];
         foreach ($labels as $value => $label) {
             $options[] = ['value' => (string) $value, 'label' => $label];

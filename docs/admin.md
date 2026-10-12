@@ -24,7 +24,7 @@ Columns: status, name, design preview, where it shows ("Listing TR, Product TL")
 |---|---|
 | Basics | Name (admin only), switch it on or off, pick a design from thumbnails (or create one in a new tab and press "Refresh designs"), priority (lower number wins), "hide other labels", "hide when a variable is zero" (e.g. leave "Only {STOCK_QTY} left" out when the quantity is 0), a link (a page of this shop such as `/sale.html`, or `https://…`; `javascript:` and other schemes are refused) with "ask search engines not to follow the link", "show on configurable, grouped and bundle products". |
 | Show when | Switches for the common cases — On sale (minimum discount %), New (days), Low stock (pieces left), Out of stock, Well rated (stars), Bestseller (among the top N by units sold in the last 30 days) — and the advanced rule tree for anything else (any product attribute, category, SKU, attribute set, type). A product must match the switches **and** the tree. Nothing switched on means every product. |
-| Show where | One row per placement: page (category/search/widgets or product page), position with the picker (arrow keys work): the 3×3 grid on the image, the dashed band around it (above, below, left, right), or in the product text next to the price, next to Add to Cart or under the name, a different design for this page, max labels in that corner, stacking, gap, offsets and "keep left/right in RTL". |
+| Show where | One row per placement: page (category/search/widgets, product page, and since 1.1 the shopping cart, mini cart, wish list, compare page and order emails, where labels show as text next to the item), position with the picker (arrow keys work): the 3×3 grid on the image, the dashed band around it (above, below, left, right), or in the product text next to the price, next to Add to Cart or under the name, a different design for this page, max labels in that corner, stacking, gap, offsets and "keep left/right in RTL". |
 | Who and when | Store views ("All Store Views" = everywhere), customer groups (empty = everyone), start and end in the shop timezone. A date without a time ends at the end of that day. Stored in UTC. |
 | Matched products | After the first save: how many products match in the default store view, the first 50 with thumbnails, what to check when nothing matches, and **Reindex now**. |
 
@@ -56,6 +56,8 @@ Stores › Configuration › Iranimij › OpenLabel:
 | Default max labels per position | 3 | For new placements (1–10). |
 | Label indexer | — | Shows the current mode; "Update by Schedule" is recommended. |
 | Debug mode | No | Adds `data-ol-label` attributes to the shop markup (render package, M3). |
+| Hide labels on these pages | none | Page types without labels (home, category, search, product, other content pages, cart, wish list, compare); no query is made there. Flush the page cache after a change. |
+| Hide labels on these other pages | empty | More pages by full action name, one per line (e.g. `brand_index_view`). |
 | Brand attribute (Label text variables) | `manufacturer` | The attribute `{BRAND}` shows. |
 | Largest image upload (Images) | 1024 KB | 50 to 5120 KB. |
 

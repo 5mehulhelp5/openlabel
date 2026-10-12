@@ -14,6 +14,7 @@ use Iranimij\Base\Model\Config\TypedReader;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Customer\Model\Context as CustomerContext;
 use Magento\Framework\App\Http\Context as HttpContext;
+use Magento\Framework\App\Request\Http as HttpRequest;
 use Magento\Framework\ObjectManager\ResetAfterRequestInterface;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -25,6 +26,20 @@ use Magento\Store\Model\StoreManagerInterface;
 class Labels implements ArgumentInterface, ResetAfterRequestInterface
 {
     public const CONFIG_ENABLED = 'openlabel/general/enabled';
+    public const CONFIG_HIDDEN_PAGES = 'openlabel/general/hidden_pages';
+    public const CONFIG_HIDDEN_ACTIONS = 'openlabel/general/hidden_actions';
+
+    /** Page types of the "hide labels on these pages" setting → full action names. */
+    public const PAGE_TYPES = [
+        'home' => ['cms_index_index'],
+        'category' => ['catalog_category_view'],
+        'search' => ['catalogsearch_result_index', 'catalogsearch_advanced_result'],
+        'product' => ['catalog_product_view'],
+        'cms' => ['cms_page_view'],
+        'cart' => ['checkout_cart_index'],
+        'wishlist' => ['wishlist_index_index'],
+        'compare' => ['catalog_product_compare_index'],
+    ];
 
     /** @var array<int, ResolvedLabelInterface[]> */
     private array $resolved = [];
@@ -40,21 +55,43 @@ class Labels implements ArgumentInterface, ResetAfterRequestInterface
      * @param StoreManagerInterface $storeManager
      * @param HttpContext $httpContext
      * @param TypedReader $config
+     * @param HttpRequest $request
      */
     public function __construct(
         private readonly LabelResolverInterface $resolver,
         private readonly StoreManagerInterface $storeManager,
         private readonly HttpContext $httpContext,
-        private readonly TypedReader $config
+        private readonly TypedReader $config,
+        private readonly HttpRequest $request
     ) {
+    }
+
+    /**
+     * Labels are on for the store and not hidden on this page ("hide labels on these pages", 1.1).
+     *
+     * @return bool
+     */
+    public function isEnabled(): bool
+    {
+        return $this->config->getBool(self::CONFIG_ENABLED) && !$this->isHiddenPage();
     }
 
     /**
      * @return bool
      */
-    public function isEnabled(): bool
+    private function isHiddenPage(): bool
     {
-        return $this->config->getBool(self::CONFIG_ENABLED);
+        $hidden = [];
+        foreach ($this->config->getList(self::CONFIG_HIDDEN_PAGES) as $type) {
+            $hidden = array_merge($hidden, self::PAGE_TYPES[$type] ?? []);
+        }
+        foreach (preg_split('/[\s,]+/', $this->config->getString(self::CONFIG_HIDDEN_ACTIONS)) ?: [] as $action) {
+            if ($action !== '') {
+                $hidden[] = $action;
+            }
+        }
+
+        return $hidden !== [] && in_array((string) $this->request->getFullActionName(), $hidden, true);
     }
 
     /**

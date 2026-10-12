@@ -103,9 +103,14 @@ class FormMapper
                 continue;
             }
             $designId = (int) ($row[PlacementInterface::DESIGN_ID] ?? 0);
+            $area = (string) ($row[PlacementInterface::AREA] ?? PlacementInterface::AREA_LISTING);
+            // Item lists show the labels as one row with the item name: the picker's position does not apply.
+            $position = in_array($area, PlacementInterface::ITEM_AREAS, true)
+                ? 'under_name'
+                : (string) ($row[PlacementInterface::POSITION] ?? 'tl');
             $placement = $this->placementFactory->create();
-            $placement->setArea((string) ($row[PlacementInterface::AREA] ?? PlacementInterface::AREA_LISTING))
-                ->setPosition((string) ($row[PlacementInterface::POSITION] ?? 'tl'))
+            $placement->setArea($area)
+                ->setPosition($position)
                 ->setDesignId($designId > 0 ? $designId : null)
                 ->setPinPhysicalSide($this->flag($row[PlacementInterface::PIN_PHYSICAL_SIDE] ?? false))
                 ->setOffsetX((int) ($row[PlacementInterface::OFFSET_X] ?? 0))

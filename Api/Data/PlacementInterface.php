@@ -30,8 +30,17 @@ interface PlacementInterface
 
     public const AREA_LISTING = 'listing';
     public const AREA_PRODUCT = 'product';
+    public const AREA_CART = 'cart';
+    public const AREA_MINICART = 'minicart';
+    public const AREA_WISHLIST = 'wishlist';
+    public const AREA_COMPARE = 'compare';
+    public const AREA_EMAIL = 'email';
+
+    /** Item lists (1.1): labels show as one row of text with the item; the position is always under_name. */
+    public const ITEM_AREAS = [self::AREA_CART, self::AREA_MINICART, self::AREA_WISHLIST, self::AREA_COMPARE, self::AREA_EMAIL];
+
     /** Areas available in this version. */
-    public const AREAS = [self::AREA_LISTING, self::AREA_PRODUCT];
+    public const AREAS = [self::AREA_LISTING, self::AREA_PRODUCT, ...self::ITEM_AREAS];
 
     /**
      * Positions on the image (the 3×3 grid) and in the bands just outside it (above, below, start side, end side);

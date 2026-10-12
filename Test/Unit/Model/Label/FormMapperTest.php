@@ -162,4 +162,20 @@ class FormMapperTest extends TestCase
         self::assertSame(['0', '1'], [$values['is_new'], $values['rating']]);
         self::assertSame('color', $advanced['conditions'][0]['attribute']);
     }
+
+    public function testItemAreasAlwaysShowTheLabelsWithTheItemName(): void
+    {
+        $label = $this->label();
+
+        $this->mapper()->apply($label, ['name' => 'Cart', 'placements' => [
+            ['area' => 'cart', 'position' => 'tl'],
+            ['area' => 'email', 'position' => 'near_price'],
+            ['area' => 'listing', 'position' => 'tl'],
+        ]]);
+
+        self::assertSame(
+            ['under_name', 'under_name', 'tl'],
+            array_map(static fn ($placement): string => $placement->getPosition(), $label->getPlacements())
+        );
+    }
 }

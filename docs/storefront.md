@@ -38,6 +38,7 @@ Run it after copying a database or `pub/media` between environments. On a fresh 
 | `ol-has-tip` + `ol-tip` | a label with a tooltip: the next sibling `<span class="ol-tip" role="tooltip">` is shown on hover and focus and referenced by `aria-describedby`; outside links the label is focusable (`tabindex="0"`) |
 | `ol-label--hidden`, `data-ol-variant="<id>"` | product page of a configurable product (1.1): every variant's labels are in the page; `0` is the product as it opens, the others stay hidden until that variant is chosen |
 | `ol-countdown` (`data-ol-end`, an `aria-hidden` ticking part, an `ol-sr` end date) | the `{COUNTDOWN}` variable (1.1) |
+| `ol-inline--cart` / `--minicart` / `--wishlist` / `--compare` | the row of labels of an item list (1.1): after the item name on the cart, wish list and compare pages, next to the item price in the mini cart |
 | `ol-inline`, `ol-inline--near-price` / `--near-cart` / `--under-name` | labels in the product text (1.1): part of the text flow, always side by side, sized by the design's font size |
 | `ol-p-<placement_id>` | offsets and gap of that placement (custom properties) |
 | `ol-label`, `ol-label--text` / `--image` / `--shape`, `ol-d-<design_id>`, `ol-shape-*` | the badge |
@@ -48,6 +49,14 @@ Custom properties: `--ol-bg --ol-fg --ol-border --ol-bw --ol-w --ol-rot --ol-op 
 JavaScript: none for display. Only pages with a `{COUNTDOWN}` or variant labels get one small inline script (openlabel-hyva, under 1 KB gzipped, registered for the CSP): one timer for all countdowns, paused in background tabs, and the switch between variant labels on Hyvä's `configurable-selection-changed` event (the labels of a variant show when exactly one variant matches the choice).
 
 Labels have `pointer-events: none`: clicks, hover image swaps and swatches work through them. Labels with a tooltip or a link (1.1) take the pointer; inside a product card a click on them still opens the product. Text sizes use container queries on the product card and the gallery, with an 11 px floor on small cards and phones.
+
+## Order emails (1.1)
+
+Labels of the "Order emails" area appear under the item name in order, invoice, shipment and credit memo emails
+(`<p class="openlabel-email">` after `<p class="product-name">` of the core item templates). Email clients ignore
+stylesheets, so each label is a `<span>` with inline styles built from the design's colours and shape; image
+designs are left out (many clients block images). Labels are resolved for the order's store view and customer
+group when the email is sent; price variables show the current price, so emails are best with plain text.
 
 ## Right-to-left stores
 

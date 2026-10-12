@@ -207,6 +207,25 @@ class LabelRendererTest extends TestCase
         self::assertTrue($renderer->isScriptNeeded());
     }
 
+    public function testAnItemAreaRendersAllItsLabelsAsOneRow(): void
+    {
+        $this->resolved = [
+            $this->label(1, 'under_name', 'vertical', 'text', 'Sale', area: 'cart'),
+            $this->label(2, 'tl', 'vertical', 'text', 'Old position', area: 'cart'),
+            $this->label(3, 'under_name', 'vertical', 'text', 'Wishlist only', area: 'wishlist'),
+        ];
+        $renderer = $this->renderer();
+
+        $stacks = $renderer->getAreaStacks($this->product(), 'cart');
+
+        self::assertCount(1, $stacks);
+        self::assertSame('ol-stack ol-stack--h ol-inline ol-inline--cart', $stacks[0]['classes']);
+        self::assertSame([1, 2], array_column($stacks[0]['labels'], 'id'));
+        self::assertNull($stacks[0]['labels'][0]['link'], 'item rows are links to the product already');
+        self::assertSame('stacks:1', $renderer->getAreaHtml($this->product(), 'wishlist'));
+        self::assertSame('', $renderer->getAreaHtml($this->product(), 'compare'));
+    }
+
     public function testInlinePositionsAreLeftOutOfTheImageSlot(): void
     {
         $this->resolved = [

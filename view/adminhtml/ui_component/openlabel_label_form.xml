@@ -468,6 +468,7 @@
                     </argument>
                     <settings>
                         <label translate="true">Page</label>
+                        <notice translate="true">In the cart, mini cart, wish list, compare page and order emails the labels show as text next to the item, so the position below does not apply there. Emails show text labels only.</notice>
                         <dataType>text</dataType>
                         <dataScope>area</dataScope>
                     </settings>
