@@ -4,7 +4,7 @@ Fine-grained checkpoint for the OpenLabel build. Updated with every merged PR. T
 
 ## Current milestone
 
-**M5 · Release 1.1 · Superset: in progress** (started 2026-10-12; plan approved by Iman, recommendations Q1–Q7 applied). Previous: M4 · API, import/export, release: **done** (2026-10-11), released as `v1.0.0` on openlabel, openlabel-hyva and openlabel-hyva-bundle. Recorded real-person tests waived by Iman for now ("no need for human test for now"). M3 · Hyvä render done 2026-10-11 (Hyvä 1.3 leg: best effort, see decisions). M2 done 2026-10-11, M1 2026-10-10, M0 2026-10-09.
+**M5 · Release 1.1 · Superset: done** (2026-10-12, released as `v1.1.0` on openlabel, openlabel-hyva and openlabel-hyva-bundle) (started 2026-10-12; plan approved by Iman, recommendations Q1–Q7 applied). Previous: M4 · API, import/export, release: **done** (2026-10-11), released as `v1.0.0` on openlabel, openlabel-hyva and openlabel-hyva-bundle. Recorded real-person tests waived by Iman for now ("no need for human test for now"). M3 · Hyvä render done 2026-10-11 (Hyvä 1.3 leg: best effort, see decisions). M2 done 2026-10-11, M1 2026-10-10, M0 2026-10-09.
 
 ## M5 slices
 
@@ -21,10 +21,10 @@ Merged by me when CI is green. Slices were built stacked branch on branch (S3 on
 | S7 | Variant-aware labels (product page), countdown | merged (#50); openlabel-hyva PR #13; dev-env e2e |
 | S8 | Cart, mini-cart, wishlist, compare, emails, hide on pages | merged (#51); openlabel-hyva PR #14 (+ PHPStan fix: compare list items); dev-env e2e |
 | S9 | Product edit tab + manual assignment (`openlabel_label_product`) | merged (#52, carries the QA-pass fixes; + PHPStan fix: phrases passed to the escaper as strings) |
-| S10 | REST CRUD (scope cut by Iman 2026-10-12: no GraphQL mutations, no bulk read) | PR #53; design fixture fix for 2.4.7/2.4.8 (sizes through `setSizes()`) found by the full matrix |
+| S10 | REST CRUD (scope cut by Iman 2026-10-12: no GraphQL mutations, no bulk read) | merged (#53); full matrix found two 2.4.7/2.4.8 issues, both fixed: design fixture sizes through `setSizes()`, and `UnstructuredArray` output (2.4.7/2.4.8 cast it element by element: `Plugin/Webapi/DesignOutputPlugin` restores store texts and sizes); full matrix 20/20 green (run 38274764765) |
 | S11 | Remote storage (S3) | skipped by Iman 2026-10-12 ("skip it please"): code already writes media through Magento's filesystem; docs/install.md says "should work, not tested"; no MinIO CI leg |
-| S12 | Label packs FR/ES/NL/IT | PR #54 (label packs de/fr/es/nl/it for the built-in designs) |
-| S13 | Close-out, README matrix, 1.1.0 | in progress on `feat/m5-s13-close-out`: README comparison with Amasty and Mirasvit (public docs only), 1.1 wording in README/docs, tooltip stacking fix (found in the report screenshots, Playwright test), bundle `release/1.1.0` (requires ^1.1), report screenshots in openlabel-dev-env `docs/m5-screenshots` |
+| S12 | Label packs FR/ES/NL/IT | merged (#54) |
+| S13 | Close-out, README matrix, 1.1.0 | merged (#55): README comparison with Amasty and Mirasvit (public docs only), 1.1 docs, tooltip stacking fix; openlabel-hyva #15 (README, openlabel-ref back to main); E2E specs openlabel-dev-env #12; releases v1.1.0-rc1 then v1.1.0 (openlabel, openlabel-hyva, bundle) |
 
 ### M5 QA pass (2026-10-12, S1–S9, tech lead + product owner + QA, storefront and admin in Chrome)
 
@@ -183,7 +183,7 @@ S1 merged as #12, S2–S10 through #21 (all M2 commits, full matrix green); #13�
 
 ## Exact next step
 
-M5 S13 close-out. In order: merge openlabel #53 (S10) and #54 (S12) once the full matrix on `feat/m5-s12-label-packs` is green; open the S13 PR (README matrix, docs, tooltip fix, PROGRESS); merge openlabel-hyva #12 → #13 → #14, then a hyva close-out PR resetting `.github/ci/openlabel-ref` to `main` with the README update; open one openlabel-dev-env PR with all M5 e2e specs (S4–S10 + S13) once both mains carry M5, E2E on Hyvä 1.4.2 + 1.5.2 + README leg; then `v1.1.0-rc1` on openlabel and openlabel-hyva, then `v1.1.0` on openlabel, openlabel-hyva and the bundle (`release/1.1.0`, requires ^1.1); Notion: 03 Feature Superset ticks, build log, things-to-remember; Farsi report with screenshots. Merged branches are deleted at the end (deleting a stacked PR's base closes the child PR). Open for Iman: recorded real-person UX tests (M2 ≤ 3 min custom label, M3 VoiceOver); Hyvä compatibility tracker submission (`docs/tracker-entry.md`); optional operator dropdown on the quick switches; re-create the lost label #341 "test"?
+M5 is done. Next: M6 / 1.2 planning when Iman wants it (04 · Roadmap). Merged M5 branches still to delete (openlabel `feat/m5-*`, openlabel-hyva `feat/m5-*`, openlabel-dev-env `test/m5-*`). Open for Iman: review the README comparison table; recorded real-person UX tests (M2 ≤ 3 min custom label, M3 VoiceOver); Hyvä compatibility tracker submission (`docs/tracker-entry.md`); optional operator dropdown on the quick switches; re-create the lost label #341 "test"?
 
 ## M1 decisions (also in the Notion build log at close-out)
 

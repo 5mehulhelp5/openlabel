@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-12
+
+OpenLabel 1.1: labels in the cart, mini cart, wish list, compare page and order emails, 21 positions, tooltips and links, variant labels and a live countdown, new conditions and variables, 31 built-in designs, a product page section, a REST API and label packs in six languages. Supported: Magento 2.4.7–2.4.9, PHP 8.2–8.4, Hyvä 1.4 and 1.5 (1.3 best effort).
+
 ### Added
 - Data for the 1.1 features (shown in the admin and storefront by the following 1.1 changes): labels get "hide when a variable is zero or empty", a click-through link (https://, http:// or a /path; `javascript:`, `data:` and `//host` links are refused) and its nofollow flag; designs get an entry animation (none, fade, pop), a hover effect (none, grow, lift) and per-breakpoint size overrides (sm, md, lg: width and font size).
 - Conditions **Bestseller** (units sold in the last 7, 30 or 90 days; bestseller rank over the last 30 days), **Most viewed** (product views in the last 7 or 30 days; rank over 30 days, from Magento's product view reports) and **Ships free** (a cart rule without coupon or conditions gives free shipping, or the final price reaches the free shipping method's minimum). All three are refreshed by the daily cron. New "Show when" switch: Bestseller (among the top N, default 10).
@@ -96,7 +100,8 @@ First release candidate of OpenLabel 1.0: engine (M1), admin (M2), Hyvä render 
 - `openlabel:reindex` and `openlabel:preview` run in the adminhtml area: right after a cache flush they failed with "Area code is not set" while building a label's condition tree.
 - Label and design changes now also clean the application cache (theme block caches such as Hyvä's one-hour product card cache), not only the page cache; a design save cleans `openlabel_design_<id>` even when only a store text changed. Found by the M3 storefront purge spec.
 
-[Unreleased]: https://github.com/iranimij/openlabel/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/iranimij/openlabel/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/iranimij/openlabel/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/iranimij/openlabel/compare/v1.0.0-rc2...v1.0.0
 [1.0.0-rc2]: https://github.com/iranimij/openlabel/compare/v1.0.0-rc1...v1.0.0-rc2
 [1.0.0-rc1]: https://github.com/iranimij/openlabel/releases/tag/v1.0.0-rc1

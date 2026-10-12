@@ -113,6 +113,10 @@ Hyvä 1.5 rebuilt the product gallery as a snap slider:
 - **Container-query root:** `#gallery` (only when it holds labels, `:has`). Containment must not go on the track
   or the wrapper: the wrapper is a shrink-to-fit flex item on desktop, and inline-size containment collapses the
   whole gallery to zero width (found by the 1.5 end-to-end leg). On 1.3/1.4 the root stays `#gallery-main`.
+- **Previous/next buttons:** they sit in a bottom corner of the image (`bottom-2 end-2`, or the start corner with
+  the theme's "start" setting) above the track. Labels placed in that corner move up 3.25 rem, above the buttons,
+  or they would be covered and not clickable (found by the 1.1 end-to-end leg). The rule is keyed on the buttons
+  being in the markup, so nothing moves after Alpine starts.
 - Listings are unchanged in 1.5: the image link of the product card is the slot, the card is the root.
 - Swatch selection still dispatches `configurable-selection-changed`; the swatches are a `<fieldset>` with a
   legend instead of a `radiogroup`.
