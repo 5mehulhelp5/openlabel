@@ -65,7 +65,7 @@
     overflow-wrap: anywhere;
     padding: .3em .7em;
     text-align: center;
-    transform: rotate(var(--ol-rot, 0deg));
+    transform: rotate(var(--ol-rot, 0deg)) translateY(var(--ol-lift, 0)) scale(var(--ol-scale, 1));
 }
 
 .ol-label--image {
@@ -85,6 +85,38 @@
 .ol-shape-circle { aspect-ratio: 1; border-radius: 50%; padding: .4em; }
 .ol-shape-ribbon { border-radius: 2px 0 0 2px; padding-inline-end: 1.1em; clip-path: polygon(0 0, 100% 0, calc(100% - .6em) 50%, 100% 100%, 0 100%); }
 .ol-shape-corner { padding-inline: 1.4em; }
+
+/*
+ * Motion (1.1): CSS only. The entry animation plays once when the label is rendered; the hover effect reacts to
+ * the product card (labels themselves let pointer events through). Both are off for reduced motion.
+ */
+.ol-anim-fade { animation: ol-fade .35s ease-out both; }
+.ol-anim-pop { animation: ol-pop .35s cubic-bezier(.34, 1.56, .64, 1) both; }
+
+@keyframes ol-fade {
+    from { opacity: 0; }
+}
+
+@keyframes ol-pop {
+    from { opacity: 0; transform: rotate(var(--ol-rot, 0deg)) scale(.6); }
+}
+
+.ol-hover-grow,
+.ol-hover-lift {
+    transition: transform .2s ease-out;
+}
+
+@media (hover: hover) {
+    :hover > .ol-stack > .ol-hover-grow { --ol-scale: 1.08; }
+    :hover > .ol-stack > .ol-hover-lift { --ol-lift: -3px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ol-label {
+        animation: none;
+        transition: none;
+    }
+}
 
 /* Mobile minimum (08 · UX Spec §2): small screens, and narrow cards such as mobile listings and sliders. */
 @media (max-width: 767px) {

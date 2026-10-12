@@ -26,6 +26,7 @@ class LabelResolver implements LabelResolverInterface
     private const DESIGN_COLUMNS = [
         'design_id', 'name', 'type', 'shape', 'image_path', 'image_width', 'image_height', 'bg_color', 'text_color',
         'border_color', 'border_width', 'font_size', 'size_mode', 'width', 'height', 'opacity', 'rotation', 'custom_css', 'is_system',
+        'animation', 'hover_effect',
     ];
     private const PLACEMENT_COLUMNS = [
         'placement_id', 'area', 'position', 'pin_physical_side', 'design_id', 'offset_x', 'offset_y', 'max_labels',

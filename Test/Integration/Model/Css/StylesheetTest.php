@@ -17,6 +17,7 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Filesystem;
 use Magento\Framework\Filesystem\Directory\WriteInterface;
 use Magento\TestFramework\Fixture\AppArea;
+use Magento\TestFramework\Fixture\Config as ConfigFixture;
 use Magento\TestFramework\Fixture\DataFixture;
 use Magento\TestFramework\Fixture\DataFixtureStorageManager;
 use Magento\TestFramework\Fixture\DbIsolation;
@@ -54,6 +55,14 @@ class StylesheetTest extends TestCase
         self::assertStringContainsString('.ol-d-' . $id . '{--ol-bg:#123456', $css);
         self::assertStringContainsString('.ol-stack{', $css, 'structural CSS is part of the same file (FE2)');
         self::assertStringContainsString('/media/openlabel/1/openlabel.', $this->storage->url(1, $paths[1]));
+    }
+
+    #[ConfigFixture('openlabel_css/general/global_css', '.ol-label{letter-spacing:.04em}', 'default')]
+    public function testTheGlobalCssIsPartOfEveryStoresStylesheet(): void
+    {
+        $paths = $this->regenerator->regenerateAll();
+
+        self::assertStringEndsWith("/* global */\n.ol-label{letter-spacing:.04em}\n", $this->media->readFile($paths[1]));
     }
 
     #[DataFixture(DesignFixture::class, ['bg_color' => '#123456'], 'design')]

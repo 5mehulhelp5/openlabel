@@ -55,6 +55,20 @@ class SaveTest extends AbstractBackendController
         self::assertRedirect(self::stringContains('openlabel/design/edit/id/' . $design->getDesignId()));
     }
 
+    public function testMotionAndBreakpointSizesAreSaved(): void
+    {
+        $this->post($this->textDesign('Moving') + [
+            'animation' => 'pop',
+            'hover_effect' => 'grow',
+            'sizes' => ['sm' => ['width' => '26', 'font_size' => '11'], 'md' => ['width' => '', 'font_size' => ''], 'lg' => ['width' => '14']],
+        ]);
+
+        $design = $this->designNamed('Moving');
+        self::assertSame('pop', $design->getAnimation());
+        self::assertSame('grow', $design->getHoverEffect());
+        self::assertSame(['sm' => ['width' => 26, 'font_size' => 11], 'lg' => ['width' => 14]], $design->getSizes(), 'empty breakpoints are not stored');
+    }
+
     public function testStoreViewUsingTheDefaultTextStoresNoRow(): void
     {
         $data = $this->textDesign('Default only');

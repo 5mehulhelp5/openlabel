@@ -270,14 +270,14 @@
         <field name="image" formElement="imageUploader" sortOrder="10">
             <settings>
                 <label translate="true">Image</label>
-                <notice translate="true">PNG, JPG, GIF, WebP or SVG. SVG stays sharp at every size; files over 50 KB slow down listings.</notice>
+                <notice translate="true">PNG, JPG, GIF, WebP, AVIF or SVG. SVG stays sharp at every size; files over 50 KB slow down listings.</notice>
                 <componentType>imageUploader</componentType>
                 <dataScope>image</dataScope>
             </settings>
             <formElements>
                 <imageUploader>
                     <settings>
-                        <allowedExtensions>png jpg jpeg gif webp svg</allowedExtensions>
+                        <allowedExtensions>png jpg jpeg gif webp avif svg</allowedExtensions>
                         <maxFileSize>1048576</maxFileSize>
                         <uploaderConfig>
                             <param xsi:type="string" name="url">openlabel/design/upload</param>
@@ -359,6 +359,114 @@
                     <rule name="validate-digits-range" xsi:type="string">0-100</rule>
                 </validation>
             </settings>
+        </field>
+        <field name="sizes_sm_width" formElement="input" sortOrder="50">
+            <settings>
+                <label translate="true">Phones: width</label>
+                <notice translate="true">Optional. Overrides the width (in the size unit above) and the largest font size (px) on this screen size.</notice>
+                <dataType>number</dataType>
+                <dataScope>sizes.sm.width</dataScope>
+                <validation>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="sizes_sm_font_size" formElement="input" sortOrder="51">
+            <settings>
+                <label translate="true">Phones: font size (px)</label>
+                <dataType>number</dataType>
+                <dataScope>sizes.sm.font_size</dataScope>
+                <validation>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="sizes_md_width" formElement="input" sortOrder="52">
+            <settings>
+                <label translate="true">Tablets: width</label>
+                <dataType>number</dataType>
+                <dataScope>sizes.md.width</dataScope>
+                <validation>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="sizes_md_font_size" formElement="input" sortOrder="53">
+            <settings>
+                <label translate="true">Tablets: font size (px)</label>
+                <dataType>number</dataType>
+                <dataScope>sizes.md.font_size</dataScope>
+                <validation>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="sizes_lg_width" formElement="input" sortOrder="54">
+            <settings>
+                <label translate="true">Desktops: width</label>
+                <dataType>number</dataType>
+                <dataScope>sizes.lg.width</dataScope>
+                <validation>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="sizes_lg_font_size" formElement="input" sortOrder="55">
+            <settings>
+                <label translate="true">Desktops: font size (px)</label>
+                <dataType>number</dataType>
+                <dataScope>sizes.lg.font_size</dataScope>
+                <validation>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+    </fieldset>
+    <fieldset name="motion" sortOrder="65">
+        <settings>
+            <label translate="true">Motion</label>
+            <collapsible>true</collapsible>
+            <opened>false</opened>
+        </settings>
+        <field name="animation" formElement="select" sortOrder="10">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="string">none</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Entry animation</label>
+                <notice translate="true">Plays once when the label appears. Shoppers who ask their device for reduced motion never see it.</notice>
+                <dataType>text</dataType>
+                <dataScope>animation</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Iranimij\OpenLabel\Model\Source\Animation"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="hover_effect" formElement="select" sortOrder="20">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="string">none</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Hover effect</label>
+                <notice translate="true">While the shopper points at the product. Not on touch screens or with reduced motion.</notice>
+                <dataType>text</dataType>
+                <dataScope>hover_effect</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Iranimij\OpenLabel\Model\Source\HoverEffect"/>
+                    </settings>
+                </select>
+            </formElements>
         </field>
     </fieldset>
     <fieldset name="store_views" sortOrder="70">

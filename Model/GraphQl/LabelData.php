@@ -45,10 +45,7 @@ class LabelData
         $design = $label->getDesign();
         $designId = (int) $design->getDesignId();
         $isImage = $design->getType() === DesignInterface::TYPE_IMAGE;
-        $classes = ['ol-label', 'ol-label--' . $design->getType(), $this->designRules->designClass($designId)];
-        if (!$isImage && (string) $design->getShape() !== '') {
-            $classes[] = 'ol-shape-' . $design->getShape();
-        }
+        $classes = $this->designRules->labelClasses($design);
         $placement = $label->getPlacement();
         $text = null;
         if (!$isImage) {

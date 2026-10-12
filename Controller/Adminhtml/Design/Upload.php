@@ -71,7 +71,7 @@ class Upload extends Action implements HttpPostActionInterface
             if ($check->getSanitizedContents() !== null) {
                 $this->fileDriver->filePutContents((string) $file['tmp_name'], $check->getSanitizedContents());
             }
-            $uploader->setAllowedExtensions(['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg']);
+            $uploader->setAllowedExtensions(['png', 'jpg', 'jpeg', 'gif', 'webp', 'avif', 'svg']);
             $uploader->setAllowRenameFiles(true);
             $uploader->setFilesDispersion(false);
             $media = $this->filesystem->getDirectoryWrite(DirectoryList::MEDIA);

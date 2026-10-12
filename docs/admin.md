@@ -37,12 +37,13 @@ Save, Save & Continue and Save & Duplicate (creates a disabled copy). Problems a
 Choose **Text**, **Image** or **Shape**; the form shows only what that type needs.
 
 - **Text and shape:** label text with a variable picker and a 24-character counter, colours with a live contrast badge (green ≥ 4.5:1, amber ≥ 3:1, red below), border, shape (rectangle, pill, circle, ribbon, corner) and rotation presets.
-- **Image:** PNG, JPG, GIF, WebP or SVG up to 1 MB (a warning above 50 KB). The real content type is checked; SVGs are cleaned (no scripts, event handlers, external references or entities). Width and height are stored so images never shift the layout. Alternative text is required.
-- **Size:** percent of the product image width (default) or pixels.
+- **Image:** PNG, JPG, GIF, WebP, AVIF or SVG up to 1 MB (the limit is a setting; a warning above 50 KB). The real content type is checked; SVGs are cleaned (no scripts, event handlers, external references or entities). Width and height are stored so images never shift the layout. Alternative text is required.
+- **Size:** percent of the product image width (default) or pixels. Optional overrides of the width and the largest font size for phones (up to 639 px wide), tablets (640–1023 px) and desktops (1024 px and up).
+- **Motion:** an entry animation (fade in, pop in) that plays once, and a hover effect (grow, lift) while the shopper points at the product. CSS only; not on touch screens for hover, and never for shoppers who ask their device for reduced motion.
 - **Text per store view:** each store view uses the default text unless you untick "Use the default text".
 - **Custom CSS:** only for users with the "Edit custom CSS of designs" permission; `@media`, `@supports` and `@container` blocks are kept; other at-rules (such as `@import`), expressions, script URLs and escapes are removed before it is saved.
 
-The 15 built-in designs are locked: open one and press **Duplicate to edit**. They pass WCAG AA contrast. Designs used by labels and built-in designs cannot be deleted.
+The 31 built-in designs are locked: open one and press **Duplicate to edit**. They pass WCAG AA contrast. Designs used by labels and built-in designs cannot be deleted.
 
 ## Settings
 
@@ -54,6 +55,10 @@ Stores › Configuration › Iranimij › OpenLabel:
 | Default max labels per position | 3 | For new placements (1–10). |
 | Label indexer | — | Shows the current mode; "Update by Schedule" is recommended. |
 | Debug mode | No | Adds `data-ol-label` attributes to the shop markup (render package, M3). |
+| Brand attribute (Label text variables) | `manufacturer` | The attribute `{BRAND}` shows. |
+| Largest image upload (Images) | 1024 KB | 50 to 5120 KB. |
+
+**Global CSS** has its own section (Stores › Configuration › Iranimij › OpenLabel custom CSS) and permission: CSS added after all designs in the label stylesheet of every store, cleaned like the custom CSS of designs. Saving it rebuilds the stylesheet.
 
 ## Permissions
 
@@ -62,4 +67,5 @@ Stores › Configuration › Iranimij › OpenLabel:
 | `Iranimij_OpenLabel::labels` | Labels grid, form, starters, matched products, reindex |
 | `Iranimij_OpenLabel::designs` | Designs grid, form, uploads |
 | `Iranimij_OpenLabel::custom_css` | Editing custom CSS of designs |
+| `Iranimij_OpenLabel::global_css` | The global CSS settings section |
 | `Iranimij_OpenLabel::config` | The settings section |

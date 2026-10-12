@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 - Conditions **Bestseller** (units sold in the last 7, 30 or 90 days; bestseller rank over the last 30 days), **Most viewed** (product views in the last 7 or 30 days; rank over 30 days, from Magento's product view reports) and **Ships free** (a cart rule without coupon or conditions gives free shipping, or the final price reaches the free shipping method's minimum). All three are refreshed by the daily cron. New "Show when" switch: Bestseller (among the top N, default 10).
 - Label text variables `{CATEGORY_NAME}` (the category being browsed, otherwise the product's deepest active category) and `{BRAND}` (the attribute set under Stores › Configuration › OpenLabel › Label text variables, default `manufacturer`).
 - "Hide when a variable is zero" on the label form: the label is left out on products where a variable in its text is 0 or empty, on the storefront and in GraphQL.
+- Designs: per-breakpoint width and font size (phones, tablets, desktops), an entry animation (fade in, pop in) and a hover effect (grow, lift), CSS only and off for reduced motion; also in the admin live preview and the GraphQL `css_class`.
+- Global CSS: a settings section with its own permission (`Iranimij_OpenLabel::global_css`), sanitized like design custom CSS and added at the end of the label stylesheet.
+- AVIF label images (dimensions read from the file), and a "Largest image upload" setting (default 1 MB, up to 5 MB).
+- 16 more built-in designs (31 in total), e.g. Bestseller, Ships free, Brand tag (`{BRAND}`), Category tag (`New in {CATEGORY_NAME}`) and Flash sale (pops in); all pass WCAG AA contrast. Existing built-in designs are not changed on upgrade.
 - Export file format version 2 with these fields; version 1 files from OpenLabel 1.0 still import, the new fields taking their defaults.
 
 ### Changed

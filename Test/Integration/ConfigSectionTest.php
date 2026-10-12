@@ -55,6 +55,25 @@ class ConfigSectionTest extends TestCase
         self::assertFalse($config->isDebug());
     }
 
+    public function testGlobalCssHasItsOwnSectionAndAclResource(): void
+    {
+        $sections = Bootstrap::getObjectManager()->get(ConfigStructureData::class)->get()['sections'];
+
+        self::assertSame('Iranimij_OpenLabel::global_css', $sections['openlabel_css']['resource'] ?? null);
+        self::assertArrayHasKey('global_css', $sections['openlabel_css']['children']['general']['children']);
+    }
+
+    public function testImageUploadLimitDefaultsToOneMegabyte(): void
+    {
+        self::assertSame(1024, Bootstrap::getObjectManager()->get(Config::class)->getMaxUploadKb());
+    }
+
+    #[ConfigFixture('openlabel/images/max_upload_kb', '99999', 'default')]
+    public function testImageUploadLimitIsCapped(): void
+    {
+        self::assertSame(Config::MAX_UPLOAD_KB_CAP, Bootstrap::getObjectManager()->get(Config::class)->getMaxUploadKb());
+    }
+
     public function testBrandVariableReadsTheManufacturerAttributeByDefault(): void
     {
         $om = Bootstrap::getObjectManager();

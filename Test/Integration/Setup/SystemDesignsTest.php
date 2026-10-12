@@ -10,6 +10,7 @@ namespace Iranimij\OpenLabel\Test\Integration\Setup;
 
 use Iranimij\OpenLabel\Model\Design\SystemDesignCatalog;
 use Iranimij\OpenLabel\Setup\Patch\Data\SystemDesigns;
+use Iranimij\OpenLabel\Setup\Patch\Data\SystemDesignsOneDotOne;
 use Magento\Framework\App\ResourceConnection;
 use Magento\TestFramework\Fixture\DbIsolation;
 use Magento\TestFramework\Helper\Bootstrap;
@@ -18,11 +19,11 @@ use PHPUnit\Framework\TestCase;
 #[DbIsolation(true)]
 class SystemDesignsTest extends TestCase
 {
-    public function testInstallCreatesTheFifteenSystemDesignsWithDefaultText(): void
+    public function testInstallCreatesTheThirtyOneSystemDesignsWithDefaultText(): void
     {
         $rows = $this->systemRows();
 
-        self::assertCount(15, $rows);
+        self::assertCount(31, $rows);
         $names = array_column((new SystemDesignCatalog())->getDefinitions(), 'name');
         self::assertEqualsCanonicalizing($names, array_column($rows, 'name'));
         self::assertNotContains(null, array_column($rows, 'text'), 'every system design has store-0 text');
@@ -31,8 +32,9 @@ class SystemDesignsTest extends TestCase
     public function testApplyingAgainCreatesNoDuplicates(): void
     {
         Bootstrap::getObjectManager()->create(SystemDesigns::class)->apply();
+        Bootstrap::getObjectManager()->create(SystemDesignsOneDotOne::class)->apply();
 
-        self::assertCount(15, $this->systemRows());
+        self::assertCount(31, $this->systemRows());
     }
 
     public function testApplyingAgainRestoresAMissingDesignButKeepsMerchantEdits(): void
@@ -45,9 +47,14 @@ class SystemDesignsTest extends TestCase
         Bootstrap::getObjectManager()->create(SystemDesigns::class)->apply();
 
         $byName = array_column($this->systemRows(), null, 'name');
-        self::assertCount(15, $byName);
+        self::assertCount(31, $byName);
         self::assertSame('#000000', $byName['Sale pill (red)']['bg_color'], 'merchant edit kept');
         self::assertSame('#166534', $byName['Eco (forest)']['bg_color'], 'missing design restored');
+    }
+
+    public function testTheOneDotOnePatchRunsAfterTheOneDotZeroPatch(): void
+    {
+        self::assertSame([SystemDesigns::class], SystemDesignsOneDotOne::getDependencies());
     }
 
     /**

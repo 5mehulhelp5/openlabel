@@ -111,7 +111,10 @@ class Save extends Action implements HttpPostActionInterface
             ->setBgColor($this->nullable($data[DesignInterface::BG_COLOR] ?? null))
             ->setTextColor($this->nullable($data[DesignInterface::TEXT_COLOR] ?? null))
             ->setBorderColor($this->nullable($data[DesignInterface::BORDER_COLOR] ?? null))
-            ->setSizeMode((string) ($data[DesignInterface::SIZE_MODE] ?? DesignInterface::SIZE_MODE_PERCENT));
+            ->setSizeMode((string) ($data[DesignInterface::SIZE_MODE] ?? DesignInterface::SIZE_MODE_PERCENT))
+            ->setAnimation((string) ($data[DesignInterface::ANIMATION] ?? '') ?: DesignInterface::ANIMATION_NONE)
+            ->setHoverEffect((string) ($data[DesignInterface::HOVER_EFFECT] ?? '') ?: DesignInterface::HOVER_EFFECT_NONE)
+            ->setSizes($this->sizes($data[DesignInterface::SIZES] ?? []));
         $design->setBorderWidth($this->int($data, DesignInterface::BORDER_WIDTH))
             ->setFontSize($this->int($data, DesignInterface::FONT_SIZE))
             ->setWidth($this->int($data, DesignInterface::WIDTH))
@@ -157,6 +160,27 @@ class Save extends Action implements HttpPostActionInterface
         }
 
         return $texts;
+    }
+
+    /**
+     * Breakpoint overrides from the form: empty inputs are dropped, the validator checks the rest.
+     *
+     * @param mixed $rows breakpoint => [width, font_size]
+     * @return array<string, array<string, int>>
+     */
+    private function sizes(mixed $rows): array
+    {
+        $sizes = [];
+        foreach (is_array($rows) ? $rows : [] as $breakpoint => $row) {
+            foreach (is_array($row) ? $row : [] as $field => $value) {
+                $value = trim((string) $value);
+                if ($value !== '') {
+                    $sizes[(string) $breakpoint][(string) $field] = (int) $value;
+                }
+            }
+        }
+
+        return $sizes;
     }
 
     /**

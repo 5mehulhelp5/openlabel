@@ -73,7 +73,7 @@
             <settings>
                 <filter>textRange</filter>
                 <label translate="true">ID</label>
-                <sorting>asc</sorting>
+                <sorting>desc</sorting>
             </settings>
         </column>
         <column name="thumb" class="Iranimij\OpenLabel\Ui\Component\Listing\Column\DesignThumb" sortOrder="20">

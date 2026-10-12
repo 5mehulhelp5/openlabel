@@ -231,10 +231,7 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
         $this->identities[Label::CACHE_TAG_PREFIX . $label->getLabelId()] = true;
         $this->identities[Design::CACHE_TAG . '_' . $designId] = true;
 
-        $classes = ['ol-label', 'ol-label--' . $design->getType(), $this->designRules->designClass($designId)];
-        if ($design->getType() !== DesignInterface::TYPE_IMAGE && (string) $design->getShape() !== '') {
-            $classes[] = 'ol-shape-' . $design->getShape();
-        }
+        $classes = $this->designRules->labelClasses($design);
         $image = null;
         if ($design->getType() === DesignInterface::TYPE_IMAGE) {
             $image = [

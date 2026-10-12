@@ -34,6 +34,7 @@ class AclTest extends TestCase
             'Iranimij_OpenLabel::labels',
             'Iranimij_OpenLabel::designs',
             'Iranimij_OpenLabel::custom_css',
+            'Iranimij_OpenLabel::global_css',
         ] as $id) {
             self::assertContains($id, $ids, "ACL resource $id must be declared");
         }

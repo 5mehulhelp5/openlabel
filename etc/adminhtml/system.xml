@@ -47,6 +47,27 @@
                     <validate>validate-code</validate>
                 </field>
             </group>
+            <group id="images" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Images</label>
+                <field id="max_upload_kb" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="1">
+                    <label>Largest image upload (KB)</label>
+                    <comment>Label images above this size are refused (50 to 5120). Files over 50 KB already get a warning: small images keep listings fast.</comment>
+                    <validate>validate-digits validate-digits-range digits-range-50-5120</validate>
+                </field>
+            </group>
+        </section>
+        <section id="openlabel_css" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="0" showInStore="0">
+            <label>OpenLabel custom CSS</label>
+            <tab>iranimij</tab>
+            <resource>Iranimij_OpenLabel::global_css</resource>
+            <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Global CSS</label>
+                <field id="global_css" translate="label comment" type="textarea" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>CSS for all labels</label>
+                    <comment>Added after all designs in the label stylesheet of every store. @import, expressions, script URLs and escapes are removed when you save.</comment>
+                    <backend_model>Iranimij\OpenLabel\Model\Config\Backend\GlobalCss</backend_model>
+                </field>
+            </group>
         </section>
     </system>
 </config>

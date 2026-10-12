@@ -64,6 +64,8 @@ class PickerOptions
                     'width' => (int) ($row['width'] ?? 18),
                     'opacity' => (int) ($row['opacity'] ?? 100),
                     'rotation' => (int) ($row['rotation'] ?? 0),
+                    'animation' => (string) ($row['animation'] ?? 'none'),
+                    'hover_effect' => (string) ($row['hover_effect'] ?? 'none'),
                     'text' => (string) ($row['text'] ?? ''),
                     'alt_text' => (string) ($row['alt_text'] ?? ''),
                     'image_url' => $imageUrl,

@@ -16,7 +16,7 @@ use Iranimij\OpenLabel\Model\ResourceModel\Design\CollectionFactory;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 
 /**
- * Installs the 15 built-in designs. Idempotent: a system design that already exists (matched by name) is never
+ * Installs the built-in designs of the catalog. Idempotent: a system design that already exists (matched by name) is never
  * touched, so merchant edits survive; a missing one is created again.
  */
 class SystemDesigns implements DataPatchInterface

@@ -108,6 +108,9 @@ class Form extends AbstractDataProvider
         /** @var \Iranimij\OpenLabel\Model\Design $design */
         $data = $design->getData();
         unset($data[DesignInterface::STORE_TEXTS]);
+        $data[DesignInterface::SIZES] = $design->getSizes();
+        $data[DesignInterface::ANIMATION] = $design->getAnimation();
+        $data[DesignInterface::HOVER_EFFECT] = $design->getHoverEffect();
         $texts = $design->getStoreTexts();
         $data['store_texts'] = [];
         $data['store_texts'][0] = [
