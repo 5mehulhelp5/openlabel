@@ -134,21 +134,21 @@ class LabelsModifier extends AbstractModifier
     {
         $productId = (int) $this->locator->getProduct()->getId();
         if ($productId === 0) {
-            return '<p>' . $this->escaper->escapeHtml(__('Labels are matched after the product is saved.')) . '</p>';
+            return '<p>' . $this->escaper->escapeHtml((string) __('Labels are matched after the product is saved.')) . '</p>';
         }
         $labels = $this->indexReader->labelsOfProduct($productId);
         if ($labels === []) {
-            return '<p>' . $this->escaper->escapeHtml(__('This product shows no labels at the moment.')) . '</p>';
+            return '<p>' . $this->escaper->escapeHtml((string) __('This product shows no labels at the moment.')) . '</p>';
         }
         $manual = $this->assignments->forProduct($productId);
         $items = '';
         foreach ($labels as $labelId => $name) {
             $items .= '<li><a href="' . $this->escaper->escapeUrl($this->url->getUrl('openlabel/label/edit', ['id' => $labelId])) . '">'
                 . $this->escaper->escapeHtml($name) . '</a>'
-                . (in_array($labelId, $manual, true) ? ' ' . $this->escaper->escapeHtml(__('(by hand)')) : '')
+                . (in_array($labelId, $manual, true) ? ' ' . $this->escaper->escapeHtml((string) __('(by hand)')) : '')
                 . '</li>';
         }
 
-        return '<p>' . $this->escaper->escapeHtml(__('Labels this product shows now:')) . '</p><ul class="ol-product-labels">' . $items . '</ul>';
+        return '<p>' . $this->escaper->escapeHtml((string) __('Labels this product shows now:')) . '</p><ul class="ol-product-labels">' . $items . '</ul>';
     }
 }
