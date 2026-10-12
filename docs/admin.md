@@ -55,7 +55,7 @@ Choose **Text**, **Image** or **Shape**; the form shows only what that type need
 - **Text per store view:** each store view uses the default text unless you untick "Use the default text".
 - **Custom CSS:** only for users with the "Edit custom CSS of designs" permission; `@media`, `@supports` and `@container` blocks are kept; other at-rules (such as `@import`), expressions, script URLs and escapes are removed before it is saved.
 
-The 31 built-in designs are locked: open one and press **Duplicate to edit**. They pass WCAG AA contrast. Designs used by labels and built-in designs cannot be deleted.
+The 31 built-in designs are locked: open one and press **Duplicate to edit**. Their texts follow the store view's language ([label packs](storefront.md#languages-label-packs-11)); a copy keeps the English text until you enter your own per store view. They pass WCAG AA contrast. Designs used by labels and built-in designs cannot be deleted.
 
 ## Settings
 

@@ -12,6 +12,7 @@ use Iranimij\OpenLabel\Api\Data\DesignInterface;
 use Iranimij\OpenLabel\Api\Data\LabelInterface;
 use Iranimij\OpenLabel\Api\Data\PlacementInterface;
 use Iranimij\OpenLabel\Api\LabelResolverInterface;
+use Iranimij\OpenLabel\Model\Design\LabelPack;
 use Iranimij\OpenLabel\Model\DesignFactory;
 use Iranimij\OpenLabel\Model\Indexer\GroupSelector;
 use Iranimij\OpenLabel\Model\PlacementFactory;
@@ -39,13 +40,15 @@ class LabelResolver implements LabelResolverInterface
      * @param PlacementFactory $placementFactory
      * @param DesignFactory $designFactory
      * @param DateTime $dateTime
+     * @param LabelPack $labelPack
      */
     public function __construct(
         private readonly ResourceConnection $resource,
         private readonly Arranger $arranger,
         private readonly PlacementFactory $placementFactory,
         private readonly DesignFactory $designFactory,
-        private readonly DateTime $dateTime
+        private readonly DateTime $dateTime,
+        private readonly LabelPack $labelPack
     ) {
     }
 
@@ -143,8 +146,13 @@ class LabelResolver implements LabelResolverInterface
         }
         $design = $this->designFactory->create();
         $design->setData($designData);
+        $text = $row['text'];
+        if ((int) $row['design_is_system'] === 1 && $text !== null) {
+            // Built-in designs are locked, so they never have texts per store view: the label pack gives the language.
+            $text = $this->labelPack->translate((string) $text);
+        }
         $design->setStoreTexts([
-            DesignInterface::DEFAULT_STORE_ID => ['text' => $row['text'], 'alt_text' => $row['alt_text'], 'tooltip' => $row['tooltip']],
+            DesignInterface::DEFAULT_STORE_ID => ['text' => $text, 'alt_text' => $row['alt_text'], 'tooltip' => $row['tooltip']],
         ]);
 
         return new ResolvedLabel(

@@ -58,6 +58,21 @@ stylesheets, so each label is a `<span>` with inline styles built from the desig
 designs are left out (many clients block images). Labels are resolved for the order's store view and customer
 group when the email is sent; price variables show the current price, so emails are best with plain text.
 
+## Languages: label packs (1.1)
+
+The built-in designs show their text in the store view's language (Stores › Configuration › General › Locale
+Options): English, German, French, Spanish, Dutch and Italian are included, also in GraphQL and order emails. For
+example "Sale -25%" becomes "Promo -25 %" in a French store view. The same files translate the texts shoppers see
+from variables ("3 days", "Ends 12/31/26").
+
+- Your own designs keep the texts you enter, per store view. **Duplicate to edit** copies a built-in design with its
+  English text: enter the texts per store view in the copy.
+- The phrases are in `i18n/<locale>.csv` of the module, prefixed with `Label text: ` (e.g.
+  `"Label text: New","Nouveau"`) so they never change other modules' texts. To change one, or to add a language or a
+  regional variant (`de_AT`, `fr_BE`, …), put the same lines in your theme's `i18n/<locale>.csv` or a language pack.
+- The French, Spanish, Dutch and Italian texts were written without a native-speaker review yet: corrections are
+  welcome as pull requests.
+
 ## Right-to-left stores
 
 Positions mirror automatically when the page direction is right-to-left. Magento and Hyvä do not set it by themselves; RTL themes declare it in their layout, for example `app/design/frontend/<Vendor>/<theme>/Magento_Theme/layout/default.xml`:
