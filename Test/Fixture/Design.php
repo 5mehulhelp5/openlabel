@@ -51,9 +51,11 @@ class Design implements RevertibleDataFixtureInterface
         $data = array_merge(self::DEFAULTS, $data);
         $design = $this->designFactory->create();
         $storeTexts = $data['store_texts'];
-        unset($data['store_texts']);
+        $sizes = $data['sizes'] ?? [];
+        unset($data['store_texts'], $data['sizes']);
         $design->setData($data);
         $design->setStoreTexts($storeTexts);
+        $design->setSizes($sizes);
 
         return $this->designRepository->save($design);
     }

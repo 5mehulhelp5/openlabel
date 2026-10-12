@@ -6,6 +6,8 @@
 - For the storefront on Hyvä: the Hyvä default theme 1.4 or 1.5 (1.3: best effort). Other themes: see
   [Custom themes](storefront.md#custom-themes).
 - MSI is optional.
+- Remote storage (Magento_RemoteStorage, e.g. Amazon S3): OpenLabel writes its stylesheets and label images through
+  Magento's filesystem, so it should work, but it is not tested yet.
 
 ## Install
 

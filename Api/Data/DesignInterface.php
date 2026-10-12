@@ -301,12 +301,16 @@ interface DesignInterface
     /**
      * Per-breakpoint size overrides (since 1.1). Width is in the design's size mode; font size in px.
      *
-     * @return array<string, array<string, int>> e.g. ['sm' => ['width' => 24, 'font_size' => 11]]
+     * UnstructuredArray (Magento's web API type for a free-form array) passes the map through as a JSON object, e.g. {"sm": {"width": 24, "font_size": 11}}.
+     *
+     * @return UnstructuredArray e.g. ['sm' => ['width' => 24, 'font_size' => 11]]
+     * @phpstan-return array<string, array<string, int>>
      */
     public function getSizes(): array;
 
     /**
-     * @param array<string, array<string, int>> $sizes keys from BREAKPOINTS, values with width and/or font_size
+     * @param UnstructuredArray $sizes keys from BREAKPOINTS, values with width and/or font_size
+     * @phpstan-param array<string, array<string, int>> $sizes
      * @return $this
      */
     public function setSizes(array $sizes): self;
@@ -320,6 +324,22 @@ interface DesignInterface
      * @return string|null
      */
     public function getUpdatedAt(): ?string;
+
+    /**
+     * Ignored: the database keeps the timestamps. Exists so an entity read from the web API can be sent back as is.
+     *
+     * @param string|null $createdAt
+     * @return $this
+     */
+    public function setCreatedAt(?string $createdAt): self;
+
+    /**
+     * Ignored: the database keeps the timestamps. Exists so an entity read from the web API can be sent back as is.
+     *
+     * @param string|null $updatedAt
+     * @return $this
+     */
+    public function setUpdatedAt(?string $updatedAt): self;
 
     /**
      * Label text for a store view, falling back to the default (store 0).
@@ -368,13 +388,16 @@ interface DesignInterface
 
     /**
      * All store-scoped rows: [store_id => ['text' => ?string, 'alt_text' => ?string, 'tooltip' => ?string]].
+     * UnstructuredArray (Magento's web API type for a free-form array) passes the map through as a JSON object keyed by store ID.
      *
-     * @return array<int, array<string, string|null>>
+     * @return UnstructuredArray
+     * @phpstan-return array<int, array<string, string|null>>
      */
     public function getStoreTexts(): array;
 
     /**
-     * @param array<int, array<string, string|null>> $storeTexts
+     * @param UnstructuredArray $storeTexts
+     * @phpstan-param array<int, array<string, string|null>> $storeTexts
      * @return $this
      */
     public function setStoreTexts(array $storeTexts): self;

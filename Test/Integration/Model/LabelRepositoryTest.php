@@ -145,6 +145,24 @@ class LabelRepositoryTest extends TestCase
         }
     }
 
+    #[DataFixture(DesignFixture::class, [], 'design')]
+    public function testSaveRejectsUnknownStoreViewsAndCustomerGroups(): void
+    {
+        $label = $this->labelFactory->create();
+        $label->setName('Nowhere')->setDesignId((int) DataFixtureStorageManager::getStorage()->get('design')->getDesignId())
+            ->setPlacements([$this->placement()])->setStoreIds([1, 9999])->setCustomerGroupIds([0, 8888]);
+
+        try {
+            $this->repository->save($label);
+            self::fail('ValidationException expected');
+        } catch (ValidationException $e) {
+            self::assertSame(
+                ['Store view 9999 does not exist.', 'Customer group 8888 does not exist.'],
+                array_map(static fn (\Throwable $error): string => $error->getMessage(), $e->getErrors())
+            );
+        }
+    }
+
     public function testSaveRejectsAnUnknownDesign(): void
     {
         $label = $this->labelFactory->create();

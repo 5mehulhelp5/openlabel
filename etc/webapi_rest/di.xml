@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Iman Aboheydary. All rights reserved.
+ * See LICENSE for license details (MIT).
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Iranimij\OpenLabel\Api\DesignRepositoryInterface">
+        <plugin name="openlabel_webapi_guard" type="Iranimij\OpenLabel\Plugin\Webapi\DesignGuardPlugin" sortOrder="1"/>
+    </type>
+    <type name="Magento\Framework\Webapi\ServiceOutputProcessor">
+        <plugin name="openlabel_design_output" type="Iranimij\OpenLabel\Plugin\Webapi\DesignOutputPlugin"/>
+    </type>
+</config>

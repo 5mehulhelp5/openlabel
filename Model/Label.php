@@ -317,6 +317,22 @@ class Label extends AbstractModel implements LabelInterface, IdentityInterface
     /**
      * @inheritDoc
      */
+    public function setCreatedAt(?string $createdAt): self
+    {
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setUpdatedAt(?string $updatedAt): self
+    {
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getPlacements(): array
     {
         $placements = $this->getData(self::PLACEMENTS);

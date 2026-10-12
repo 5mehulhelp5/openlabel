@@ -219,6 +219,22 @@ interface LabelInterface
     public function getUpdatedAt(): ?string;
 
     /**
+     * Ignored: the database keeps the timestamps. Exists so an entity read from the web API can be sent back as is.
+     *
+     * @param string|null $createdAt
+     * @return $this
+     */
+    public function setCreatedAt(?string $createdAt): self;
+
+    /**
+     * Ignored: the database keeps the timestamps. Exists so an entity read from the web API can be sent back as is.
+     *
+     * @param string|null $updatedAt
+     * @return $this
+     */
+    public function setUpdatedAt(?string $updatedAt): self;
+
+    /**
      * @return \Iranimij\OpenLabel\Api\Data\PlacementInterface[]
      */
     public function getPlacements(): array;
