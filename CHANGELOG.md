@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 - Labels follow the chosen variant on the product page of a configurable product: each variant shows the product's own labels plus its own (e.g. "Only 2 left" for the size that is running out); and the `{COUNTDOWN}` variable, a live countdown to the end of the special price. Both need a few lines of JavaScript that only pages using them get (openlabel-hyva).
 - New places for labels: shopping cart, mini cart, wish list, compare page (Hyvä via openlabel-hyva) and order, invoice, shipment and credit memo emails (text labels with inline styles, for the order's store view and customer group). There labels show as a row of text with the item.
 - "Hide labels on these pages": page types (home, category, search, product, content pages, cart, wish list, compare) and any other page by full action name; no label query on those pages.
+- An "OpenLabel" section on the product edit page: the labels the product shows now, and "Always show these labels" to assign labels by hand (new table `openlabel_label_product`; the indexer adds these products to the label's matches).
 - Export file format version 2 with these fields; version 1 files from OpenLabel 1.0 still import, the new fields taking their defaults.
 
 ### Changed
@@ -26,6 +27,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 - **API (minor, new methods):** `Api\Data\LabelInterface` gains `isHideOnZeroVariable()`, `getClickUrl()`, `isClickNofollow()` and their setters; `Api\Data\DesignInterface` gains `getAnimation()`, `getHoverEffect()`, `getSizes()` and their setters, plus the `ANIMATIONS`, `HOVER_EFFECTS` and `BREAKPOINTS` constants; `Api\Data\ResolvedLabelInterface` gains `isHideOnZeroVariable()`, `getTooltip()`, `getClickUrl()` and `isClickNofollow()`; `Api\Data\PlacementInterface::AREAS` gains `cart`, `minicart`, `wishlist`, `compare` and `email` (`ITEM_AREAS`); `ViewModel\Labels` takes the request as a new constructor argument; `ViewModel\LabelRenderer` gains `getAreaHtml()`; `Api\Data\PlacementInterface::POSITIONS` gains the band and text positions, with the new `IMAGE_POSITIONS` and `INLINE_POSITIONS` lists. `ViewModel\LabelRenderer` gains `getProductPageStacksHtml()` (variant labels) and `isScriptNeeded()`, and its constructor two arguments (`Arranger`, `Variants`); `getStacks()` returns the image and band stacks only; the text positions come from the new `getInlineHtml()` / `getInlineStacks()`. Code that only uses these interfaces is unaffected; classes that implement them must add the methods.
 
 ### Fixed
+- Upgrading kept serving the previous version's label stylesheet until a design was saved: `setup:upgrade` now rebuilds it for every store.
+- `module:uninstall -r` also removes the global CSS setting (`openlabel_css/*`).
 - Label text with inline markup lost the space next to it on the storefront ("Sale <b>now</b>" showed as "Salenow"): labels keep their spaces.
 - Saving a design in the admin no longer drops its tooltips (they were stored as empty).
 - After a full reindex `bin/magento setup:db:status` reported the schema as out of date (so deploy pipelines ran `setup:upgrade` every time): swapping the index with its replica swapped their table comments. Both tables now carry the same comment.

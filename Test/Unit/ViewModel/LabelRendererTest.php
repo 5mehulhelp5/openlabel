@@ -186,6 +186,19 @@ class LabelRendererTest extends TestCase
         self::assertTrue($renderer->isScriptNeeded());
     }
 
+    public function testVariantsWithoutLabelsOfTheirOwnKeepTheOrdinaryStacks(): void
+    {
+        $this->resolved = [$this->label(1, 'tl', 'vertical', 'text', 'New', area: 'product')];
+        $this->byProduct = [201 => [], 202 => []];
+        $this->children = [$this->product(201), $this->product(202)];
+        $renderer = $this->renderer();
+
+        $stacks = $renderer->getProductPageStacks($this->product());
+
+        self::assertSame([null], array_column($stacks[0]['labels'], 'variant'), 'no hidden copies when no variant has a label of its own');
+        self::assertFalse($renderer->isScriptNeeded());
+    }
+
     public function testProductsWithoutVariantsKeepTheOrdinaryStacks(): void
     {
         $this->resolved = [$this->label(1, 'tl', 'vertical', 'text', 'New', area: 'product')];

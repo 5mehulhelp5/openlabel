@@ -45,7 +45,8 @@ class Css extends AbstractBlock
      */
     public function getStylesheetUrl(): ?string
     {
-        if (!$this->labels->isEnabled()) {
+        // Also on pages without labels: mini cart labels (customer data) appear there and need their styles.
+        if (!$this->labels->isModuleEnabled()) {
             return null;
         }
         $storeId = $this->labels->getStoreId();

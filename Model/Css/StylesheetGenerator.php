@@ -51,9 +51,10 @@ class StylesheetGenerator
     }
 
     /**
+     * @param string|null $globalCss the custom CSS just saved in the admin; null reads it from the configuration
      * @return string the stylesheet for the current designs and placements
      */
-    public function build(): string
+    public function build(?string $globalCss = null): string
     {
         $designs = $this->designCollectionFactory->create()->setOrder(DesignInterface::DESIGN_ID, 'ASC');
         $placements = $this->placementCollectionFactory->create()->setOrder(PlacementInterface::PLACEMENT_ID, 'ASC');
@@ -63,7 +64,7 @@ class StylesheetGenerator
         /** @var PlacementInterface[] $placementItems */
         $placementItems = $placements->getItems();
 
-        return $this->compose($this->structuralCss(), $designItems, $placementItems, $this->config->getGlobalCss());
+        return $this->compose($this->structuralCss(), $designItems, $placementItems, $globalCss ?? $this->config->getGlobalCss());
     }
 
     /**

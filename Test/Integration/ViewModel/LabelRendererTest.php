@@ -185,6 +185,20 @@ class LabelRendererTest extends TestCase
         );
     }
 
+    #[Config('openlabel/general/hidden_pages', 'category', 'store', 'default')]
+    public function testThePageWithHiddenLabelsKeepsTheStylesheetForTheMiniCart(): void
+    {
+        $request = Bootstrap::getObjectManager()->get(\Magento\Framework\App\Request\Http::class);
+        $request->setRouteName('catalog')->setControllerName('category')->setActionName('view');
+
+        self::assertFalse(Bootstrap::getObjectManager()->get(Labels::class)->isEnabled(), 'no labels on category pages');
+        self::assertStringContainsString(
+            'data-openlabel="css"',
+            Bootstrap::getObjectManager()->get(LayoutInterface::class)->createBlock(Css::class)->toHtml(),
+            'mini cart labels (customer data) still need their styles there'
+        );
+    }
+
     #[Config('openlabel/general/enabled', 0, 'store', 'default')]
     public function testCssBlockIsEmptyWhenTheModuleIsDisabled(): void
     {

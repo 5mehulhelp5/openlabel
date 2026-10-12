@@ -55,4 +55,24 @@ class Matcher
             $this->storeManager->setCurrentStore($previousStore);
         }
     }
+
+    /**
+     * Of the given products, those enabled and in the store (manual assignments skip the conditions, not these).
+     *
+     * @param int $storeId
+     * @param int[] $productIds
+     * @return int[]
+     */
+    public function available(int $storeId, array $productIds): array
+    {
+        if ($productIds === []) {
+            return [];
+        }
+        $collection = $this->collectionFactory->create();
+        $collection->setStoreId($storeId)->addStoreFilter($storeId);
+        $collection->addAttributeToFilter('status', ['eq' => Status::STATUS_ENABLED]);
+        $collection->addIdFilter(array_map('intval', $productIds));
+
+        return array_map('intval', $collection->getAllIds());
+    }
 }

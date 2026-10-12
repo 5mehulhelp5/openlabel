@@ -73,7 +73,17 @@ class Labels implements ArgumentInterface, ResetAfterRequestInterface
      */
     public function isEnabled(): bool
     {
-        return $this->config->getBool(self::CONFIG_ENABLED) && !$this->isHiddenPage();
+        return $this->isModuleEnabled() && !$this->isHiddenPage();
+    }
+
+    /**
+     * OpenLabel is on for the store, whatever the page (the stylesheet: mini cart labels load on every page).
+     *
+     * @return bool
+     */
+    public function isModuleEnabled(): bool
+    {
+        return $this->config->getBool(self::CONFIG_ENABLED);
     }
 
     /**

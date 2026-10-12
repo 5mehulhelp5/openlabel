@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Iranimij\OpenLabel\Model\Label;
 
+use Iranimij\OpenLabel\Api\Data\PlacementInterface;
+
 /**
  * Turns "listing:tr,product:tl" (as aggregated by the grid collection) into "Listing TR, Product TL".
  */
@@ -25,7 +27,10 @@ class PlacementSummary
         $parts = [];
         foreach (explode(',', $raw) as $pair) {
             [$area, $position] = array_pad(explode(':', $pair, 2), 2, '');
-            $parts[] = $this->areaLabel($area) . ' ' . $this->positionLabel($position);
+            // Item lists and emails have no position: the labels show with the item.
+            $parts[] = in_array($area, PlacementInterface::ITEM_AREAS, true)
+                ? $this->areaLabel($area)
+                : $this->areaLabel($area) . ' ' . $this->positionLabel($position);
         }
 
         return implode(', ', $parts);
@@ -62,6 +67,11 @@ class PlacementSummary
         return match ($area) {
             'listing' => (string) __('Listing'),
             'product' => (string) __('Product'),
+            'cart' => (string) __('Cart'),
+            'minicart' => (string) __('Mini cart'),
+            'wishlist' => (string) __('Wish list'),
+            'compare' => (string) __('Compare'),
+            'email' => (string) __('Emails'),
             default => ucfirst($area),
         };
     }

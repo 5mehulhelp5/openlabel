@@ -12,6 +12,7 @@ admin (M2), Hyvä rendering (M3) and GraphQL / import (M4) build on it.
 | `openlabel_design` | the *how it looks*: type (text, image, shape), colours, size, rotation, custom CSS, `is_system` |
 | `openlabel_design_store` | text, alt text and tooltip per store view (store 0 = default, other stores fall back to it) |
 | `openlabel_placement` | one *where* per label: area (`listing`, `product`), position (`tl … br`), optional design override, offsets, `max_labels`, stacking, gap |
+| `openlabel_label_product` | products assigned to a label by hand on the product edit page (1.1); the indexer adds them to the label's matches, still within its status, store views, customer groups and dates, and only when the product is enabled in that store |
 | `openlabel_index` | the result: (`label_id`, `product_id`, `store_id`, `customer_group_id`) with the label's priority and window copied in; `customer_group_id = -1` means every group |
 
 Repositories: `LabelRepositoryInterface` saves a label with its placements, `DesignRepositoryInterface` saves a

@@ -62,6 +62,7 @@ class SchemaTest extends TestCase
                 'label_id', 'product_id', 'store_id', 'customer_group_id', 'parent_product_id', 'priority', 'valid_from', 'valid_to',
             ]],
             'index_replica' => ['openlabel_index_replica', ['label_id', 'product_id', 'store_id', 'customer_group_id']],
+            'label_product' => ['openlabel_label_product', ['label_id', 'product_id']],
         ];
     }
 
@@ -95,5 +96,20 @@ class SchemaTest extends TestCase
         ));
         self::assertCount(1, $toLabel);
         self::assertSame('CASCADE', $toLabel[0]['ON_DELETE']);
+    }
+
+    public function testManualAssignmentsGoWithTheirLabelAndProduct(): void
+    {
+        $keys = $this->resource->getConnection()->getForeignKeys($this->resource->getTableName('openlabel_label_product'));
+        $byColumn = [];
+        foreach ($keys as $key) {
+            $byColumn[$key['COLUMN_NAME']] = [$key['REF_TABLE_NAME'], $key['ON_DELETE']];
+        }
+        ksort($byColumn);
+
+        self::assertSame([
+            'label_id' => [$this->resource->getTableName('openlabel_label'), 'CASCADE'],
+            'product_id' => [$this->resource->getTableName('catalog_product_entity'), 'CASCADE'],
+        ], $byColumn);
     }
 }

@@ -9,10 +9,12 @@ declare(strict_types=1);
 namespace Iranimij\OpenLabel\Test\Integration\Model\Css;
 
 use Iranimij\OpenLabel\Api\DesignRepositoryInterface;
+use Iranimij\OpenLabel\Model\Config\Backend\GlobalCss;
 use Iranimij\OpenLabel\Model\Css\Regenerator;
 use Iranimij\OpenLabel\Model\Css\Storage;
 use Iranimij\OpenLabel\Test\Fixture\Design as DesignFixture;
 use Magento\Framework\App\CacheInterface;
+use Magento\Framework\App\Config\Value;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Filesystem;
 use Magento\Framework\Filesystem\Directory\WriteInterface;
@@ -63,6 +65,19 @@ class StylesheetTest extends TestCase
         $paths = $this->regenerator->regenerateAll();
 
         self::assertStringEndsWith("/* global */\n.ol-label{letter-spacing:.04em}\n", $this->media->readFile($paths[1]));
+    }
+
+    #[AppArea('adminhtml')]
+    public function testSavingTheGlobalCssInTheAdminPutsItInTheStylesheet(): void
+    {
+        /** @var Value $value */
+        $value = Bootstrap::getObjectManager()->create(GlobalCss::class);
+        $value->setData(['path' => 'openlabel_css/general/global_css', 'scope' => 'default', 'scope_id' => 0])
+            ->setValue('.ol-label{word-spacing:2px}')
+            ->save();
+
+        $current = (string) $this->storage->current(1);
+        self::assertStringEndsWith("/* global */\n.ol-label{word-spacing:2px}\n", $this->media->readFile($current), 'the value just saved, not the cached config');
     }
 
     #[DataFixture(DesignFixture::class, ['bg_color' => '#123456'], 'design')]

@@ -34,4 +34,15 @@
             <argument name="fieldsetRenderer" xsi:type="object">Iranimij\OpenLabel\Block\Adminhtml\Label\Edit\ConditionsFieldset</argument>
         </arguments>
     </type>
+    <!-- 1.1: "OpenLabel" section on the product edit page (labels shown now, labels assigned by hand). -->
+    <virtualType name="Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\Pool">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="openlabel" xsi:type="array">
+                    <item name="class" xsi:type="string">Iranimij\OpenLabel\Ui\DataProvider\Product\LabelsModifier</item>
+                    <item name="sortOrder" xsi:type="number">1000</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
 </config>

@@ -156,15 +156,17 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
         foreach ($this->onPage($own) as $label) {
             $entries[] = [$label, $product, 0];
         }
-        $variantEntries = 0;
+        $variantOwn = 0;
         foreach ($children as $child) {
             $childId = (int) $child->getId();
-            foreach ($this->variantLabels($own, $this->labels->getForProduct($childId)) as $label) {
+            $childLabels = $this->onPage($this->labels->getForProduct($childId));
+            $variantOwn += count($childLabels);
+            foreach ($this->variantLabels($own, $childLabels) as $label) {
                 $entries[] = [$label, $child, $childId];
-                $variantEntries++;
             }
         }
-        if ($variantEntries === 0) {
+        // Without a label of its own on any variant, choosing one changes nothing: no hidden copies, no script.
+        if ($variantOwn === 0) {
             return $this->getStacks($product, PlacementInterface::AREA_PRODUCT, $loading);
         }
         $this->observeProduct((int) $product->getId());

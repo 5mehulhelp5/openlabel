@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Iranimij\OpenLabel\Model\Indexer;
 
 use Iranimij\OpenLabel\Api\Data\LabelInterface;
+use Iranimij\OpenLabel\Model\Label\ManualAssignments;
 use Iranimij\OpenLabel\Model\Rule\RuleFactory;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Store\Model\StoreManagerInterface;
@@ -27,6 +28,7 @@ class RowBuilder
      * @param GroupSelector $groupSelector
      * @param ParentRows $parentRows
      * @param StoreManagerInterface $storeManager
+     * @param ManualAssignments $manualAssignments
      */
     public function __construct(
         private readonly ResourceConnection $resource,
@@ -34,7 +36,8 @@ class RowBuilder
         private readonly Matcher $matcher,
         private readonly GroupSelector $groupSelector,
         private readonly ParentRows $parentRows,
-        private readonly StoreManagerInterface $storeManager
+        private readonly StoreManagerInterface $storeManager,
+        private readonly ManualAssignments $manualAssignments
     ) {
     }
 
@@ -49,6 +52,10 @@ class RowBuilder
         $rule = $this->ruleFactory->create();
         $rule->setConditionsSerialized((string) $label->getConditionsSerialized());
         $groups = $this->groupSelector->forLabel($label, $rule->requiresCustomerGroup());
+        $manual = $this->manualAssignments->forLabel((int) $label->getLabelId());
+        if ($productIds !== null) {
+            $manual = array_values(array_intersect($manual, array_map('intval', $productIds)));
+        }
         $base = [
             'label_id' => (int) $label->getLabelId(),
             'priority' => $label->getPriority(),
@@ -56,8 +63,11 @@ class RowBuilder
             'valid_to' => $label->getValidTo(),
         ];
         foreach ($this->storeIds($label) as $storeId) {
+            $assigned = $this->matcher->available($storeId, $manual);
             foreach ($groups as $groupId) {
                 $matched = $this->matcher->match($rule, $storeId, $groupId, $productIds);
+                // Products assigned by hand show the label whatever its conditions.
+                $matched = array_values(array_unique(array_merge($matched, $assigned)));
                 $rows = [];
                 foreach ($matched as $productId) {
                     $rows[] = $base + [

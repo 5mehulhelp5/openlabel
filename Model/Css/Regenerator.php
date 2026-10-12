@@ -29,11 +29,13 @@ class Regenerator
     }
 
     /**
+     * @param string|null $globalCss the custom CSS just saved in the admin, which the configuration does not return
+     *                               until the next request; null reads it from the configuration
      * @return array<int, string> store id => path relative to the media directory
      */
-    public function regenerateAll(): array
+    public function regenerateAll(?string $globalCss = null): array
     {
-        $css = $this->generator->build();
+        $css = $this->generator->build($globalCss);
         $paths = [];
         foreach ($this->storeManager->getStores() as $store) {
             $storeId = (int) $store->getId();

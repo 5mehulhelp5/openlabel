@@ -20,11 +20,28 @@ Merged by me when CI is green, **but never anything visible on GitHub during wor
 | S6 | Tooltip, click-through | done locally on `feat/m5-s6-interaction` (stacked on S5) + dev-env `test/m5-s6-interaction`; no openlabel-hyva change needed; unit 415, coverage gate, PHPStan, PHPCS, integration, Playwright interaction 4/4 and admin forms 12/12 green; push after hours |
 | S7 | Variant-aware labels (product page), countdown | done locally: openlabel `feat/m5-s7-variants-countdown` (stacked on S6), openlabel-hyva `feat/m5-s7-variants-countdown` (stacked on S5), dev-env `test/m5-s7-variants-countdown`; unit 423 + hyva 40, coverage gate, PHPStan, PHPCS, integration (hyva 10), mkdocs strict, Playwright variants 6/6 + positions/interaction/motion 18/18 green; push after hours |
 | S8 | Cart, mini-cart, wishlist, compare, emails, hide on pages | done locally: openlabel `feat/m5-s8-areas` (stacked on S7), openlabel-hyva `feat/m5-s8-areas` (stacked on S7), dev-env `test/m5-s8-areas`; unit 432 + hyva 45, coverage gate, PHPStan, PHPCS, integration (email, mini cart section, controllers 92), mkdocs strict, Playwright items 3/3 + regression 24/24 + admin 9/9 green; push after hours |
-| S9 | Product edit tab + manual assignment (`openlabel_label_product`) | |
+| S9 | Product edit tab + manual assignment (`openlabel_label_product`) | done locally on `feat/m5-s9-product-tab` (stacked on S8) + dev-env `test/m5-s9-product-tab`; schema change (whitelist regenerated), unit 439, PHPStan, PHPCS, integration (schema, indexer incl. manual assignment, product save), mkdocs strict, Playwright product tab 1/1 green; full matrix needed after hours (SQL) |
 | S10 | REST CRUD + bulk read, GraphQL mutations | |
 | S11 | Remote storage (S3) | |
 | S12 | Label packs FR/ES/NL/IT | |
 | S13 | Close-out, README matrix, 1.1.0 | |
+
+### M5 QA pass (2026-10-12, S1–S9, tech lead + product owner + QA, storefront and admin in Chrome)
+
+Fixed and tested (openlabel commits on `feat/m5-s9-product-tab`, openlabel-hyva `e034f13` on `feat/m5-s8-areas`, dev-env `4937073`; they ship with the S8/S9 pushes):
+1. Product cards on pages where labels are hidden got the cached card with labels (Hyvä's card cache key has no page type): `-openlabel-off` key suffix.
+2. Countdown in order emails showed a frozen timer: emails show the end date.
+3. Design image upload ignored the configured maximum size in the admin uploader.
+4. Placement summary in the label grid had no words for the item areas (cart, mini cart, ...).
+5. Live preview said nothing for item areas: it now explains that these show next to the item.
+6. GraphQL `area` doc listed only listing/product.
+7. Variant mode switched on for every configurable with a parent label, hiding labels on swatch change: only when a variant has labels of its own.
+8. The label stylesheet link ignored "Enable OpenLabel = No": `Block/Css` uses `Labels::isModuleEnabled()`.
+9. `setup:upgrade` kept serving the previous version's CSS: `Setup/RecurringData` rebuilds the stylesheet (failure only logs a warning); upgrade docs name static content deploy.
+10. Saving the custom CSS in the admin rebuilt the stylesheet with the old value (configuration cached for the request): the saved value is passed to the rebuild.
+11. `acceptance-starter.spec.ts` deleted every label on the dev store: it now backs up and restores labels, placements and manual assignments.
+
+Verified: unit openlabel 442 + hyva 46, coverage gate, PHPStan, PHPCS, integration (full), Playwright 102/102, mkdocs strict. Browser: listing bands, inline slots, link labels, tooltips, hover, motion, PDP, variant switch (XS + Blue), countdown ticking, cart, mini cart, compare, wish list, hide on pages; admin labels grid, label form (31 new designs, hide-on-zero, link validation, Bestseller switch, new conditions, 5×5 picker, preview), design form (tooltip, AVIF, sizes, motion), configuration (hidden pages, brand attribute, upload limit, custom CSS), product tab assign + unassign (storefront follows). No console errors.
 
 ## M5 decisions
 
@@ -56,6 +73,7 @@ Merged by me when CI is green, **but never anything visible on GitHub during wor
 - Mini cart without JavaScript (better than Q3's Alpine piece): Hyvä prints each item's `product_price` from the cart section with `x-html`. The label HTML must be appended in `Cart::afterGetSectionData` (sortOrder 1000), after the Tax/Weee plugins that render every item's price again; appending in `DefaultItem::getItemData` is lost.
 - Emails: text and shape designs only, inline styles from validated hex colours, resolved for the order's store view and group at send time (price variables show the current price).
 - "Hide labels on these pages" is store config (page types + full action names), not per label: no schema change. `Labels::isEnabled()` is false there, so nothing is queried.
+- Manual assignment: `openlabel_label_product` merged in `RowBuilder` (rule matches ∪ assigned products that are enabled in the store); the product form section is a catalog form modifier (Labels ACL) with a hidden `openlabel_touched` flag so an empty multiselect still clears assignments; the observer reindexes only labels whose set changed. Not in the export file yet (documented).
 - Ships free = the store's free-shipping threshold met by the final price, or an active no-coupon cart rule for the website/group with free shipping and no conditions. Cart rules with conditions are ignored (they depend on the cart, not the product).
 
 ## M4 slices
@@ -165,7 +183,7 @@ S1 merged as #12, S2–S10 through #21 (all M2 commits, full matrix green); #13�
 
 ## Exact next step
 
-M5 S9 (product edit tab + manual assignment `openlabel_label_product`) stacked on S8. After hours, in order: push S2 (coverage fix), PR #45 green → merge; push S3 → PR, full matrix, merge; push S4 + dev-env `test/m5-s4-design` → PRs, full matrix + E2E, merge; push S5 (openlabel, then openlabel-hyva with openlabel-ref, then dev-env `test/m5-s5-positions`) → PRs, full matrix + E2E incl. Hyvä 1.5.2, merge, reset openlabel-ref to main; push S6 + dev-env `test/m5-s6-interaction` → PRs, full matrix + E2E, merge; push S7 (openlabel, openlabel-hyva with openlabel-ref, dev-env) → PRs, full matrix + E2E, merge; then S8 the same way; reset openlabel-ref to main when the stack is merged. Open for Iman: recorded real-person UX tests (M2 ≤ 3 min custom label, M3 VoiceOver) whenever wanted; Hyvä compatibility tracker submission (`docs/tracker-entry.md`); optional operator dropdown on the quick switches.
+M5 S10 (REST CRUD + bulk read, GraphQL mutations) stacked on S9. After hours, in order: push S2 (coverage fix), PR #45 green → merge; push S3 → PR, full matrix, merge; push S4 + dev-env `test/m5-s4-design` → PRs, full matrix + E2E, merge; push S5 (openlabel, then openlabel-hyva with openlabel-ref, then dev-env `test/m5-s5-positions`) → PRs, full matrix + E2E incl. Hyvä 1.5.2, merge, reset openlabel-ref to main; push S6 + dev-env `test/m5-s6-interaction` → PRs, full matrix + E2E, merge; push S7 (openlabel, openlabel-hyva with openlabel-ref, dev-env) → PRs, full matrix + E2E, merge; then S8 the same way; then S9 (openlabel + dev-env, full matrix: schema change); reset openlabel-ref to main when the stack is merged. Open for Iman: recorded real-person UX tests (M2 ≤ 3 min custom label, M3 VoiceOver) whenever wanted; Hyvä compatibility tracker submission (`docs/tracker-entry.md`); optional operator dropdown on the quick switches.
 
 ## M1 decisions (also in the Notion build log at close-out)
 
@@ -202,6 +220,8 @@ M5 S9 (product edit tab + manual assignment `openlabel_label_product`) stacked o
 
 - Hyvä 1.3 end-to-end leg: Hyvä 1.3 needs `hyva-themes/magento2-reset-theme`, which is not in Hyvä's public GitHub repositories. Options: your portal keys as a GitHub secret on openlabel-dev-env (adds a 1.3 leg), or test 1.4 only and state "1.3: best effort" in the README. CI runs Hyvä 1.4.2 from the public OSL repositories (your choice, 2026-10-11).
 - Recorded real-person tests: M2 custom label ≤ 3 min; M3 VoiceOver/NVDA reading "Sale -25%" with the product name (the accessible name is asserted automatically).
+
+- Label "test" (#341, 5 listing top-left placements, priority 0, no conditions) and #323 were deleted on 2026-10-12 by the old `acceptance-starter.spec.ts` run on the dev store (no binlog, not recoverable). Re-create it?
 
 ## Known failing or skipped tests
 

@@ -64,7 +64,7 @@ class GlobalCss extends Value
     public function afterSave()
     {
         if ($this->isValueChanged()) {
-            $this->regenerator->regenerateAll();
+            $this->regenerator->regenerateAll((string) $this->getValue());
         }
 
         return parent::afterSave();
