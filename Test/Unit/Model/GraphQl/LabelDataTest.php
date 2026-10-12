@@ -95,6 +95,16 @@ class LabelDataTest extends TestCase
         self::assertSame('bl', $data['position']);
     }
 
+    public function testCssClassCarriesTheMotionClassesForHeadlessThemes(): void
+    {
+        $label = $this->label(3, 'text', 'New');
+        $label->getDesign()->setAnimation('pop')->setHoverEffect('lift');
+
+        $data = $this->labelData()->toArray($label, $this->product(), new Context(1, 1, 0));
+
+        self::assertSame('ol-label ol-label--text ol-d-30 ol-anim-pop ol-hover-lift', $data['css_class'] ?? null);
+    }
+
     public function testEmptyColoursAreNull(): void
     {
         $label = $this->label(3, 'shape', 'Hot', 'tl', 'listing', 'circle');

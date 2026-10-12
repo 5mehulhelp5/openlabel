@@ -52,6 +52,26 @@ class StylesheetGeneratorTest extends TestCase
         self::assertStringContainsString('color:red', $css);
     }
 
+    public function testGlobalCssComesLastAndIsSanitized(): void
+    {
+        $css = $this->generator()->compose(
+            self::STRUCTURAL,
+            [$this->design(3, ['custom_css' => '.ol-d-3{color:red}'])],
+            [],
+            '.ol-label{letter-spacing:.05em}@import url(https://evil.test/x.css);.x{width:expression(alert(1))}'
+        );
+
+        self::assertStringContainsString("/* global */\n.ol-label{letter-spacing:.05em}", $css);
+        self::assertGreaterThan(strpos($css, 'color:red'), strpos($css, 'letter-spacing'));
+        self::assertStringNotContainsString('@import', $css);
+        self::assertStringNotContainsString('expression', $css);
+    }
+
+    public function testEmptyGlobalCssAddsNothing(): void
+    {
+        self::assertStringNotContainsString('global', $this->generator()->compose(self::STRUCTURAL, [], [], "  \n"));
+    }
+
     public function testCommentHeaderOfTheStructuralSourceIsKeptOutOfTheOutput(): void
     {
         $css = $this->generator()->compose("/**\n * Copyright\n */\n.ol-anchor{position:relative}", [], []);

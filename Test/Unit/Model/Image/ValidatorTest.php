@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Iranimij\OpenLabel\Test\Unit\Model\Image;
 
+use Iranimij\Base\Model\Config\TypedReader;
+use Iranimij\OpenLabel\Model\Config;
 use Iranimij\OpenLabel\Model\Image\SvgSanitizer;
 use Iranimij\OpenLabel\Model\Image\Validator;
 use Magento\Framework\Filesystem\Driver\File;
@@ -17,6 +19,9 @@ class ValidatorTest extends TestCase
 {
     /** @var string[] */
     private array $files = [];
+
+    /** the "largest image upload" setting in KB, 0 = not set */
+    private int $maxKb = 0;
 
     protected function tearDown(): void
     {
@@ -48,7 +53,63 @@ class ValidatorTest extends TestCase
 
     private function validator(): Validator
     {
-        return new Validator(new SvgSanitizer(), new File());
+        $reader = $this->createStub(TypedReader::class);
+        $reader->method('getInt')->willReturnCallback(fn (): int => $this->maxKb);
+
+        return new Validator(new SvgSanitizer(), new File(), new Config($reader));
+    }
+
+    /**
+     * An AVIF header as written by encoders: `ftyp` with the avif brand, then the image size in an `ispe` box.
+     */
+    private function avif(int $width, int $height, string $brand = 'avif'): string
+    {
+        $ftyp = pack('N', 28) . 'ftyp' . $brand . pack('N', 0) . 'mif1miafMA1B';
+        $ispe = pack('N', 20) . 'ispe' . pack('N', 0) . pack('N', $width) . pack('N', $height);
+        $meta = pack('N', 8 + 12 + strlen($ispe)) . 'meta' . pack('N', 0) . pack('N', 8 + strlen($ispe)) . 'iprp' . $ispe;
+
+        return $ftyp . $meta . str_repeat("\0", 64);
+    }
+
+    public function testAvifIsAcceptedWithItsDimensions(): void
+    {
+        $result = $this->validator()->validate($this->file($this->avif(120, 40)), 'sale.avif');
+
+        self::assertSame([], $result->getErrors());
+        self::assertSame('avif', $result->getExtension());
+        self::assertSame([120, 40], [$result->getWidth(), $result->getHeight()]);
+    }
+
+    public function testAFileNamedAvifWithoutTheAvifBrandIsRejected(): void
+    {
+        $video = $this->validator()->validate($this->file($this->avif(120, 40, 'mp42')), 'clip.avif');
+        $text = $this->validator()->validate($this->file('hello world, not an image at all'), 'note.avif');
+
+        foreach ([$video, $text] as $result) {
+            self::assertSame(
+                ['The file content does not match its extension. Upload a real PNG, JPG, GIF, WebP, AVIF or SVG image.'],
+                array_map('strval', $result->getErrors())
+            );
+        }
+    }
+
+    public function testAnAvifWithoutDimensionsIsRejected(): void
+    {
+        $noSize = substr($this->avif(1, 1), 0, 28) . str_repeat("\0", 64);
+
+        self::assertNotSame([], $this->validator()->validate($this->file($noSize), 'broken.avif')->getErrors());
+    }
+
+    public function testTheUploadLimitFollowsTheSetting(): void
+    {
+        $this->maxKb = 200;
+        $png = $this->png();
+
+        $over = $this->validator()->validate($this->file($png . str_repeat("\0", 210 * 1024)), 'over.png');
+        $under = $this->validator()->validate($this->file($png . str_repeat("\0", 150 * 1024)), 'under.png');
+
+        self::assertSame(['The image is larger than 200 KB. Use a smaller file; SVG works best.'], array_map('strval', $over->getErrors()));
+        self::assertSame([], $under->getErrors());
     }
 
     public function testPngIsAcceptedWithItsDimensions(): void
@@ -78,14 +139,14 @@ class ValidatorTest extends TestCase
     {
         $result = $this->validator()->validate($this->file('<?php echo "x";'), 'shell.png');
 
-        self::assertSame(['The file content does not match its extension. Upload a real PNG, JPG, GIF, WebP or SVG image.'], array_map('strval', $result->getErrors()));
+        self::assertSame(['The file content does not match its extension. Upload a real PNG, JPG, GIF, WebP, AVIF or SVG image.'], array_map('strval', $result->getErrors()));
     }
 
     public function testUnsupportedExtensionIsRejected(): void
     {
         $result = $this->validator()->validate($this->file('x'), 'label.php');
 
-        self::assertSame(['Allowed image types are PNG, JPG, GIF, WebP and SVG.'], array_map('strval', $result->getErrors()));
+        self::assertSame(['Allowed image types are PNG, JPG, GIF, WebP, AVIF and SVG.'], array_map('strval', $result->getErrors()));
     }
 
     public function testFilesOver50KbGetAWarningAndOver1MbAnError(): void

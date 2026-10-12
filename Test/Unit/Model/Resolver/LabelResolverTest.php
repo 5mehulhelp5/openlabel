@@ -49,6 +49,7 @@ class LabelResolverTest extends TestCase
         self::assertSame('Sale', $first->getText());
         self::assertSame('Sale badge', $first->getAltText());
         self::assertSame('#e11d48', $first->getDesign()->getBgColor());
+        self::assertSame('fade', $first->getDesign()->getAnimation(), 'motion settings reach the renderer');
         self::assertSame(2, $result[7][1]->getLabelId());
         self::assertSame('Neu', $result[7][1]->getText());
     }
@@ -104,7 +105,7 @@ class LabelResolverTest extends TestCase
             'design_image_width' => null, 'design_image_height' => null, 'design_bg_color' => '#e11d48', 'design_text_color' => '#fff',
             'design_border_color' => null, 'design_border_width' => 0, 'design_font_size' => 14, 'design_size_mode' => 'percent',
             'design_width' => 18, 'design_height' => null, 'design_opacity' => 100, 'design_rotation' => 0, 'design_custom_css' => null,
-            'design_is_system' => 0, 'text' => $text, 'alt_text' => $alt, 'tooltip' => null,
+            'design_is_system' => 0, 'design_animation' => 'fade', 'design_hover_effect' => 'none', 'text' => $text, 'alt_text' => $alt, 'tooltip' => null,
             'area' => 'listing', 'position' => 'tl', 'max_labels' => 3,
         ];
     }

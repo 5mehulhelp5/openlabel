@@ -15,7 +15,7 @@ define([
         defaults: {
             hints: {
                 text: 'Plain text on a coloured background',
-                image: 'Your own PNG, SVG or WebP badge',
+                image: 'Your own PNG, SVG, WebP or AVIF badge',
                 shape: 'Text inside a pill, ribbon, circle or corner'
             }
         },

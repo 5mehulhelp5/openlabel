@@ -50,6 +50,47 @@ class DesignRulesTest extends TestCase
         self::assertStringNotContainsString('--ol-bg', $css);
     }
 
+    public function testBreakpointSizesBecomeMediaRules(): void
+    {
+        $design = $this->design(7, ['size_mode' => 'percent', 'width' => 18, 'font_size' => 15]);
+        $design->setSizes(['sm' => ['width' => 26, 'font_size' => 11], 'md' => ['width' => 22], 'lg' => ['font_size' => 16]]);
+
+        self::assertSame(
+            '.ol-d-7{--ol-w:18cqw;--ol-fs-max:15px}'
+            . "\n@media (max-width:639px){.ol-d-7{--ol-w:26cqw;--ol-fs-max:11px}}"
+            . "\n@media (min-width:640px) and (max-width:1023px){.ol-d-7{--ol-w:22cqw}}"
+            . "\n@media (min-width:1024px){.ol-d-7{--ol-fs-max:16px}}",
+            (new DesignRules())->forDesign($design)
+        );
+    }
+
+    public function testBreakpointWidthsUseTheDesignsSizeUnit(): void
+    {
+        $design = $this->design(8, ['size_mode' => 'px', 'width' => 80]);
+        $design->setSizes(['sm' => ['width' => 60]]);
+
+        self::assertStringEndsWith('@media (max-width:639px){.ol-d-8{--ol-w:60px}}', (new DesignRules())->forDesign($design));
+    }
+
+    public function testLabelClassesNameTypeDesignShapeAnimationAndHover(): void
+    {
+        $rules = new DesignRules();
+
+        self::assertSame(
+            ['ol-label', 'ol-label--shape', 'ol-d-9', 'ol-shape-pill'],
+            $rules->labelClasses($this->design(9, ['type' => 'shape', 'shape' => 'pill']))
+        );
+        self::assertSame(
+            ['ol-label', 'ol-label--text', 'ol-d-9', 'ol-anim-pop', 'ol-hover-lift'],
+            $rules->labelClasses($this->design(9, ['type' => 'text', 'animation' => 'pop', 'hover_effect' => 'lift']))
+        );
+        self::assertSame(
+            ['ol-label', 'ol-label--image', 'ol-d-9', 'ol-anim-fade'],
+            $rules->labelClasses($this->design(9, ['type' => 'image', 'shape' => 'pill', 'animation' => 'fade', 'hover_effect' => 'shake'])),
+            'images have no shape; unknown effects are ignored'
+        );
+    }
+
     public function testDesignWithoutIdProducesNothing(): void
     {
         self::assertSame('', (new DesignRules())->forDesign($this->design(null, [])));

@@ -10,6 +10,7 @@ namespace Iranimij\OpenLabel\Model\Css;
 
 use Iranimij\OpenLabel\Api\Data\DesignInterface;
 use Iranimij\OpenLabel\Api\Data\PlacementInterface;
+use Iranimij\OpenLabel\Model\Config;
 use Iranimij\OpenLabel\Model\ResourceModel\Design\CollectionFactory as DesignCollectionFactory;
 use Iranimij\OpenLabel\Model\ResourceModel\Placement\CollectionFactory as PlacementCollectionFactory;
 use Magento\Framework\Filesystem\Driver\File;
@@ -18,7 +19,8 @@ use Magento\Framework\Module\Dir\Reader;
 
 /**
  * Builds the one OpenLabel stylesheet (10 · Front-end Review FE2): the module's structural CSS, one custom-property
- * line per design, one per placement that moves away from the defaults, then the sanitized custom CSS of each design.
+ * line per design, one per placement that moves away from the defaults, then the sanitized custom CSS of each design
+ * and finally the sanitized global CSS from the configuration.
  * Theme packages add their own structural rules (container roots, theme quirks) through the `sources` argument:
  * module name => file path relative to that module's `view` directory.
  */
@@ -33,6 +35,7 @@ class StylesheetGenerator
      * @param PlacementCollectionFactory $placementCollectionFactory
      * @param Reader $moduleReader
      * @param File $file
+     * @param Config $config
      * @param array<string, string> $sources
      */
     public function __construct(
@@ -42,6 +45,7 @@ class StylesheetGenerator
         private readonly PlacementCollectionFactory $placementCollectionFactory,
         private readonly Reader $moduleReader,
         private readonly File $file,
+        private readonly Config $config,
         private readonly array $sources = []
     ) {
     }
@@ -59,16 +63,17 @@ class StylesheetGenerator
         /** @var PlacementInterface[] $placementItems */
         $placementItems = $placements->getItems();
 
-        return $this->compose($this->structuralCss(), $designItems, $placementItems);
+        return $this->compose($this->structuralCss(), $designItems, $placementItems, $this->config->getGlobalCss());
     }
 
     /**
      * @param string $structural
      * @param DesignInterface[] $designs
      * @param PlacementInterface[] $placements
+     * @param string $globalCss
      * @return string
      */
-    public function compose(string $structural, array $designs, array $placements): string
+    public function compose(string $structural, array $designs, array $placements, string $globalCss = ''): string
     {
         usort($designs, fn (DesignInterface $a, DesignInterface $b): int
             => (int) $a->getDesignId() <=> (int) $b->getDesignId());
@@ -93,6 +98,10 @@ class StylesheetGenerator
             if ($custom !== '') {
                 $lines[] = '/* design ' . (int) $design->getDesignId() . " */\n" . $custom;
             }
+        }
+        $global = trim((string) $this->sanitizer->sanitize($globalCss));
+        if ($global !== '') {
+            $lines[] = "/* global */\n" . $global;
         }
 
         return implode("\n", $lines) . "\n";

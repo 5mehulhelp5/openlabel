@@ -20,6 +20,13 @@ class DesignRules
     private const HEX = '/^#(?:[0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$/';
     private const DEFAULT_GAP = 4;
 
+    /** Breakpoints of the per-size overrides (08 · UX Spec §2: phone, tablet, desktop). */
+    private const MEDIA = [
+        'sm' => '(max-width:639px)',
+        'md' => '(min-width:640px) and (max-width:1023px)',
+        'lg' => '(min-width:1024px)',
+    ];
+
     /**
      * @param int $designId
      * @return string
@@ -39,8 +46,34 @@ class DesignRules
     }
 
     /**
+     * Classes of one label element: type, design, shape (not for images), entry animation and hover effect.
+     *
      * @param DesignInterface $design
-     * @return string `.ol-d-<id>{...}` or an empty string for an unsaved design
+     * @return string[]
+     */
+    public function labelClasses(DesignInterface $design): array
+    {
+        $isImage = $design->getType() === DesignInterface::TYPE_IMAGE;
+        $classes = ['ol-label', 'ol-label--' . $design->getType(), $this->designClass((int) $design->getDesignId())];
+        if (!$isImage && (string) $design->getShape() !== '') {
+            $classes[] = 'ol-shape-' . $design->getShape();
+        }
+        $animation = $design->getAnimation();
+        if ($animation !== DesignInterface::ANIMATION_NONE && in_array($animation, DesignInterface::ANIMATIONS, true)) {
+            $classes[] = 'ol-anim-' . $animation;
+        }
+        $hover = $design->getHoverEffect();
+        if ($hover !== DesignInterface::HOVER_EFFECT_NONE && in_array($hover, DesignInterface::HOVER_EFFECTS, true)) {
+            $classes[] = 'ol-hover-' . $hover;
+        }
+
+        return $classes;
+    }
+
+    /**
+     * @param DesignInterface $design
+     * @return string `.ol-d-<id>{...}`, followed by one media rule per breakpoint override, or an empty string
+     *                for an unsaved design
      */
     public function forDesign(DesignInterface $design): string
     {
@@ -65,15 +98,39 @@ class DesignRules
         if ($design->getRotation() !== 0) {
             $props['--ol-rot'] = $design->getRotation() . 'deg';
         }
-        if ($design->getWidth() > 0) {
-            $unit = $design->getSizeMode() === DesignInterface::SIZE_MODE_PX ? 'px' : 'cqw';
-            $props['--ol-w'] = $design->getWidth() . $unit;
-        }
-        if ($design->getFontSize() > 0) {
-            $props['--ol-fs-max'] = $design->getFontSize() . 'px';
+        $props += $this->sizeProps($design, $design->getWidth(), $design->getFontSize());
+        $selector = '.' . $this->designClass((int) $design->getDesignId());
+        $rules = [$selector . '{' . $this->join($props) . '}'];
+        $sizes = $design->getSizes();
+        foreach (self::MEDIA as $breakpoint => $media) {
+            $size = $sizes[$breakpoint] ?? [];
+            $sizeProps = $this->sizeProps($design, (int) ($size['width'] ?? 0), (int) ($size['font_size'] ?? 0));
+            if ($sizeProps !== []) {
+                $rules[] = '@media ' . $media . '{' . $selector . '{' . $this->join($sizeProps) . '}}';
+            }
         }
 
-        return '.' . $this->designClass((int) $design->getDesignId()) . '{' . $this->join($props) . '}';
+        return implode("\n", $rules);
+    }
+
+    /**
+     * @param DesignInterface $design
+     * @param int $width in the design's size mode, 0 = unset
+     * @param int $fontSize px, 0 = unset
+     * @return array<string, string>
+     */
+    private function sizeProps(DesignInterface $design, int $width, int $fontSize): array
+    {
+        $props = [];
+        if ($width > 0) {
+            $unit = $design->getSizeMode() === DesignInterface::SIZE_MODE_PX ? 'px' : 'cqw';
+            $props['--ol-w'] = $width . $unit;
+        }
+        if ($fontSize > 0) {
+            $props['--ol-fs-max'] = $fontSize . 'px';
+        }
+
+        return $props;
     }
 
     /**

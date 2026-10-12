@@ -17,12 +17,33 @@ use PHPUnit\Framework\TestCase;
 
 class SystemDesignCatalogTest extends TestCase
 {
-    public function testCatalogHasFifteenUniquelyNamedDesigns(): void
+    public function testCatalogHasThirtyOneUniquelyNamedDesigns(): void
     {
         $definitions = (new SystemDesignCatalog())->getDefinitions();
 
-        self::assertCount(15, $definitions);
-        self::assertCount(15, array_unique(array_column($definitions, 'name')));
+        self::assertCount(31, $definitions);
+        self::assertCount(31, array_unique(array_column($definitions, 'name')));
+    }
+
+    public function testTheOneDotZeroDesignsKeepTheirNames(): void
+    {
+        $names = array_column((new SystemDesignCatalog())->getDefinitions(), 'name');
+
+        foreach (['Sale pill (red)', 'New pill (green)', 'Low stock pill (amber)', 'Eco (forest)', 'Free shipping (blue)'] as $name) {
+            self::assertContains($name, $names, 'system designs are matched by name');
+        }
+    }
+
+    public function testOneDotOneDesignsShowTheNewFeatures(): void
+    {
+        $definitions = (new SystemDesignCatalog())->getDefinitions();
+        $texts = array_map(static fn (array $d): string => (string) $d['store_texts'][0]['text'], $definitions);
+
+        self::assertContains('{BRAND}', $texts);
+        self::assertContains('New in {CATEGORY_NAME}', $texts);
+        self::assertSame('pop', $definitions['flash_sale']['animation']);
+        self::assertSame('grow', $definitions['trending']['hover_effect']);
+        self::assertSame('none', $definitions[SystemDesignCatalog::SALE]['animation'], '1.0 designs stay still');
     }
 
     public function testStarterKeysPointAtCatalogEntries(): void

@@ -175,6 +175,17 @@ class LabelRendererTest extends TestCase
         self::assertSame(['-{SAVE_PERCENT}%'], $this->preloadedTexts);
     }
 
+    public function testEntryAnimationAndHoverEffectAreClasses(): void
+    {
+        $label = $this->label(1, 'tl', 'vertical', 'text', 'Sale');
+        $label->getDesign()->setAnimation('fade')->setHoverEffect('grow');
+        $this->resolved = [$label];
+
+        $stacks = $this->renderer()->getStacks($this->product(), 'listing');
+
+        self::assertSame('ol-label ol-label--text ol-d-10 ol-anim-fade ol-hover-grow', $stacks[0]['labels'][0]['classes']);
+    }
+
     public function testHideOnZeroDropsALabelWhoseVariableIsZeroOrEmpty(): void
     {
         $this->resolved = [

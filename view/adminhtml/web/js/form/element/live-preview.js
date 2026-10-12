@@ -143,6 +143,14 @@ define([
                 classes.push('ol-shape-' + (type === 'shape' && data.shape ? data.shape : 'rectangle'));
             }
 
+            if (data.animation && data.animation !== 'none') {
+                classes.push('ol-anim-' + data.animation);
+            }
+
+            if (data.hover_effect && data.hover_effect !== 'none') {
+                classes.push('ol-hover-' + data.hover_effect);
+            }
+
             return {
                 classes: classes.join(' '),
                 vars: {
