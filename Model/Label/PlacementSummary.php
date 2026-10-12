@@ -25,10 +25,32 @@ class PlacementSummary
         $parts = [];
         foreach (explode(',', $raw) as $pair) {
             [$area, $position] = array_pad(explode(':', $pair, 2), 2, '');
-            $parts[] = $this->areaLabel($area) . ' ' . strtoupper($position);
+            $parts[] = $this->areaLabel($area) . ' ' . $this->positionLabel($position);
         }
 
         return implode(', ', $parts);
+    }
+
+    /**
+     * @param string $position
+     * @return string short words for the positions added in 1.1, the code for the 3×3 grid (TL, BR, ...)
+     */
+    private function positionLabel(string $position): string
+    {
+        return match ($position) {
+            'above_l' => (string) __('above left'),
+            'above_c' => (string) __('above centre'),
+            'above_r' => (string) __('above right'),
+            'below_l' => (string) __('below left'),
+            'below_c' => (string) __('below centre'),
+            'below_r' => (string) __('below right'),
+            'left_t', 'left_m', 'left_b' => (string) __('left side'),
+            'right_t', 'right_m', 'right_b' => (string) __('right side'),
+            'near_price' => (string) __('next to the price'),
+            'near_cart' => (string) __('next to Add to Cart'),
+            'under_name' => (string) __('under the name'),
+            default => strtoupper($position),
+        };
     }
 
     /**

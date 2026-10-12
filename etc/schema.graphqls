@@ -12,7 +12,7 @@ type OpenLabelLabel @doc(description: "One OpenLabel label in one placement.") {
     text: String @doc(description: "Label text for the store view with variables filled in, as plain text (the BR variable becomes a line break). Null for image labels.")
     image_url: String @doc(description: "Absolute URL of the label image. Null unless type is image.")
     alt: String @doc(description: "Alternative text of an image label.")
-    position: String! @doc(description: "Position on the image: tl, tc, tr, ml, mc, mr, bl, bc or br.")
+    position: String! @doc(description: "On the image: tl, tc, tr, ml, mc, mr, bl, bc, br. In the bands around it: above_l, above_c, above_r, below_l, below_c, below_r, left_t, left_m, left_b, right_t, right_m, right_b. In the product text: near_price, near_cart, under_name.")
     area: String! @doc(description: "Where the label shows: listing or product.")
     css_class: String! @doc(description: "The ol-* classes the storefront renders, for headless themes that load the generated stylesheet.")
     bg_color: String @doc(description: "Background colour (hex).")

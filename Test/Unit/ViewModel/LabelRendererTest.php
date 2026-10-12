@@ -87,7 +87,57 @@ class LabelRendererTest extends TestCase
             'pinned left stays left in RTL' => ['tl', true, 'ol-pos-tl'],
             'pinned right' => ['br', true, 'ol-pos-br'],
             'pinning a centre has no effect' => ['tc', true, 'ol-pos-tc'],
+            'above, start' => ['above_l', false, 'ol-pos-ots'],
+            'above, centre' => ['above_c', false, 'ol-pos-otc'],
+            'above, end' => ['above_r', false, 'ol-pos-ote'],
+            'below, start' => ['below_l', false, 'ol-pos-obs'],
+            'below, centre' => ['below_c', false, 'ol-pos-obc'],
+            'below, end' => ['below_r', false, 'ol-pos-obe'],
+            'start side, top' => ['left_t', false, 'ol-pos-ost'],
+            'start side, middle' => ['left_m', false, 'ol-pos-osm'],
+            'start side, bottom' => ['left_b', false, 'ol-pos-osb'],
+            'end side, top' => ['right_t', false, 'ol-pos-oet'],
+            'end side, middle' => ['right_m', false, 'ol-pos-oem'],
+            'end side, bottom' => ['right_b', false, 'ol-pos-oeb'],
+            'pinned above left' => ['above_l', true, 'ol-pos-otl'],
+            'pinned below right' => ['below_r', true, 'ol-pos-obr'],
+            'pinned left side' => ['left_m', true, 'ol-pos-olm'],
+            'pinned right side' => ['right_b', true, 'ol-pos-orb'],
+            'pinning above centre has no effect' => ['above_c', true, 'ol-pos-otc'],
         ];
+    }
+
+    public function testInlinePositionsAreLeftOutOfTheImageSlot(): void
+    {
+        $this->resolved = [
+            $this->label(1, 'tl', 'vertical', 'text', 'On image'),
+            $this->label(2, 'near_price', 'vertical', 'text', 'By the price'),
+        ];
+
+        $stacks = $this->renderer()->getStacks($this->product(), 'listing');
+
+        self::assertCount(1, $stacks);
+        self::assertSame([1], array_column($stacks[0]['labels'], 'id'));
+    }
+
+    public function testAnInlinePositionRendersAsOneInlineStack(): void
+    {
+        $this->resolved = [
+            $this->label(1, 'tl', 'vertical', 'text', 'On image'),
+            $this->label(2, 'near_price', 'vertical', 'text', 'By the price'),
+            $this->label(3, 'near_price', 'vertical', 'text', 'Also'),
+            $this->label(4, 'under_name', 'vertical', 'text', 'Under'),
+        ];
+        $renderer = $this->renderer();
+
+        $stacks = $renderer->getInlineStacks($this->product(), 'listing', 'near_price');
+
+        self::assertCount(1, $stacks);
+        self::assertSame('ol-stack ol-stack--h ol-inline ol-inline--near-price', $stacks[0]['classes'], 'inline labels always sit side by side');
+        self::assertSame([2, 3], array_column($stacks[0]['labels'], 'id'));
+        self::assertSame('stacks:1', $renderer->getInlineHtml($this->product(), 'listing', 'under_name'));
+        self::assertSame('', $renderer->getInlineHtml($this->product(), 'listing', 'near_cart'));
+        self::assertSame('', $renderer->getInlineHtml($this->product(), 'listing', 'tl'), 'only inline positions');
     }
 
     public function testPlacementWithOffsetsGetsItsCustomPropertyClass(): void

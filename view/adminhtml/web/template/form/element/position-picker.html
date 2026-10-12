@@ -5,16 +5,34 @@
  */
 -->
 <div class="ol-position-picker" role="radiogroup" data-role="ol-position-picker"
-     data-bind="attr: {'aria-label': $t('Position on the image')}">
+     data-bind="attr: {'aria-label': $t('Position on or around the image')}">
     <!-- ko foreach: { data: cells(), as: 'cell' } -->
+    <!-- ko if: cell.spacer -->
+    <span class="ol-position-picker__spacer" aria-hidden="true"></span>
+    <!-- /ko -->
+    <!-- ko ifnot: cell.spacer -->
     <button type="button" class="ol-position-picker__cell" role="radio"
             data-bind="click: $parent.choose.bind($parent, cell),
                        event: {keydown: $parent.onKey.bind($parent, cell)},
-                       css: {'ol-position-picker__cell--active': $parent.isChosen(cell)},
+                       css: {'ol-position-picker__cell--active': $parent.isChosen(cell),
+                             'ol-position-picker__cell--band': cell.band},
                        attr: {'aria-checked': $parent.isChosen(cell) ? 'true' : 'false',
                               'data-position': cell.value, title: cell.label, 'aria-label': cell.label,
-                              tabindex: $parent.isChosen(cell) ? 0 : -1}">
+                              tabindex: $parent.tabIndex(cell, false)}">
         <span class="ol-position-picker__dot" aria-hidden="true"></span>
     </button>
+    <!-- /ko -->
+    <!-- /ko -->
+</div>
+<div class="ol-position-inline" role="radiogroup" data-role="ol-position-inline"
+     data-bind="attr: {'aria-label': $t('Position in the product text')}">
+    <!-- ko foreach: { data: inlineCells(), as: 'cell' } -->
+    <button type="button" class="ol-position-inline__option" role="radio"
+            data-bind="click: $parent.choose.bind($parent, cell),
+                       event: {keydown: $parent.onInlineKey.bind($parent, cell)},
+                       css: {'ol-position-inline__option--active': $parent.isChosen(cell)},
+                       attr: {'aria-checked': $parent.isChosen(cell) ? 'true' : 'false',
+                              'data-position': cell.value, tabindex: $parent.tabIndex(cell, true)},
+                       text: cell.label"></button>
     <!-- /ko -->
 </div>

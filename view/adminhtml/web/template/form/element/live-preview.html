@@ -35,7 +35,7 @@
                 <span class="ol-anchor ol-preview__image-wrap">
                     <img class="ol-preview__image" width="600" height="600" alt="" data-bind="attr: {src: sampleImage}">
                     <!-- ko ifnot: hiddenReason() -->
-                    <!-- ko foreach: stacks() -->
+                    <!-- ko foreach: imageStacks() -->
                     <span data-bind="attr: {class: stackClass}, style: stackStyle">
                         <!-- ko foreach: labels -->
                         <span data-role="ol-preview-label" data-bind="attr: {class: classes}, style: vars">
@@ -52,9 +52,51 @@
                     <!-- /ko -->
                 </span>
                 <div class="ol-preview__meta">
-                    <span class="ol-preview__name" data-bind="i18n: 'Sample product'"></span>
-                    <span class="ol-preview__price">€29.99</span>
-                    <span class="ol-preview__cart" data-role="ol-preview-cart" data-bind="i18n: 'Add to cart'"></span>
+                    <span class="ol-preview__name"><span data-bind="i18n: 'Sample product'"></span>
+                        <!-- ko ifnot: hiddenReason() --><!-- ko foreach: inlineStacks('under_name') -->
+                        <span data-bind="attr: {class: stackClass}">
+                            <!-- ko foreach: labels -->
+                            <span data-role="ol-preview-label" data-bind="attr: {class: classes}, style: vars">
+                                <!-- ko if: isImage -->
+                                <img data-bind="attr: {src: imageUrl, alt: alt, width: imageWidth, height: imageHeight}">
+                                <!-- /ko -->
+                                <!-- ko ifnot: isImage -->
+                                <span class="ol-preview__text" data-bind="foreach: lines"><span data-bind="text: $data"></span><!-- ko if: $index() < $parent.lines.length - 1 --><br><!-- /ko --></span>
+                                <!-- /ko -->
+                            </span>
+                            <!-- /ko -->
+                        </span>
+                        <!-- /ko --><!-- /ko --></span>
+                    <span class="ol-preview__price">€29.99
+                        <!-- ko ifnot: hiddenReason() --><!-- ko foreach: inlineStacks('near_price') -->
+                        <span data-bind="attr: {class: stackClass}">
+                            <!-- ko foreach: labels -->
+                            <span data-role="ol-preview-label" data-bind="attr: {class: classes}, style: vars">
+                                <!-- ko if: isImage -->
+                                <img data-bind="attr: {src: imageUrl, alt: alt, width: imageWidth, height: imageHeight}">
+                                <!-- /ko -->
+                                <!-- ko ifnot: isImage -->
+                                <span class="ol-preview__text" data-bind="foreach: lines"><span data-bind="text: $data"></span><!-- ko if: $index() < $parent.lines.length - 1 --><br><!-- /ko --></span>
+                                <!-- /ko -->
+                            </span>
+                            <!-- /ko -->
+                        </span>
+                        <!-- /ko --><!-- /ko --></span>
+                    <span class="ol-preview__cart-row"><span class="ol-preview__cart" data-role="ol-preview-cart" data-bind="i18n: 'Add to cart'"></span>
+                        <!-- ko ifnot: hiddenReason() --><!-- ko foreach: inlineStacks('near_cart') -->
+                        <span data-bind="attr: {class: stackClass}">
+                            <!-- ko foreach: labels -->
+                            <span data-role="ol-preview-label" data-bind="attr: {class: classes}, style: vars">
+                                <!-- ko if: isImage -->
+                                <img data-bind="attr: {src: imageUrl, alt: alt, width: imageWidth, height: imageHeight}">
+                                <!-- /ko -->
+                                <!-- ko ifnot: isImage -->
+                                <span class="ol-preview__text" data-bind="foreach: lines"><span data-bind="text: $data"></span><!-- ko if: $index() < $parent.lines.length - 1 --><br><!-- /ko --></span>
+                                <!-- /ko -->
+                            </span>
+                            <!-- /ko -->
+                        </span>
+                        <!-- /ko --><!-- /ko --></span>
                 </div>
             </div>
         </div>

@@ -168,7 +168,7 @@ class ImportExportTest extends TestCase
         $file['labels'][0]['stores'] = ['no_such_store'];
         $file['labels'][0]['customer_groups'] = ['No such group'];
         $file['labels'][0]['conditions']['conditions'][] = ['type' => \Magento\Framework\DataObject::class];
-        $file['labels'][0]['placements'][0]['position'] = 'near_price';
+        $file['labels'][0]['placements'][0]['position'] = 'side';
         $counts = $this->counts();
 
         $result = $this->importer()->import($this->roundTrip($file));
@@ -177,7 +177,7 @@ class ImportExportTest extends TestCase
             'labels[0] "ol-ie Broken": this shop has no store view with code "no_such_store".',
             'labels[0] "ol-ie Broken": this shop has no customer group with code "No such group".',
             'labels[0] "ol-ie Broken": condition type "Magento\Framework\DataObject" is not an OpenLabel condition.',
-            'labels[0] "ol-ie Broken": Placement position "near_price" is not available in this version.',
+            'labels[0] "ol-ie Broken": Placement position "side" is not available in this version.',
         ], $result->errors);
         self::assertSame($counts, $this->counts());
     }

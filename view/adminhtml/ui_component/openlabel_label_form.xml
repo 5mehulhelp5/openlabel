@@ -460,7 +460,8 @@
                         </item>
                     </argument>
                     <settings>
-                        <label translate="true">Position on the image</label>
+                        <label translate="true">Position</label>
+                        <notice translate="true">On the image, in the band around it (dashed), or in the product text next to the price, next to Add to Cart or under the name.</notice>
                         <dataType>text</dataType>
                         <dataScope>position</dataScope>
                         <elementTmpl>Iranimij_OpenLabel/form/element/position-picker</elementTmpl>
