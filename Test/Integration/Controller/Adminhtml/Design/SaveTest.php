@@ -69,6 +69,19 @@ class SaveTest extends AbstractBackendController
         self::assertSame(['sm' => ['width' => 26, 'font_size' => 11], 'lg' => ['width' => 14]], $design->getSizes(), 'empty breakpoints are not stored');
     }
 
+    public function testTooltipsAreSavedPerStoreView(): void
+    {
+        $data = $this->textDesign('With tooltip');
+        $data['store_texts'][0]['tooltip'] = 'Ends Sunday';
+        $data['store_texts'][1]['tooltip'] = 'Endet Sonntag';
+
+        $this->post($data);
+
+        $design = $this->designNamed('With tooltip');
+        self::assertSame('Ends Sunday', $design->getTooltip());
+        self::assertSame('Endet Sonntag', $design->getTooltip(1));
+    }
+
     public function testStoreViewUsingTheDefaultTextStoresNoRow(): void
     {
         $data = $this->textDesign('Default only');

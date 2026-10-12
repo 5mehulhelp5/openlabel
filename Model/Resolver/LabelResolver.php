@@ -91,7 +91,7 @@ class LabelResolver implements LabelResolverInterface
             ->join(
                 ['l' => $this->resource->getTableName('openlabel_label')],
                 'l.label_id = i.label_id AND l.status = ' . LabelInterface::STATUS_ENABLED,
-                ['name', 'priority', 'hide_lower_priority', 'hide_on_zero_variable']
+                ['name', 'priority', 'hide_lower_priority', 'hide_on_zero_variable', 'click_url', 'click_nofollow']
             )
             ->join(['p' => $this->resource->getTableName('openlabel_placement')], 'p.label_id = l.label_id', $placementColumns)
             ->join(['d' => $this->resource->getTableName('openlabel_design')], 'd.design_id = COALESCE(p.design_id, l.design_id)', $designColumns)
@@ -156,7 +156,9 @@ class LabelResolver implements LabelResolverInterface
             $row['parent_product_id'] === null ? null : (int) $row['parent_product_id'],
             $placement,
             $design,
-            (bool) $row['hide_on_zero_variable']
+            (bool) $row['hide_on_zero_variable'],
+            $row['click_url'] === null ? null : (string) $row['click_url'],
+            (bool) $row['click_nofollow']
         );
     }
 }

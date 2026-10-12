@@ -49,7 +49,9 @@ class FormMapper
             ->setPriority(max(0, (int) ($data[LabelInterface::PRIORITY] ?? 0)))
             ->setApplyToParent($this->flag($data[LabelInterface::APPLY_TO_PARENT] ?? false))
             ->setHideLowerPriority($this->flag($data[LabelInterface::HIDE_LOWER_PRIORITY] ?? false))
-            ->setHideOnZeroVariable($this->flag($data[LabelInterface::HIDE_ON_ZERO_VARIABLE] ?? false));
+            ->setHideOnZeroVariable($this->flag($data[LabelInterface::HIDE_ON_ZERO_VARIABLE] ?? false))
+            ->setClickUrl(trim((string) ($data[LabelInterface::CLICK_URL] ?? '')))
+            ->setClickNofollow($this->flag($data[LabelInterface::CLICK_NOFOLLOW] ?? false));
         $designId = (int) ($data[LabelInterface::DESIGN_ID] ?? 0);
         if ($designId > 0) {
             $label->setDesignId($designId);

@@ -144,6 +144,17 @@
                 <elementTmpl>Iranimij_OpenLabel/form/element/text-with-variables</elementTmpl>
             </settings>
         </field>
+        <field name="store_texts_tooltip" formElement="input" sortOrder="15">
+            <settings>
+                <label translate="true">Tooltip</label>
+                <notice translate="true">Optional. Shown when the shopper points at the label or moves to it with the keyboard, e.g. "Offer ends Sunday". Variables work here too.</notice>
+                <dataType>text</dataType>
+                <dataScope>store_texts.0.tooltip</dataScope>
+                <validation>
+                    <rule name="max_text_length" xsi:type="number">255</rule>
+                </validation>
+            </settings>
+        </field>
         <field name="font_size" formElement="input" sortOrder="20">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">

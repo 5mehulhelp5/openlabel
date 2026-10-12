@@ -72,4 +72,19 @@ interface ResolvedLabelInterface
      * @return string|null
      */
     public function getAltText(): ?string;
+
+    /**
+     * @return string|null tooltip for the store view (may contain variables), null when the design has none
+     */
+    public function getTooltip(): ?string;
+
+    /**
+     * @return string|null click-through link: https://, http:// or a path of this shop
+     */
+    public function getClickUrl(): ?string;
+
+    /**
+     * @return bool add rel="nofollow" to the click-through link
+     */
+    public function isClickNofollow(): bool;
 }

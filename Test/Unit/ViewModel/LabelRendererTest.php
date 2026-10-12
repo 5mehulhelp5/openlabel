@@ -107,6 +107,49 @@ class LabelRendererTest extends TestCase
         ];
     }
 
+    public function testLabelsLinkOnTheProductPageAndInTheProductTextButNotInsideTheCardLink(): void
+    {
+        $page = $this->label(1, 'tl', 'vertical', 'text', 'Sale', area: 'product', clickUrl: '/sale.html', nofollow: true);
+        $external = $this->label(2, 'tr', 'vertical', 'text', 'Brand', area: 'product', clickUrl: 'https://brand.test/x');
+        $card = $this->label(3, 'tl', 'vertical', 'text', 'Sale', clickUrl: '/sale.html');
+        $text = $this->label(4, 'near_price', 'vertical', 'text', 'Sale', clickUrl: '/sale.html');
+        $this->resolved = [$page, $external, $card, $text];
+        $renderer = $this->renderer();
+
+        $product = $renderer->getStacks($this->product(), 'product');
+        $listing = $renderer->getStacks($this->product(), 'listing');
+        $inline = $renderer->getInlineStacks($this->product(), 'listing', 'near_price');
+
+        self::assertSame(['href' => 'https://shop.test/sale.html', 'rel' => 'nofollow'], $product[0]['labels'][0]['link']);
+        self::assertSame(['href' => 'https://brand.test/x', 'rel' => null], $product[1]['labels'][0]['link']);
+        self::assertNull($listing[0]['labels'][0]['link'], 'the product card image is already a link: no link inside a link');
+        self::assertSame('https://shop.test/sale.html', $inline[0]['labels'][0]['link']['href'] ?? null);
+        self::assertStringContainsString('ol-label--link', $product[0]['labels'][0]['classes']);
+        self::assertStringNotContainsString('ol-label--link', $listing[0]['labels'][0]['classes']);
+    }
+
+    public function testTooltipsGetStableIdsAndAreFocusableOutsideTheCardLink(): void
+    {
+        $first = $this->label(1, 'tl', 'vertical', 'text', 'Sale', area: 'product');
+        $first->getDesign()->setTooltip('Ends {SPECIAL_ENDS_IN}');
+        $second = $this->label(2, 'tl', 'vertical', 'text', 'New', area: 'product');
+        $second->getDesign()->setTooltip('Just in');
+        $card = $this->label(3, 'br', 'vertical', 'text', 'Hot');
+        $card->getDesign()->setTooltip('Selling fast');
+        $plain = $this->label(4, 'br', 'vertical', 'text', 'Plain');
+        $this->resolved = [$first, $second, $card, $plain];
+        $renderer = $this->renderer();
+
+        $labels = $renderer->getStacks($this->product(), 'product')[0]['labels'];
+        $cardLabels = $renderer->getStacks($this->product(), 'listing')[0]['labels'];
+
+        self::assertSame(['id' => 'ol-tip-11-100', 'html' => '<b>Ends {SPECIAL_ENDS_IN}</b>', 'focusable' => true], $labels[0]['tooltip']);
+        self::assertSame('ol-tip-12-100', $labels[1]['tooltip']['id'] ?? null);
+        self::assertFalse($cardLabels[0]['tooltip']['focusable'] ?? null, 'nothing focusable inside the card link');
+        self::assertNull($cardLabels[1]['tooltip']);
+        self::assertStringContainsString('ol-has-tip', $labels[0]['classes']);
+    }
+
     public function testInlinePositionsAreLeftOutOfTheImageSlot(): void
     {
         $this->resolved = [
@@ -317,6 +360,7 @@ class LabelRendererTest extends TestCase
         $store = $this->createStub(Store::class);
         $store->method('getWebsiteId')->willReturn(1);
         $storeManager = $this->createStub(StoreManagerInterface::class);
+        $store->method('getBaseUrl')->willReturn('https://shop.test/');
         $storeManager->method('getStore')->willReturn($store);
 
         return new LabelRenderer($labels, $renderer, new DesignRules(), $imageUrl, $config, $layout, $storeManager);
@@ -342,13 +386,16 @@ class LabelRendererTest extends TestCase
         ?string $shape = null,
         bool $pinned = false,
         int $offsetX = 0,
-        bool $hideOnZero = false
+        bool $hideOnZero = false,
+        string $area = 'listing',
+        ?string $clickUrl = null,
+        bool $nofollow = false
     ): ResolvedLabel {
         $om = new ObjectManager($this);
         /** @var Placement $placement */
         $placement = $om->getObject(Placement::class);
         $placement->setData([
-            'placement_id' => $id + 10, 'area' => 'listing', 'position' => $position, 'stacking' => $stacking,
+            'placement_id' => $id + 10, 'area' => $area, 'position' => $position, 'stacking' => $stacking,
             'pin_physical_side' => $pinned, 'offset_x' => $offsetX,
         ]);
         /** @var Design $design */
@@ -359,6 +406,6 @@ class LabelRendererTest extends TestCase
         ]);
         $design->setText($text)->setAltText($type === 'image' ? 'New in' : null);
 
-        return new ResolvedLabel($id, 'Label ' . $id, $id, false, 100, null, $placement, $design, $hideOnZero);
+        return new ResolvedLabel($id, 'Label ' . $id, $id, false, 100, null, $placement, $design, $hideOnZero, $clickUrl, $nofollow);
     }
 }

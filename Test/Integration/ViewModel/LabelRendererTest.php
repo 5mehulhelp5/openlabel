@@ -86,6 +86,26 @@ class LabelRendererTest extends TestCase
         self::assertStringNotContainsString('data-ol-label', $html);
     }
 
+    #[DataFixture(ScheduledSearchIndex::class)]
+    #[DataFixture(DesignFixture::class, ['store_texts' => [0 => ['text' => 'Sale', 'tooltip' => 'Ends <b>Sunday</b>']]], 'design')]
+    public function testLinkAndTooltipMarkupWithoutALinkInsideTheCardLink(): void
+    {
+        $product = $this->products(1)[0];
+        $this->label([
+            'click_url' => '/sale.html',
+            'click_nofollow' => true,
+            'placements' => [['area' => 'listing', 'position' => 'tl'], ['area' => 'product', 'position' => 'tl']],
+        ]);
+
+        $card = $this->renderer()->getStacksHtml($product, 'listing');
+        $page = $this->renderer()->getStacksHtml($product, 'product');
+
+        self::assertStringNotContainsString('<a ', $card, 'the card image is already a link');
+        self::assertStringNotContainsString('tabindex', $card, 'nothing focusable inside the card link');
+        self::assertMatchesRegularExpression('#<span class="[^"]*ol-has-tip" aria-describedby="(ol-tip-\d+-\d+)">Sale</span><span class="ol-tip" role="tooltip" id="\1">Ends <b>Sunday</b></span>#', $card);
+        self::assertMatchesRegularExpression('#<a class="[^"]*ol-label--link ol-has-tip" href="https?://[^"]+/sale\.html" rel="nofollow" aria-describedby="ol-tip-\d+-\d+">Sale</a><span class="ol-tip"#', $page);
+    }
+
     #[DataFixture(DesignFixture::class, [
         'type' => DesignInterface::TYPE_IMAGE, 'image_path' => 'designs/new.svg', 'image_width' => 80, 'image_height' => 40,
         'store_texts' => [0 => ['text' => null, 'alt_text' => 'New in']],

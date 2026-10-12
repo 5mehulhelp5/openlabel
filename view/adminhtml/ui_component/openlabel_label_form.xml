@@ -133,6 +133,32 @@
                 </checkbox>
             </formElements>
         </field>
+        <field name="click_url" formElement="input" sortOrder="57">
+            <settings>
+                <label translate="true">Link</label>
+                <notice translate="true">Optional. Where a click on the label goes: a page of this shop such as /sale.html, or https://... On product cards the image already opens the product, so labels there are not links.</notice>
+                <dataType>text</dataType>
+                <dataScope>click_url</dataScope>
+            </settings>
+        </field>
+        <field name="click_nofollow" formElement="checkbox" sortOrder="58">
+            <settings>
+                <label translate="true">Ask search engines not to follow the link</label>
+                <dataType>boolean</dataType>
+                <dataScope>click_nofollow</dataScope>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <prefer>toggle</prefer>
+                        <valueMap>
+                            <map name="false" xsi:type="string">0</map>
+                            <map name="true" xsi:type="string">1</map>
+                        </valueMap>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
         <field name="hide_lower_priority" formElement="checkbox" sortOrder="50">
             <settings>
                 <label translate="true">Hide other labels</label>

@@ -158,13 +158,27 @@ class DesignRules
 
     /**
      * @param string|null $colour
-     * @return string|null lower-case hex, or null for anything that is not a hex colour
+     * @return string|null lower-case hex in its shortest form (#ffffff → #fff), or null for anything that is not a
+     *                     hex colour
      */
     private function colour(?string $colour): ?string
     {
         $colour = strtolower(trim((string) $colour));
+        if (preg_match(self::HEX, $colour) !== 1) {
+            return null;
+        }
+        if (strlen($colour) === 7 || strlen($colour) === 9) {
+            $pairs = str_split(substr($colour, 1), 2);
+            $short = true;
+            foreach ($pairs as $pair) {
+                $short = $short && $pair[0] === $pair[1];
+            }
+            if ($short) {
+                return '#' . implode('', array_map(static fn (string $pair): string => $pair[0], $pairs));
+            }
+        }
 
-        return preg_match(self::HEX, $colour) === 1 ? $colour : null;
+        return $colour;
     }
 
     /**

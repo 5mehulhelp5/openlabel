@@ -182,11 +182,13 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
         $this->preload($product, $context);
         $debug = $this->config->getBool(self::CONFIG_DEBUG);
 
+        // Product cards are links to the product: labels on their image must not be links or focusable themselves.
+        $insideLink = $area === PlacementInterface::AREA_LISTING && array_diff($positions, PlacementInterface::IMAGE_POSITIONS) === [];
         $result = [];
         foreach ($stacks as $labels) {
             $items = [];
             foreach ($labels as $label) {
-                $item = $this->labelData($label, $product, $context, $loading, $debug);
+                $item = $this->labelData($label, $product, $context, $loading, $debug, $insideLink);
                 if ($item !== null) {
                     $items[] = $item;
                 }
@@ -277,6 +279,7 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
      * @param Context $context
      * @param string $loading
      * @param bool $debug
+     * @param bool $insideLink the label is rendered inside a link (the image of a product card)
      * @return array<string, mixed>|null null when "hide when a variable is zero or empty" applies
      */
     private function labelData(
@@ -284,7 +287,8 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
         ProductInterface $product,
         Context $context,
         string $loading,
-        bool $debug
+        bool $debug,
+        bool $insideLink = false
     ): ?array {
         $design = $label->getDesign();
         $designId = (int) $design->getDesignId();
@@ -311,13 +315,49 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
             ];
         }
 
+        $link = $insideLink ? null : $this->link($label);
+        if ($link !== null) {
+            $classes[] = 'ol-label--link';
+        }
+        $tooltip = null;
+        if ($label->getTooltip() !== null) {
+            $classes[] = 'ol-has-tip';
+            $tooltip = [
+                // Stable across cached blocks (Hyvä caches product cards): placement + product.
+                'id' => 'ol-tip-' . (int) $label->getPlacement()->getPlacementId() . '-' . (int) $product->getId(),
+                'html' => $this->renderer->render((string) $label->getTooltip(), $product, $context)->getHtml(),
+                'focusable' => !$insideLink && $link === null,
+            ];
+        }
+
         return [
             'id' => $label->getLabelId(),
             'classes' => implode(' ', $classes),
             'html' => $html,
             'image' => $image,
+            'link' => $link,
+            'tooltip' => $tooltip,
             'debug_id' => $debug ? $label->getLabelId() : null,
         ];
+    }
+
+    /**
+     * @param ResolvedLabelInterface $label
+     * @return array{href: string, rel: string|null}|null shop paths become absolute URLs of the current store
+     */
+    private function link(ResolvedLabelInterface $label): ?array
+    {
+        $url = $label->getClickUrl();
+        if ($url === null) {
+            return null;
+        }
+        if (str_starts_with($url, '/')) {
+            $store = $this->storeManager->getStore();
+            $base = $store instanceof Store ? (string) $store->getBaseUrl() : '/';
+            $url = rtrim($base, '/') . $url;
+        }
+
+        return ['href' => $url, 'rel' => $label->isClickNofollow() ? 'nofollow' : null];
     }
 
     /**

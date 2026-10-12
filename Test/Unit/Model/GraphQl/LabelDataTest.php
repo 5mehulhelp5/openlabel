@@ -48,6 +48,9 @@ class LabelDataTest extends TestCase
             'bg_color' => '#e11d48',
             'text_color' => '#ffffff',
             'priority' => 3,
+            'tooltip' => null,
+            'click_url' => null,
+            'click_nofollow' => false,
             'design_id' => 70,
         ], $data);
     }
@@ -103,6 +106,17 @@ class LabelDataTest extends TestCase
         $data = $this->labelData()->toArray($label, $this->product(), new Context(1, 1, 0));
 
         self::assertSame('ol-label ol-label--text ol-d-30 ol-anim-pop ol-hover-lift', $data['css_class'] ?? null);
+    }
+
+    public function testTooltipAndClickThroughAreExposedForHeadlessThemes(): void
+    {
+        $label = new ResolvedLabel(8, 'Label 8', 3, false, 100, null, $this->label(8, 'text', 'Sale')->getPlacement(), $this->label(8, 'text', 'Sale')->getDesign(), false, '/sale.html', true);
+        $label->getDesign()->setTooltip('Ends soon');
+        $this->renderedHtml = 'Ends <b>soon</b>';
+
+        $data = $this->labelData()->toArray($label, $this->product(), new Context(1, 1, 0));
+
+        self::assertSame(['Ends soon', '/sale.html', true], [$data['tooltip'] ?? null, $data['click_url'] ?? null, $data['click_nofollow'] ?? null]);
     }
 
     public function testEmptyColoursAreNull(): void

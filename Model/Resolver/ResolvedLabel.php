@@ -24,6 +24,8 @@ class ResolvedLabel implements ResolvedLabelInterface
      * @param PlacementInterface $placement
      * @param DesignInterface $design
      * @param bool $hideOnZeroVariable
+     * @param string|null $clickUrl
+     * @param bool $clickNofollow
      */
     public function __construct(
         private readonly int $labelId,
@@ -34,7 +36,9 @@ class ResolvedLabel implements ResolvedLabelInterface
         private readonly ?int $parentProductId,
         private readonly PlacementInterface $placement,
         private readonly DesignInterface $design,
-        private readonly bool $hideOnZeroVariable = false
+        private readonly bool $hideOnZeroVariable = false,
+        private readonly ?string $clickUrl = null,
+        private readonly bool $clickNofollow = false
     ) {
     }
 
@@ -124,5 +128,33 @@ class ResolvedLabel implements ResolvedLabelInterface
     public function getAltText(): ?string
     {
         return $this->design->getAltText();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTooltip(): ?string
+    {
+        $tooltip = trim((string) $this->design->getTooltip());
+
+        return $tooltip === '' ? null : $tooltip;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getClickUrl(): ?string
+    {
+        $url = trim((string) $this->clickUrl);
+
+        return $url === '' ? null : $url;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isClickNofollow(): bool
+    {
+        return $this->clickNofollow;
     }
 }

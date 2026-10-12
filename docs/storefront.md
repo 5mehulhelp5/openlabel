@@ -34,6 +34,8 @@ Run it after copying a database or `pub/media` between environments. On a fresh 
 | `ol-pos-tl tr ml mr bl br` | placements set to "keep left/right in RTL" |
 | `ol-pos-ots otc ote obs obc obe ost osm osb oet oem oeb` | the bands just outside the image (1.1): o(utside) + t(op), b(ottom), s(tart side), e(nd side) + the place along it; over the space around the image |
 | `ol-pos-otl otr obl obr olt olm olb ort orm orb` | the bands with "keep left/right in RTL" |
+| `ol-label--link` | the label is an `<a href>` (click-through, 1.1); never inside the product card's image link, where labels stay `<span>` |
+| `ol-has-tip` + `ol-tip` | a label with a tooltip: the next sibling `<span class="ol-tip" role="tooltip">` is shown on hover and focus and referenced by `aria-describedby`; outside links the label is focusable (`tabindex="0"`) |
 | `ol-inline`, `ol-inline--near-price` / `--near-cart` / `--under-name` | labels in the product text (1.1): part of the text flow, always side by side, sized by the design's font size |
 | `ol-p-<placement_id>` | offsets and gap of that placement (custom properties) |
 | `ol-label`, `ol-label--text` / `--image` / `--shape`, `ol-d-<design_id>`, `ol-shape-*` | the badge |
@@ -41,7 +43,7 @@ Run it after copying a database or `pub/media` between environments. On a fresh 
 
 Custom properties: `--ol-bg --ol-fg --ol-border --ol-bw --ol-w --ol-rot --ol-op --ol-fs-min --ol-fs-cq --ol-fs-max --ol-gap --ol-ox --ol-oy --ol-z`. All rules use a single class, without `!important`, so a theme overrides them with two classes, for example `.product-item .ol-stack { --ol-z: 20; }`.
 
-Labels have `pointer-events: none`: clicks, hover image swaps and swatches work through them. Text sizes use container queries on the product card and the gallery, with an 11 px floor on small cards and phones.
+Labels have `pointer-events: none`: clicks, hover image swaps and swatches work through them. Labels with a tooltip or a link (1.1) take the pointer; inside a product card a click on them still opens the product. Text sizes use container queries on the product card and the gallery, with an 11 px floor on small cards and phones.
 
 ## Right-to-left stores
 
