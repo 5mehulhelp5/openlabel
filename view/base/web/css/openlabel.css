@@ -196,6 +196,10 @@
 .ol-has-tip:hover + .ol-tip,
 .ol-has-tip:focus + .ol-tip { display: block; }
 
+/* Every stack is its own stacking context: lift the one with the open tooltip above the stacks around it. */
+.ol-stack:hover,
+.ol-stack:focus-within { z-index: calc(var(--ol-z, 5) + 1); }
+
 /* Variant labels waiting for their variant, the countdown (digits keep their width) and screen-reader-only text. */
 .ol-label--hidden { display: none; }
 .ol-countdown { font-variant-numeric: tabular-nums; }
