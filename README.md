@@ -2,8 +2,9 @@
 
 **Labels that just work on Hyvä, free, with zero slowdown.**
 
-"Sale -25%", "New", "Only 3 left": rule-based product labels on listings and product pages. One query per page,
-zero layout shift, correct under Varnish for every customer group, no JavaScript and no Tailwind rebuild. MIT.
+"Sale -25%", "New", "Only 3 left": rule-based product labels on listings, product pages, the cart, wish list,
+compare list and order emails. One query per page, zero layout shift, correct under Varnish for every customer group,
+no Tailwind rebuild. MIT.
 
 <!-- A short screen recording of the quick start goes here (docs/assets/quick-start.gif). -->
 
@@ -31,9 +32,10 @@ That is all on a stock Hyvä theme: no theme changes, no `npm run build`. In pro
 To change it, open the label. The form has these parts:
 
 - **Show when:** quick switches and the full rule tree.
-- **Show where:** a 3×3 position picker for listings and the product page.
+- **Show where:** a position picker for listings and the product page (21 positions: on the image, around it,
+  and next to the price, Add to Cart or the name), plus the cart, mini cart, wish list, compare list and emails.
 - **Who and when:** store views, customer groups, schedule.
-- **Design:** pick one of 15 built-in designs or make your own.
+- **Design:** pick one of 31 built-in designs or make your own.
 
 The live preview follows every change. Details: [docs/admin.md](docs/admin.md).
 
@@ -42,12 +44,65 @@ The live preview follows every change. Details: [docs/admin.md](docs/admin.md).
 - **Fast.** A dedicated indexer matches rules in SQL; a category page with 36 products costs one extra query.
 - **Cache-correct.** Labels are part of the cached HTML; Varnish and the built-in page cache keep one copy per
   customer group, as Magento does for prices. Saving a label purges exactly the pages it changes.
-- **No layout shift, no JavaScript.** Labels are positioned with CSS inside the product image; one small
-  generated stylesheet per store view. Lighthouse scores and CLS are identical with and without the module.
+- **No layout shift, almost no JavaScript.** Labels are positioned with CSS; one small generated stylesheet per
+  store view. Tooltips, links and animations are CSS only. A few lines of JavaScript load only on pages that show a live
+  countdown, and on product pages with variant labels. Lighthouse scores and CLS are identical with and without
+  the module.
 - **Hyvä-native, theme-safe.** Works on a fresh Hyvä install without a Tailwind build; CSP-clean (no inline
   styles or scripts); right-to-left stores mirror positions automatically.
 - **Everything scriptable.** `openlabel:export` / `openlabel:import` keep labels in git, `openlabel:preview`
-  shows what a label matches, GraphQL `openlabel_labels` serves headless storefronts.
+  shows what a label matches, the REST API lets a PIM or ERP manage labels, GraphQL `openlabel_labels` serves
+  headless storefronts.
+
+## How it compares
+
+OpenLabel 1.1 next to the two best-known paid label modules. Their columns come only from their public
+documentation and product pages (October 2026), never from their code. "Not in docs" means we found no mention,
+not that the feature is missing. Corrections are welcome as an issue.
+
+| | OpenLabel 1.1 | Amasty Product Labels | Mirasvit Product Labels |
+|---|---|---|---|
+| Price | Free, MIT | Paid | Paid |
+| Hyvä | ✓ native render package, included | ✓ | ✓ |
+| Text, shape and image labels | ✓ | ✓ | ✓ |
+| Image formats | PNG, JPG, GIF, SVG (sanitized), WebP, AVIF; size limit setting | PNG, JPG, GIF, WebP | Not in docs |
+| Built-in designs | 31, all WCAG AA contrast | ✓ ready-made pack | ✓ |
+| Size per phone, tablet, desktop | ✓ | Not in docs | Not in docs |
+| Custom CSS | ✓ per design and global, sanitized, own permissions | ✓ | ✓ |
+| Entry animation and hover effect (CSS only, off for reduced motion) | ✓ | Through custom CSS | Not in docs |
+| Positions on the image | 9 | 9 | 9 |
+| Positions around the image (above, below, left, right) | 12 | Not in docs | Not in docs |
+| Next to the price, next to Add to Cart, under the name | ✓ | ✓ | Not in docs |
+| Listing, search, product page, widgets, related / upsell / cross-sell | ✓ | ✓ | ✓ |
+| Cart and mini cart | ✓ (Hyvä) | Paid add-on | Not in docs |
+| Checkout | No (Hyvä Checkout planned on request) | Paid add-on | Not in docs |
+| Wish list | ✓ | Not in docs | Not in docs |
+| Compare list | ✓ | Not in docs | ✓ |
+| Order, invoice, shipment and credit memo emails | ✓ | Not in docs | Not in docs |
+| Hide labels on chosen pages | ✓ | ✓ | Not in docs |
+| Conditions: any attribute, category, SKU, on sale, new, stock, price | ✓ | ✓ | ✓ |
+| Conditions: bestseller, most viewed | ✓ | Bestseller as add-on | Not in docs |
+| Condition: ships free | ✓ | Not in docs | Not in docs |
+| Configurable products: label follows the chosen variant | ✓ | Not in docs | ✓ |
+| Variables: discount, prices, stock, SKU, any attribute, days left | ✓ | ✓ | ✓ |
+| Variables: category, brand | ✓ | Not in docs | Category |
+| Hide the label when a variable is zero | ✓ | ✓ | Not in docs |
+| Live countdown | ✓ | Separate module | Not in docs |
+| Tooltip | ✓ (hover, keyboard focus, touch) | ✓ | Not in docs |
+| Click-through link (nofollow option) | ✓ | ✓ | ✓ |
+| Schedule, store views, customer groups, priority | ✓ | ✓ | ✓ |
+| Label texts translated | EN, DE, FR, ES, NL, IT | EN, DE | Not in docs |
+| Live preview and matched-products count in the admin | ✓ | Count | Count |
+| Labels on the product edit page, assign by hand | ✓ | Not in docs | Not in docs |
+| Dedicated indexer | ✓ | ✓ | ✓ |
+| Cached per customer group in Varnish, no AJAX, zero layout shift | ✓ | Not in docs | Not in docs |
+| GraphQL (storefront) | ✓ | ✓ | Not in docs |
+| REST API | ✓ create, read, update, delete | ✓ | Not in docs |
+| Export and import (JSON, CLI); import from Smile | ✓ | Not in docs | Not in docs |
+| Remote storage (S3) for label images | Should work, not tested | ✓ | Not in docs |
+
+Not in OpenLabel 1.1: GraphQL mutations for the admin, a bulk REST read, checkout labels, a Luma render package
+and importers from Amasty and Mirasvit (planned for 1.2).
 
 ## Compatibility
 
@@ -80,6 +135,7 @@ Other themes: the core package (`iranimij/openlabel`) works with any theme throu
 - [the engine](docs/engine.md)
 - [CLI](docs/cli.md)
 - [GraphQL](docs/graphql.md)
+- [REST API](docs/rest-api.md)
 - [export, import and moving from Smile](docs/import-export.md)
 
 ## Packages
@@ -101,7 +157,8 @@ Other themes: the core package (`iranimij/openlabel`) works with any theme throu
 ## Notice
 
 OpenLabel is an independent open-source project. It is not affiliated with, endorsed by, or sponsored by Hyvä
-Themes B.V. or Adobe Inc. "Hyvä" and "Magento" are trademarks of their respective owners.
+Themes B.V., Adobe Inc., Amasty or Mirasvit. "Hyvä", "Magento", "Amasty" and "Mirasvit" are trademarks of their
+respective owners.
 
 ## License
 
