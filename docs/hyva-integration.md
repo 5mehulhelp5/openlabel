@@ -90,6 +90,16 @@ Themes that override `product/list/image.phtml` with another template name or re
   listens to `configurable-selection-changed` and ticks `.ol-countdown[data-ol-end]`; the inline script is
   registered with `$hyvaCsp->registerInlineScript()`.
 
+## 8. Item lists (1.1)
+
+- **Cart page:** `Plugin\Items\CartItemPlugin` inserts the item's labels after `h3.product-item-name` of
+  `php-cart/item/default.phtml`.
+- **Mini cart:** Hyvä renders each item's `product_price` from the cart section as HTML, so
+  `Plugin\Items\MiniCartItemPlugin` appends the labels there (`AbstractItem::getItemData`). No JavaScript; the
+  labels update when the cart section reloads.
+- **Wish list:** `Plugin\Items\WishlistItemPlugin` after the name column (`Item\Column\Info`).
+- **Compare page:** `Plugin\Items\CompareListPlugin` after each product's name link, found by its URL.
+
 ## Hyvä 1.5 (verified on default theme 1.5.2, 2026-10-11)
 
 Hyvä 1.5 rebuilt the product gallery as a snap slider:

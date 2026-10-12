@@ -33,6 +33,16 @@
                     <comment>Rebuilt automatically after every design or label save. Use this after copying the database or media folder from another environment.</comment>
                     <frontend_model>Iranimij\OpenLabel\Block\Adminhtml\System\Config\RegenerateCss</frontend_model>
                 </field>
+                <field id="hidden_pages" translate="label comment" type="multiselect" sortOrder="38" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Hide labels on these pages</label>
+                    <comment>No labels on the selected pages, for example a home page full of banners. Flush the page cache after a change.</comment>
+                    <source_model>Iranimij\OpenLabel\Model\Source\HiddenPages</source_model>
+                    <can_be_empty>1</can_be_empty>
+                </field>
+                <field id="hidden_actions" translate="label comment" type="textarea" sortOrder="39" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Hide labels on these other pages</label>
+                    <comment>Full action names, one per line, e.g. brand_index_view for a brand page.</comment>
+                </field>
                 <field id="debug" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Debug mode</label>
                     <comment>Adds data-ol-label attributes with label IDs to the shop's markup, to help with support. Keep off in production.</comment>

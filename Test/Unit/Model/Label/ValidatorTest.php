@@ -112,7 +112,7 @@ class ValidatorTest extends TestCase
     public static function invalidPlacements(): array
     {
         return [
-            'area' => [['area' => 'cart'], 'Placement area "cart" is not available in this version.'],
+            'area' => [['area' => 'checkout'], 'Placement area "checkout" is not available in this version.'],
             'position' => [['position' => 'side'], 'Placement position "side" is not available in this version.'],
             'stacking' => [['stacking' => 'diagonal'], 'Stacking must be vertical or horizontal.'],
             'max too low' => [['max_labels' => 0], 'Max labels must be between 1 and 10.'],
@@ -130,9 +130,17 @@ class ValidatorTest extends TestCase
         }
     }
 
+    public function testTheOneDotOneAreasAreAccepted(): void
+    {
+        foreach (['cart', 'minicart', 'wishlist', 'compare', 'email'] as $area) {
+            $placement = $this->placement(['area' => $area, 'position' => 'under_name']);
+            self::assertSame([], $this->messages($this->label([], [$placement])), $area);
+        }
+    }
+
     public function testEveryPlacementIsChecked(): void
     {
-        $label = $this->label([], [$this->placement(['area' => 'email']), $this->placement(['gap' => -1])]);
+        $label = $this->label([], [$this->placement(['area' => 'checkout']), $this->placement(['gap' => -1])]);
 
         self::assertCount(2, $this->validator->validate($label));
     }

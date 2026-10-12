@@ -184,6 +184,45 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
     }
 
     /**
+     * Labels of one item in an item list (cart, mini cart, wish list, compare, emails): one row of text labels.
+     *
+     * @param ProductInterface $product
+     * @param string $area one of PlacementInterface::ITEM_AREAS
+     * @return string
+     */
+    public function getAreaHtml(ProductInterface $product, string $area): string
+    {
+        return $this->stacksHtml($this->getAreaStacks($product, $area));
+    }
+
+    /**
+     * @param ProductInterface $product
+     * @param string $area
+     * @return array<int, array{classes: string, labels: array<int, array<string, mixed>>}>
+     */
+    public function getAreaStacks(ProductInterface $product, string $area): array
+    {
+        if (!in_array($area, PlacementInterface::ITEM_AREAS, true)) {
+            return [];
+        }
+        $this->observeProduct((int) $product->getId());
+        $entries = [];
+        foreach ($this->labels->getForProduct((int) $product->getId()) as $label) {
+            if ($label->getPlacement()->getArea() === $area) {
+                $entries[] = [$label, $product, null];
+            }
+        }
+        // The item row links to the product already: labels in it are not links.
+        $stacks = $this->stacksFromEntries($entries, $product, true, 'lazy');
+        if ($stacks === []) {
+            return [];
+        }
+        $labels = array_merge(...array_column($stacks, 'labels'));
+
+        return [['classes' => 'ol-stack ol-stack--h ol-inline ol-inline--' . $area, 'labels' => $labels]];
+    }
+
+    /**
      * Labels of one product in the product text (next to the price, next to Add to Cart, under the name), for the
      * theme integration that renders that part of the page.
      *

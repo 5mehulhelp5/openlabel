@@ -139,4 +139,11 @@
             <argument name="logger" xsi:type="object">Iranimij\OpenLabel\Logger</argument>
         </arguments>
     </type>
+    <!-- 1.1: labels in order, invoice, shipment and credit memo emails (sent from any area). -->
+    <type name="Magento\Sales\Block\Order\Email\Items\Order\DefaultOrder">
+        <plugin name="openlabel_email_item_labels" type="Iranimij\OpenLabel\Plugin\Email\ItemLabelsPlugin"/>
+    </type>
+    <type name="Magento\Sales\Block\Order\Email\Items\DefaultItems">
+        <plugin name="openlabel_email_item_labels" type="Iranimij\OpenLabel\Plugin\Email\ItemLabelsPlugin"/>
+    </type>
 </config>
