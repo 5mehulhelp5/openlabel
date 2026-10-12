@@ -16,7 +16,7 @@ Merged by me when CI is green, **but never anything visible on GitHub during wor
 | S2 | Conditions: bestseller (units + rank), most viewed (views + rank), ships free; Bestseller quick switch | PR #45: full matrix 18/20, all unit + integration legs green, coverage gate failed (Model/Condition 80.8 %); fix committed locally (98.4 %), push after hours |
 | S3 | Variables `{CATEGORY_NAME}` `{BRAND}` + hide on zero (storefront + GraphQL) | done locally on `feat/m5-s3-variables` (stacked on S2); unit, coverage gate, PHPStan, PHPCS, integration green; push after hours, full matrix |
 | S4 | Design 1.1: breakpoint sizes, animation/hover CSS, global CSS, AVIF + size setting, 31 system designs | done locally on `feat/m5-s4-design` (stacked on S3) + e2e on openlabel-dev-env `test/m5-s4-design`; unit 388, coverage gate, PHPStan, PHPCS, integration, Playwright design form 8/8 and motion 6/6 green; push after hours |
-| S5 | 21 positions, near price / add to cart / under name (+ openlabel-hyva) | |
+| S5 | 21 positions, near price / add to cart / under name (+ openlabel-hyva) | done locally: openlabel `feat/m5-s5-positions` (stacked on S4), openlabel-hyva `feat/m5-s5-positions`, dev-env `test/m5-s5-positions`; unit 411 + hyva 38, integration (openlabel + hyva 8), PHPStan, PHPCS, Playwright positions 8/8 and admin picker/preview 16/16 green; push after hours |
 | S6 | Tooltip, click-through (+ openlabel-hyva) | |
 | S7 | Variant-aware labels, countdown (openlabel-hyva) | |
 | S8 | Cart, mini-cart, wishlist, compare, emails, hide on pages | |
@@ -41,6 +41,10 @@ Merged by me when CI is green, **but never anything visible on GitHub during wor
 - AVIF is validated without image libraries: `ftyp` brand avif/avis plus the first `ispe` box for the size.
 - Built-in designs grow to 31 through `SystemDesignsOneDotOne` (re-runs the idempotent catalog install); the designs grid now sorts newest first so merchant designs are not buried behind them.
 - Local e2e note: the dev store has two manual labels from 2026-10-11 ("Sale -{SAVE_PERCENT}%" #323, "test" #341) on every product; they make the older storefront specs fail locally (stacks full). Left untouched (Iman's data); CI runs on a fresh store.
+- Positions: 21 image positions = 3×3 grid + 12 band positions (`above_l/c/r`, `below_l/c/r`, `left_t/m/b`, `right_t/m/b`; classes `ol-pos-o{t,b,s,e}*`, physical `ol-pos-o{t,b,l,r}*`), absolutely placed just past the image edge (over the card padding, no layout shift). 3 text positions (`near_price`, `near_cart`, `under_name`) render as in-flow `ol-inline` stacks, always horizontal, sized by the design font size. `getStacks()` = image positions only, so 1.0 slots never print text positions.
+- Hyvä text slots: listing price = plugin on `FinalPriceBox` (zone `item_list`); listing name/cart = insert after `a.product-item-link` / `[data-addto="cart"]` in the rendered card (`Magento\Catalog\Block\Product\View`, template guard); product page = plugin on `Layout::renderElement` for `product.info.title/price/addtocart` (DI map). Verified on 1.4.2 locally; the 1.5.2 leg runs in CI.
+- CSS budget: structural CSS 4.6 KB; the 100-design stylesheet is 20,137 bytes of the 20,480 budget (2 KB gzipped of 8 KB). S6 (tooltip) must stay tiny or compact the design lines (e.g. short hex colours).
+- openlabel-hyva requires openlabel ^1.1 (openlabel dev-main aliased 1.1.x-dev). Its `.github/ci/openlabel-ref` points at `feat/m5-s5-positions` while stacked: reset to `main` once openlabel S5 is merged.
 - Ships free = the store's free-shipping threshold met by the final price, or an active no-coupon cart rule for the website/group with free shipping and no conditions. Cart rules with conditions are ignored (they depend on the cart, not the product).
 
 ## M4 slices
@@ -150,7 +154,7 @@ S1 merged as #12, S2–S10 through #21 (all M2 commits, full matrix green); #13�
 
 ## Exact next step
 
-M5 S5 (21 positions, near price / add to cart / under name; openlabel + openlabel-hyva) on `feat/m5-s5-positions`, stacked on S4. After hours, in order: push S2 (coverage fix), PR #45 green → merge; push S3 → PR, full matrix, merge; push S4 + dev-env `test/m5-s4-design` → PRs, full matrix + E2E, merge. Open for Iman: recorded real-person UX tests (M2 ≤ 3 min custom label, M3 VoiceOver) whenever wanted; Hyvä compatibility tracker submission (`docs/tracker-entry.md`); optional operator dropdown on the quick switches.
+M5 S6 (tooltip, click-through; openlabel + openlabel-hyva) on `feat/m5-s6-interaction`, stacked on S5. After hours, in order: push S2 (coverage fix), PR #45 green → merge; push S3 → PR, full matrix, merge; push S4 + dev-env `test/m5-s4-design` → PRs, full matrix + E2E, merge; push S5 (openlabel, then openlabel-hyva with openlabel-ref, then dev-env `test/m5-s5-positions`) → PRs, full matrix + E2E incl. Hyvä 1.5.2, merge, reset openlabel-ref to main. Open for Iman: recorded real-person UX tests (M2 ≤ 3 min custom label, M3 VoiceOver) whenever wanted; Hyvä compatibility tracker submission (`docs/tracker-entry.md`); optional operator dropdown on the quick switches.
 
 ## M1 decisions (also in the Notion build log at close-out)
 
