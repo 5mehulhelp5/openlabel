@@ -20,8 +20,13 @@ define([
     var POSITION_CLASS = {
         tl: 'ol-pos-ts', tc: 'ol-pos-tc', tr: 'ol-pos-te',
         ml: 'ol-pos-ms', mc: 'ol-pos-mc', mr: 'ol-pos-me',
-        bl: 'ol-pos-bs', bc: 'ol-pos-bc', br: 'ol-pos-be'
-    };
+        bl: 'ol-pos-bs', bc: 'ol-pos-bc', br: 'ol-pos-be',
+        above_l: 'ol-pos-ots', above_c: 'ol-pos-otc', above_r: 'ol-pos-ote',
+        below_l: 'ol-pos-obs', below_c: 'ol-pos-obc', below_r: 'ol-pos-obe',
+        left_t: 'ol-pos-ost', left_m: 'ol-pos-osm', left_b: 'ol-pos-osb',
+        right_t: 'ol-pos-oet', right_m: 'ol-pos-oem', right_b: 'ol-pos-oeb'
+    },
+        INLINE = ['near_price', 'near_cart', 'under_name'];
 
     return Element.extend({
         defaults: {
@@ -44,6 +49,11 @@ define([
         initObservable: function () {
             this._super().observe(['area', 'device', 'previewGroup', 'collapsed', 'formData']);
             this.stacks = ko.pureComputed(this.buildStacks, this);
+            this.imageStacks = ko.pureComputed(function () {
+                return this.stacks().filter(function (stack) {
+                    return !stack.inline;
+                });
+            }, this);
             this.contrastWarning = ko.pureComputed(this.buildContrastWarning, this);
             this.hiddenReason = ko.pureComputed(this.buildHiddenReason, this);
 
@@ -173,6 +183,16 @@ define([
             };
         },
 
+        /**
+         * @param {String} position near_price, near_cart or under_name
+         * @returns {Array} the stack in that place of the product text (at most one)
+         */
+        inlineStacks: function (position) {
+            return this.stacks().filter(function (stack) {
+                return stack.position === position;
+            });
+        },
+
         /** @returns {Array} one stack per occupied position */
         buildStacks: function () {
             var data = this.formData(),
@@ -188,11 +208,15 @@ define([
                 }
                 if (!byPosition[key]) {
                     byPosition[key] = {
-                        stackClass: [
-                            'ol-stack',
-                            placement.stacking === 'horizontal' ? 'ol-stack--h' : 'ol-stack--v',
-                            POSITION_CLASS[key] || 'ol-pos-ts'
-                        ].join(' '),
+                        position: key,
+                        inline: INLINE.indexOf(key) > -1,
+                        stackClass: (INLINE.indexOf(key) > -1 ?
+                            ['ol-stack', 'ol-stack--h', 'ol-inline', 'ol-inline--' + key.replace('_', '-')] :
+                            [
+                                'ol-stack',
+                                placement.stacking === 'horizontal' ? 'ol-stack--h' : 'ol-stack--v',
+                                POSITION_CLASS[key] || 'ol-pos-ts'
+                            ]).join(' '),
                         stackStyle: {
                             '--ol-gap': (placement.gap === undefined || placement.gap === '' ? 4 : placement.gap) + 'px',
                             '--ol-ox': (placement.offset_x || 0) + 'px',

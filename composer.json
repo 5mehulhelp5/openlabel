@@ -61,7 +61,7 @@
             "changelog": "https://github.com/iranimij/openlabel/blob/main/CHANGELOG.md"
         },
         "branch-alias": {
-            "dev-main": "1.0.x-dev"
+            "dev-main": "1.1.x-dev"
         }
     },
     "config": {

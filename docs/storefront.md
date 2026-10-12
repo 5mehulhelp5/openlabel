@@ -32,6 +32,9 @@ Run it after copying a database or `pub/media` between environments. On a fresh 
 | `ol-stack`, `ol-stack--v` / `--h` | positioned container of one corner, vertical or horizontal stacking |
 | `ol-pos-ts te tc ms mc me bs bc be` | position with logical sides (start/end): mirrors in right-to-left stores |
 | `ol-pos-tl tr ml mr bl br` | placements set to "keep left/right in RTL" |
+| `ol-pos-ots otc ote obs obc obe ost osm osb oet oem oeb` | the bands just outside the image (1.1): o(utside) + t(op), b(ottom), s(tart side), e(nd side) + the place along it; over the space around the image |
+| `ol-pos-otl otr obl obr olt olm olb ort orm orb` | the bands with "keep left/right in RTL" |
+| `ol-inline`, `ol-inline--near-price` / `--near-cart` / `--under-name` | labels in the product text (1.1): part of the text flow, always side by side, sized by the design's font size |
 | `ol-p-<placement_id>` | offsets and gap of that placement (custom properties) |
 | `ol-label`, `ol-label--text` / `--image` / `--shape`, `ol-d-<design_id>`, `ol-shape-*` | the badge |
 | `data-ol-label="<label_id>"` | only with **Debug mode** on |

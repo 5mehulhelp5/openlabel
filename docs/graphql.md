@@ -21,7 +21,7 @@ OpenLabel adds one field to `ProductInterface`, so every product type in every p
 | `type` | Design type: `text`, `image` or `shape` |
 | `text` | Text for the store view with variables filled in, as plain text (`{BR}` becomes a line break). `null` for image labels |
 | `image_url`, `alt` | Image labels only |
-| `position` | `tl tc tr ml mc mr bl bc br` |
+| `position` | on the image `tl tc tr ml mc mr bl bc br`; around it `above_l above_c above_r below_l below_c below_r left_t left_m left_b right_t right_m right_b`; in the product text `near_price near_cart under_name` |
 | `area` | `listing` or `product` |
 | `css_class` | The `ol-*` classes the storefront uses; load the generated stylesheet to reuse them |
 | `bg_color`, `text_color` | Hex colours of the design |

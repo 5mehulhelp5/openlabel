@@ -33,8 +33,21 @@ interface PlacementInterface
     /** Areas available in this version. */
     public const AREAS = [self::AREA_LISTING, self::AREA_PRODUCT];
 
-    /** Admin positions; rendered as logical (RTL-aware) classes. */
-    public const POSITIONS = ['tl', 'tc', 'tr', 'ml', 'mc', 'mr', 'bl', 'bc', 'br'];
+    /**
+     * Positions on the image (the 3×3 grid) and in the bands just outside it (above, below, start side, end side);
+     * rendered as logical (RTL-aware) classes inside the image wrapper.
+     */
+    public const IMAGE_POSITIONS = [
+        'tl', 'tc', 'tr', 'ml', 'mc', 'mr', 'bl', 'bc', 'br',
+        'above_l', 'above_c', 'above_r', 'below_l', 'below_c', 'below_r',
+        'left_t', 'left_m', 'left_b', 'right_t', 'right_m', 'right_b',
+    ];
+
+    /** Positions in the text of the product: next to the price, next to Add to Cart, under the name (1.1). */
+    public const INLINE_POSITIONS = ['near_price', 'near_cart', 'under_name'];
+
+    /** Every admin position. */
+    public const POSITIONS = [...self::IMAGE_POSITIONS, ...self::INLINE_POSITIONS];
 
     public const STACKING_VERTICAL = 'vertical';
     public const STACKING_HORIZONTAL = 'horizontal';

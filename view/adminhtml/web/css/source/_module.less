@@ -177,8 +177,8 @@
     border-radius: 3px;
     display: grid;
     gap: 2px;
-    grid-template-columns: repeat(3, 2.6rem);
-    grid-template-rows: repeat(3, 2.6rem);
+    grid-template-columns: 1.6rem repeat(3, 2.6rem) 1.6rem;
+    grid-template-rows: 1.6rem repeat(3, 2.6rem) 1.6rem;
     padding: 2px;
     width: max-content;
 }
@@ -197,6 +197,44 @@
     &:focus {
         border-color: #007bdb;
     }
+}
+
+// The bands around the image: thinner cells on a lighter background than the image itself.
+.ol-position-picker__cell--band {
+    background: #fafafa;
+    border-style: dashed;
+}
+
+.ol-position-picker__spacer {
+    display: block;
+}
+
+.ol-position-inline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    margin-top: .6rem;
+}
+
+.ol-position-inline__option {
+    background: #fff;
+    border: 1px solid #adadad;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: .3rem .7rem;
+
+    &:hover,
+    &:focus {
+        border-color: #007bdb;
+    }
+}
+
+.ol-position-inline__option--active {
+    background: #e8f3fd;
+    border-color: #007bdb;
+    color: #004a80;
+    font-weight: 600;
 }
 
 .ol-position-picker__dot {
@@ -329,6 +367,19 @@
     flex-direction: column;
     gap: .3rem;
     padding: .8rem;
+}
+
+// Labels in the product text: next to the name, the price and the cart button, like on the storefront.
+.ol-preview__cart-row {
+    align-items: center;
+    display: flex;
+    gap: .4rem;
+    margin-top: .4rem;
+
+    .ol-preview__cart {
+        flex: 1;
+        margin-top: 0;
+    }
 }
 
 .ol-preview__cart {

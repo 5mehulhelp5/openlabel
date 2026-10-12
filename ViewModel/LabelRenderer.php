@@ -37,15 +37,27 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
     public const TEMPLATE = 'Iranimij_OpenLabel::base/stacks.phtml';
     public const CONFIG_DEBUG = 'openlabel/general/debug';
 
-    /** Admin positions → logical classes, mirrored automatically in RTL stores (FE4). */
+    /**
+     * Admin positions → logical classes, mirrored automatically in RTL stores (FE4). Bands outside the image:
+     * o + t(op) / b(ottom) / s(tart side) / e(nd side) + the place along that band.
+     */
     private const LOGICAL = [
         'tl' => 'ts', 'tc' => 'tc', 'tr' => 'te',
         'ml' => 'ms', 'mc' => 'mc', 'mr' => 'me',
         'bl' => 'bs', 'bc' => 'bc', 'br' => 'be',
+        'above_l' => 'ots', 'above_c' => 'otc', 'above_r' => 'ote',
+        'below_l' => 'obs', 'below_c' => 'obc', 'below_r' => 'obe',
+        'left_t' => 'ost', 'left_m' => 'osm', 'left_b' => 'osb',
+        'right_t' => 'oet', 'right_m' => 'oem', 'right_b' => 'oeb',
     ];
 
-    /** Positions that have a side, so "keep left/right in RTL" applies to them. */
-    private const SIDED = ['tl', 'tr', 'ml', 'mr', 'bl', 'br'];
+    /** Positions that have a side → their physical class for "keep left/right in RTL". */
+    private const PHYSICAL = [
+        'tl' => 'tl', 'tr' => 'tr', 'ml' => 'ml', 'mr' => 'mr', 'bl' => 'bl', 'br' => 'br',
+        'above_l' => 'otl', 'above_r' => 'otr', 'below_l' => 'obl', 'below_r' => 'obr',
+        'left_t' => 'olt', 'left_m' => 'olm', 'left_b' => 'olb',
+        'right_t' => 'ort', 'right_m' => 'orm', 'right_b' => 'orb',
+    ];
 
     /** @var array<string, true> */
     private array $identities = [];
@@ -83,7 +95,15 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
      */
     public function getStacksHtml(ProductInterface $product, string $area, string $loading = 'lazy'): string
     {
-        $stacks = $this->getStacks($product, $area, $loading);
+        return $this->stacksHtml($this->getStacks($product, $area, $loading));
+    }
+
+    /**
+     * @param array<int, array{classes: string, labels: array<int, array<string, mixed>>}> $stacks
+     * @return string
+     */
+    private function stacksHtml(array $stacks): string
+    {
         if ($stacks === []) {
             return '';
         }
@@ -97,6 +117,37 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
     }
 
     /**
+     * Labels of one product in the product text (next to the price, next to Add to Cart, under the name), for the
+     * theme integration that renders that part of the page.
+     *
+     * @param ProductInterface $product
+     * @param string $area listing|product
+     * @param string $position one of PlacementInterface::INLINE_POSITIONS
+     * @return string inline stack markup, or an empty string
+     */
+    public function getInlineHtml(ProductInterface $product, string $area, string $position): string
+    {
+        return $this->stacksHtml($this->getInlineStacks($product, $area, $position));
+    }
+
+    /**
+     * @param ProductInterface $product
+     * @param string $area
+     * @param string $position
+     * @return array<int, array{classes: string, labels: array<int, array<string, mixed>>}>
+     */
+    public function getInlineStacks(ProductInterface $product, string $area, string $position): array
+    {
+        if (!in_array($position, PlacementInterface::INLINE_POSITIONS, true)) {
+            return [];
+        }
+
+        return $this->buildStacks($product, $area, [$position], 'lazy');
+    }
+
+    /**
+     * Stacks on and around the product image (inline positions are rendered by getInlineHtml()).
+     *
      * @param ProductInterface $product
      * @param string $area
      * @param string $loading
@@ -104,11 +155,24 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
      */
     public function getStacks(ProductInterface $product, string $area, string $loading = 'lazy'): array
     {
+        return $this->buildStacks($product, $area, PlacementInterface::IMAGE_POSITIONS, $loading);
+    }
+
+    /**
+     * @param ProductInterface $product
+     * @param string $area
+     * @param string[] $positions
+     * @param string $loading
+     * @return array<int, array{classes: string, labels: array<int, array<string, mixed>>}>
+     */
+    private function buildStacks(ProductInterface $product, string $area, array $positions, string $loading): array
+    {
         $this->observeProduct((int) $product->getId());
         $stacks = [];
         foreach ($this->labels->getForProduct((int) $product->getId()) as $label) {
-            if ($label->getPlacement()->getArea() === $area) {
-                $stacks[$label->getPlacement()->getPosition()][] = $label;
+            $placement = $label->getPlacement();
+            if ($placement->getArea() === $area && in_array($placement->getPosition(), $positions, true)) {
+                $stacks[$placement->getPosition()][] = $label;
             }
         }
         if ($stacks === []) {
@@ -188,14 +252,18 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
     private function stackClasses(PlacementInterface $placement): string
     {
         $position = $placement->getPosition();
-        $positionClass = $placement->isPinPhysicalSide() && in_array($position, self::SIDED, true)
-            ? $position
-            : (self::LOGICAL[$position] ?? 'ts');
-        $classes = [
-            'ol-stack',
-            $placement->getStacking() === PlacementInterface::STACKING_HORIZONTAL ? 'ol-stack--h' : 'ol-stack--v',
-            'ol-pos-' . $positionClass,
-        ];
+        if (in_array($position, PlacementInterface::INLINE_POSITIONS, true)) {
+            $classes = ['ol-stack', 'ol-stack--h', 'ol-inline', 'ol-inline--' . str_replace('_', '-', $position)];
+        } else {
+            $positionClass = $placement->isPinPhysicalSide() && isset(self::PHYSICAL[$position])
+                ? self::PHYSICAL[$position]
+                : (self::LOGICAL[$position] ?? 'ts');
+            $classes = [
+                'ol-stack',
+                $placement->getStacking() === PlacementInterface::STACKING_HORIZONTAL ? 'ol-stack--h' : 'ol-stack--v',
+                'ol-pos-' . $positionClass,
+            ];
+        }
         if ($this->designRules->forPlacement($placement) !== null) {
             $classes[] = $this->designRules->placementClass((int) $placement->getPlacementId());
         }

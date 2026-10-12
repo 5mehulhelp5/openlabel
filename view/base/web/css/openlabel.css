@@ -48,6 +48,55 @@
 .ol-pos-bl { bottom: var(--ol-oy, 0); left: var(--ol-ox, 0); }
 .ol-pos-br { bottom: var(--ol-oy, 0); right: var(--ol-ox, 0); }
 
+/*
+ * Bands outside the image (1.1): the stack sits just past an edge of the image wrapper, over the space around the
+ * image (card padding, the gallery margin). Offsets move it further out or back in.
+ */
+.ol-pos-ots, .ol-pos-otc, .ol-pos-ote { inset-block-end: calc(100% + var(--ol-oy, 0px)); }
+.ol-pos-obs, .ol-pos-obc, .ol-pos-obe { inset-block-start: calc(100% + var(--ol-oy, 0px)); }
+.ol-pos-ots, .ol-pos-obs { inset-inline-start: var(--ol-ox, 0); }
+.ol-pos-otc, .ol-pos-obc { inset-inline-start: 50%; transform: translateX(-50%); }
+.ol-pos-ote, .ol-pos-obe { inset-inline-end: var(--ol-ox, 0); }
+.ol-pos-ost, .ol-pos-osm, .ol-pos-osb { inset-inline-end: calc(100% + var(--ol-ox, 0px)); }
+.ol-pos-oet, .ol-pos-oem, .ol-pos-oeb { inset-inline-start: calc(100% + var(--ol-ox, 0px)); }
+.ol-pos-ost, .ol-pos-oet { inset-block-start: var(--ol-oy, 0); }
+.ol-pos-osm, .ol-pos-oem { inset-block-start: 50%; transform: translateY(-50%); }
+.ol-pos-osb, .ol-pos-oeb { inset-block-end: var(--ol-oy, 0); }
+
+/* The bands with "keep left/right in RTL". */
+.ol-pos-otl, .ol-pos-otr { bottom: calc(100% + var(--ol-oy, 0px)); }
+.ol-pos-obl, .ol-pos-obr { top: calc(100% + var(--ol-oy, 0px)); }
+.ol-pos-otl, .ol-pos-obl { left: var(--ol-ox, 0); }
+.ol-pos-otr, .ol-pos-obr { right: var(--ol-ox, 0); }
+.ol-pos-olt, .ol-pos-olm, .ol-pos-olb { right: calc(100% + var(--ol-ox, 0px)); }
+.ol-pos-ort, .ol-pos-orm, .ol-pos-orb { left: calc(100% + var(--ol-ox, 0px)); }
+.ol-pos-olt, .ol-pos-ort { top: var(--ol-oy, 0); }
+.ol-pos-olm, .ol-pos-orm { top: 50%; transform: translateY(-50%); }
+.ol-pos-olb, .ol-pos-orb { bottom: var(--ol-oy, 0); }
+
+/*
+ * In the product text (1.1): next to the price, next to Add to Cart, under the name. Part of the text flow, so
+ * they take their own space; sized by the design's font size instead of the image width.
+ */
+.ol-inline {
+    display: inline-flex;
+    margin-inline-start: .5em;
+    max-inline-size: 100%;
+    position: static;
+    vertical-align: middle;
+}
+
+.ol-inline .ol-label {
+    font-size: var(--ol-fs-max, 14px);
+    min-inline-size: 0;
+}
+
+.ol-inline--under-name {
+    display: flex;
+    justify-content: inherit;
+    margin: .25em 0 0;
+}
+
 .ol-label {
     align-items: center;
     background: var(--ol-bg, #111827);

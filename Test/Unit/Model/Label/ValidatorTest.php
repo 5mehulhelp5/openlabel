@@ -113,7 +113,7 @@ class ValidatorTest extends TestCase
     {
         return [
             'area' => [['area' => 'cart'], 'Placement area "cart" is not available in this version.'],
-            'position' => [['position' => 'near_price'], 'Placement position "near_price" is not available in this version.'],
+            'position' => [['position' => 'side'], 'Placement position "side" is not available in this version.'],
             'stacking' => [['stacking' => 'diagonal'], 'Stacking must be vertical or horizontal.'],
             'max too low' => [['max_labels' => 0], 'Max labels must be between 1 and 10.'],
             'max too high' => [['max_labels' => 11], 'Max labels must be between 1 and 10.'],
@@ -121,6 +121,13 @@ class ValidatorTest extends TestCase
             'offset x' => [['offset_x' => -201], 'Offsets must be between -200 and 200 px.'],
             'offset y' => [['offset_y' => 201], 'Offsets must be between -200 and 200 px.'],
         ];
+    }
+
+    public function testEveryOneDotOnePositionIsAccepted(): void
+    {
+        foreach (['above_c', 'below_l', 'left_m', 'right_b', 'near_price', 'near_cart', 'under_name'] as $position) {
+            self::assertSame([], $this->messages($this->label([], [$this->placement(['position' => $position])])), $position);
+        }
     }
 
     public function testEveryPlacementIsChecked(): void

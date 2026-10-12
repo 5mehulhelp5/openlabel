@@ -68,6 +68,18 @@ Absolutely positioned elements on the card (FE5): only the swatch radio inputs (
 
 Themes that override `product/list/image.phtml` with another template name or rename `#gallery-main` render the labels themselves: one `getChildHtml('openlabel.product.labels')` call in the gallery, one `LabelRenderer::getStacksHtml()` call in the listing image. Exact snippets: [storefront.md](storefront.md#custom-themes). The plugins detect the `ol-stack` marker and never render twice.
 
+## 6. Labels in the product text (1.1)
+
+- **Listing, next to the price:** `Plugin\PriceBoxPlugin` appends the stack to `Magento\Catalog\Pricing\Render\FinalPriceBox`
+  in the `item_list` zone (every product card, widget and slider).
+- **Listing, under the name and next to Add to Cart:** the card has no child block there, so
+  `Plugin\ListItemPlugin` inserts the stacks right after `a.product-item-link` and `[data-addto="cart"]` of the
+  rendered `Magento_Catalog::product/list/item.phtml`. Cards without those elements keep their markup.
+- **Product page:** `Plugin\InlineSlotPlugin` appends the stacks after the layout elements `product.info.title`,
+  `product.info.price` and `product.info.addtocart`. A theme that renames them adds its names to the
+  `productPageSlots` argument of the plugin in `etc/frontend/di.xml`.
+- All three render inside the cached card or page, tagged like the image labels; no JavaScript.
+
 ## Hyvä 1.5 (verified on default theme 1.5.2, 2026-10-11)
 
 Hyvä 1.5 rebuilt the product gallery as a snap slider:

@@ -18,6 +18,14 @@ class PlacementSummaryTest extends TestCase
         self::assertSame('Listing TR, Product TL', (new PlacementSummary())->format('listing:tr,product:tl'));
     }
 
+    public function testPositionsAroundTheImageAndInlineReadAsWords(): void
+    {
+        self::assertSame(
+            'Listing above centre, Product next to the price, Listing under the name',
+            (new PlacementSummary())->format('listing:above_c,product:near_price,listing:under_name')
+        );
+    }
+
     public function testEmptyMeansNowhere(): void
     {
         self::assertSame('Nowhere yet', (new PlacementSummary())->format(null));
