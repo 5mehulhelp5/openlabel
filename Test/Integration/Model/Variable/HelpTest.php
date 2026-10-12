@@ -24,7 +24,7 @@ class HelpTest extends TestCase
         $codes = array_map(static fn ($processor): string => $processor->getCode(), array_values($om->get(Pool::class)->getAll()));
         $help = $om->get(Help::class)->getVariables();
 
-        self::assertCount(15, $codes);
+        self::assertCount(17, $codes);
         foreach ($codes as $code) {
             $key = $code === 'ATTR' ? 'ATTR:code' : $code;
             self::assertArrayHasKey($key, $help, "help for {$code}");

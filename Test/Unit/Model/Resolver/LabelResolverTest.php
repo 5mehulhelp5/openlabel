@@ -40,6 +40,7 @@ class LabelResolverTest extends TestCase
         self::assertSame('Label 1', $first->getName());
         self::assertSame(0, $first->getPriority());
         self::assertFalse($first->isHideLowerPriority());
+        self::assertTrue($first->isHideOnZeroVariable());
         self::assertSame(7, $first->getProductId());
         self::assertNull($first->getParentProductId());
         self::assertSame('listing', $first->getPlacement()->getArea());
@@ -95,7 +96,7 @@ class LabelResolverTest extends TestCase
     {
         return [
             'product_id' => $product, 'parent_product_id' => null, 'label_id' => $label, 'name' => 'Label ' . $label,
-            'priority' => $priority, 'hide_lower_priority' => 0,
+            'priority' => $priority, 'hide_lower_priority' => 0, 'hide_on_zero_variable' => 1,
             'placement_placement_id' => 10 + $label, 'placement_area' => 'listing', 'placement_position' => 'tl',
             'placement_pin_physical_side' => 0, 'placement_design_id' => null, 'placement_offset_x' => 0, 'placement_offset_y' => 0,
             'placement_max_labels' => 3, 'placement_stacking' => 'vertical', 'placement_gap' => 4, 'placement_sort_order' => 0,

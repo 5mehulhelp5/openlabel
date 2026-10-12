@@ -71,7 +71,10 @@ class LabelsResolver implements BatchResolverInterface
             $items = [];
             if ($product instanceof ProductInterface) {
                 foreach ($resolved[(int) $product->getId()] ?? [] as $label) {
-                    $items[] = $this->labelData->toArray($label, $product, $variables);
+                    $item = $this->labelData->toArray($label, $product, $variables);
+                    if ($item !== null) {
+                        $items[] = $item;
+                    }
                 }
             }
             $response->addResponse($request, $items);

@@ -35,6 +35,8 @@ class Help
             'RATING' => [__('Average rating out of 5'), '4.6'],
             'REVIEW_COUNT' => [__('Number of approved reviews'), '128'],
             'SOLD_LAST_30D' => [__('Units sold in the last 30 days'), '57'],
+            'CATEGORY_NAME' => [__('Category being browsed, or the product\'s main category'), 'Jackets'],
+            'BRAND' => [__('Brand (attribute set under Stores › Configuration › OpenLabel)'), 'Acme'],
         ];
         $variables = [];
         foreach ($rows as $code => [$description, $sample]) {

@@ -8,13 +8,13 @@ Fine-grained checkpoint for the OpenLabel build. Updated with every merged PR. T
 
 ## M5 slices
 
-Merged by me when CI is green. Order and scope from the approved plan; Hyvä Checkout skipped (no licence, Iman 2026-10-12).
+Merged by me when CI is green, **but never anything visible on GitHub during working hours** (Iman 2026-10-12; assumed Mon–Fri 08:00–18:00): in working hours slices are committed locally and stacked branch on branch (S3 on S2, S4 on S3, ...), then pushed, CI-checked and merged in order after hours. Order and scope from the approved plan; Hyvä Checkout skipped (no licence, Iman 2026-10-12).
 
 | # | Slice | State |
 |---|---|---|
 | S1 | 1.1 data: label hide-on-zero / click-through / nofollow, design animation / hover / breakpoint sizes, export format 2; fix: `setup:db:status` diff after full reindex | merged (#44, full matrix green) |
-| S2 | Conditions: bestseller (units + rank), most viewed (views + rank), ships free; Bestseller quick switch | PR open, full matrix |
-| S3 | Variables `{CATEGORY_NAME}` `{BRAND}` + hide on zero | |
+| S2 | Conditions: bestseller (units + rank), most viewed (views + rank), ships free; Bestseller quick switch | PR #45: full matrix 18/20, all unit + integration legs green, coverage gate failed (Model/Condition 80.8 %); fix committed locally (98.4 %), push after hours |
+| S3 | Variables `{CATEGORY_NAME}` `{BRAND}` + hide on zero (storefront + GraphQL) | done locally on `feat/m5-s3-variables` (stacked on S2); unit, coverage gate, PHPStan, PHPCS, integration green; push after hours, full matrix |
 | S4 | Design 1.1: breakpoint sizes, animation/hover CSS, global CSS, AVIF + size setting, 30+ system designs | |
 | S5 | 21 positions, near price / add to cart / under name (+ openlabel-hyva) | |
 | S6 | Tooltip, click-through (+ openlabel-hyva) | |
@@ -34,6 +34,8 @@ Merged by me when CI is green. Order and scope from the approved plan; Hyvä Che
 - Design `sizes` is JSON in a text column (`{"sm": {"width": 24, "font_size": 11}}`), width in the design's size mode.
 - `openlabel_index` and its replica carry the same table comment (the full reindex swaps them by renaming).
 - Bestseller and most viewed count per website over fixed windows (7/30/90 days sold, 7/30 days viewed) and rank over 30 days (`RANK()`, MariaDB 10.2+/MySQL 8). Each is one aggregated subquery joined by the SQL builder; no temp table. Products with no activity have no rank, so "top N" never matches them. Labels using them are reindexed by the daily cron.
+- Hide on zero is applied when a label is rendered, after the priority rules: a hidden label does not free its place in a full stack and its "hide other labels" still applies (the arranger runs in the resolver, before variables are known).
+- `{CATEGORY_NAME}` = the browsed category only on category pages (`current_category` without `current_product`); elsewhere the product's deepest active category in the store's tree (cache-safe: never the category the shopper came from). `{BRAND}` = configurable attribute code (`openlabel/variables/brand_attribute`, default `manufacturer`).
 - Ships free = the store's free-shipping threshold met by the final price, or an active no-coupon cart rule for the website/group with free shipping and no conditions. Cart rules with conditions are ignored (they depend on the cart, not the product).
 
 ## M4 slices
@@ -143,7 +145,7 @@ S1 merged as #12, S2–S10 through #21 (all M2 commits, full matrix green); #13�
 
 ## Exact next step
 
-M5 S2: wait for the full matrix on the S2 PR, merge, then S3 (variables `{CATEGORY_NAME}` `{BRAND}` + hide on zero) on `feat/m5-s3-variables`. Open for Iman: recorded real-person UX tests (M2 ≤ 3 min custom label, M3 VoiceOver) whenever wanted; Hyvä compatibility tracker submission (`docs/tracker-entry.md`); optional operator dropdown on the quick switches.
+M5 S4 (design 1.1) on `feat/m5-s4-design`, stacked on S3. After hours: push S2 (coverage fix) and check PR #45, merge; then push S3, open its PR, full matrix, merge. Open for Iman: recorded real-person UX tests (M2 ≤ 3 min custom label, M3 VoiceOver) whenever wanted; Hyvä compatibility tracker submission (`docs/tracker-entry.md`); optional operator dropdown on the quick switches.
 
 ## M1 decisions (also in the Notion build log at close-out)
 

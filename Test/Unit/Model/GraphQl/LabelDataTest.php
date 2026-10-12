@@ -107,10 +107,32 @@ class LabelDataTest extends TestCase
         self::assertSame('ol-label ol-label--shape ol-d-30 ol-shape-circle', $data['css_class']);
     }
 
+    public function testHideOnZeroLeavesTheLabelOutWhenAVariableIsEmpty(): void
+    {
+        $this->emptyVariables = ['STOCK_QTY'];
+        $hidden = $this->label(4, 'text', 'Only {STOCK_QTY} left', hideOnZero: true);
+        $shown = $this->label(5, 'text', 'Only {STOCK_QTY} left');
+
+        self::assertNull($this->labelData()->toArray($hidden, $this->product(), new Context(1, 1, 0)));
+        self::assertSame(5, $this->labelData()->toArray($shown, $this->product(), new Context(1, 1, 0))['id'] ?? null);
+    }
+
+    public function testHideOnZeroIgnoresImageLabels(): void
+    {
+        $this->emptyVariables = ['STOCK_QTY'];
+
+        $data = $this->labelData()->toArray($this->label(6, 'image', null, hideOnZero: true), $this->product(), new Context(1, 1, 0));
+
+        self::assertSame(6, $data['id'] ?? null);
+    }
+
+    /** @var string[] what the stubbed variable renderer reports as empty */
+    private array $emptyVariables = [];
+
     private function labelData(): LabelData
     {
         $renderer = $this->createStub(Renderer::class);
-        $renderer->method('render')->willReturnCallback(fn (): Rendered => new Rendered($this->renderedHtml, []));
+        $renderer->method('render')->willReturnCallback(fn (): Rendered => new Rendered($this->renderedHtml, $this->emptyVariables));
         $imageUrl = $this->createStub(ImageUrl::class);
         $imageUrl->method('get')->willReturnCallback(
             static fn (?string $path): ?string => $path === null ? null : 'https://shop.test/media/openlabel/' . $path
@@ -133,7 +155,8 @@ class LabelDataTest extends TestCase
         ?string $text,
         string $position = 'tl',
         string $area = 'listing',
-        ?string $shape = null
+        ?string $shape = null,
+        bool $hideOnZero = false
     ): ResolvedLabel {
         $om = new ObjectManager($this);
         /** @var Placement $placement */
@@ -148,6 +171,6 @@ class LabelDataTest extends TestCase
         ]);
         $design->setText($text)->setAltText($type === 'image' ? 'New in' : null);
 
-        return new ResolvedLabel($id, 'Label ' . $id, 3, false, 100, null, $placement, $design);
+        return new ResolvedLabel($id, 'Label ' . $id, 3, false, 100, null, $placement, $design, $hideOnZero);
     }
 }

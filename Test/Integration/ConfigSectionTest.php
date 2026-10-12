@@ -55,6 +55,15 @@ class ConfigSectionTest extends TestCase
         self::assertFalse($config->isDebug());
     }
 
+    public function testBrandVariableReadsTheManufacturerAttributeByDefault(): void
+    {
+        $om = Bootstrap::getObjectManager();
+        $fields = $om->get(ConfigStructureData::class)->get()['sections']['openlabel']['children']['variables']['children'];
+
+        self::assertArrayHasKey('brand_attribute', $fields);
+        self::assertSame('manufacturer', $om->get(ScopeConfigInterface::class)->getValue('openlabel/variables/brand_attribute', 'store'));
+    }
+
     #[ConfigFixture('openlabel/general/default_max_labels', '25', 'default')]
     public function testDefaultMaxLabelsIsClampedToTheAllowedRange(): void
     {

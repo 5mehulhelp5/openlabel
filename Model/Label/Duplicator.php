@@ -46,7 +46,10 @@ class Duplicator
             ->setValidTo($source->getValidTo())
             ->setConditionsSerialized($source->getConditionsSerialized())
             ->setApplyToParent($source->isApplyToParent())
-            ->setHideLowerPriority($source->isHideLowerPriority());
+            ->setHideLowerPriority($source->isHideLowerPriority())
+            ->setHideOnZeroVariable($source->isHideOnZeroVariable())
+            ->setClickUrl($source->getClickUrl())
+            ->setClickNofollow($source->isClickNofollow());
         if ($source->getDesignId() !== null) {
             $copy->setDesignId($source->getDesignId());
         }

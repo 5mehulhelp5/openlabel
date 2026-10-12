@@ -72,6 +72,8 @@
                 <item name="Rating" xsi:type="object">Iranimij\OpenLabel\Model\Variable\Processor\Rating</item>
                 <item name="ReviewCount" xsi:type="object">Iranimij\OpenLabel\Model\Variable\Processor\ReviewCount</item>
                 <item name="SoldLast30d" xsi:type="object">Iranimij\OpenLabel\Model\Variable\Processor\SoldLast30d</item>
+                <item name="CategoryName" xsi:type="object">Iranimij\OpenLabel\Model\Variable\Processor\CategoryName</item>
+                <item name="Brand" xsi:type="object">Iranimij\OpenLabel\Model\Variable\Processor\Brand</item>
             </argument>
         </arguments>
     </type>

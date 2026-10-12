@@ -107,13 +107,23 @@ queries for prices and stock):
 
 `{SAVE_PERCENT}` `{SAVE_AMOUNT}` `{PRICE}` `{SPECIAL_PRICE}` `{FINAL_PRICE}` `{STOCK_QTY}` `{NEW_FOR}` `{SKU}`
 `{ATTR:code}` `{BR}` `{SPECIAL_ENDS_IN}` `{SPECIAL_END_DATE}` `{RATING}` `{REVIEW_COUNT}` `{SOLD_LAST_30D}`
+`{CATEGORY_NAME}` `{BRAND}`
 
 Numbers, currency amounts and dates are formatted for the store's locale. Values are escaped; the text itself
 may use `b strong i em br span small sup sub` (attributes other than `class`, `id`, `title`, `style` are
 removed). Unknown variables stay literal so typos are visible. A zero number renders as "0" and is reported as
-empty, which the 1.1 "hide label when a variable is zero/empty" flag will use. `{RATING}`, `{REVIEW_COUNT}` and
-`{SOLD_LAST_30D}` load their data once per listing through `VariablePreloadInterface`; `{SPECIAL_ENDS_IN}`
-treats `special_to_date` as valid through that day. Custom variables implement
+empty: a label with **Hide when a variable is zero** on is left out on such products (storefront and GraphQL).
+The label is dropped after the priority rules, so it does not free its place in a full stack, and its
+"hide other labels" still applies. `{RATING}`, `{REVIEW_COUNT}`, `{SOLD_LAST_30D}` and `{CATEGORY_NAME}` load
+their data once per listing through `VariablePreloadInterface`; `{SPECIAL_ENDS_IN}` treats `special_to_date` as
+valid through that day.
+
+`{CATEGORY_NAME}` is the category being browsed on a category page. Everywhere else (product page, search,
+widgets, GraphQL) it is the product's deepest active category in the store's tree, never the category the
+shopper came from, so cached pages stay correct. Renaming a category updates labels on that category's pages
+at once and elsewhere when the product's page cache is next cleaned. `{BRAND}` shows the attribute set under
+**Stores › Configuration › Iranimij › OpenLabel › Label text variables** (default `manufacturer`), like
+`{ATTR:code}`; on listings the attribute needs "Used in Product Listing". Custom variables implement
 `Iranimij\OpenLabel\Api\VariableProcessorInterface` and are registered in the
 `Iranimij\OpenLabel\Model\Variable\Pool` `processors` argument.
 

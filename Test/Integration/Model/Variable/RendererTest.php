@@ -11,6 +11,8 @@ namespace Iranimij\OpenLabel\Test\Integration\Model\Variable;
 use Iranimij\OpenLabel\Model\Variable\Context;
 use Iranimij\OpenLabel\Model\Variable\Renderer;
 use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Catalog\Api\CategoryRepositoryInterface;
+use Magento\Catalog\Test\Fixture\Category as CategoryFixture;
 use Magento\Catalog\Test\Fixture\Product as ProductFixture;
 use Magento\Checkout\Test\Fixture\PlaceOrder as PlaceOrderFixture;
 use Magento\Checkout\Test\Fixture\SetBillingAddress as SetBillingAddressFixture;
@@ -21,7 +23,9 @@ use Magento\Checkout\Test\Fixture\SetShippingAddress as SetShippingAddressFixtur
 use Magento\ConfigurableProduct\Test\Fixture\Attribute as AttributeFixture;
 use Magento\ConfigurableProduct\Test\Fixture\Product as ConfigurableFixture;
 use Iranimij\OpenLabel\Test\Integration\Helper\StockSetter;
+use Magento\Framework\App\Config\MutableScopeConfigInterface;
 use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\Registry;
 use Magento\Quote\Test\Fixture\AddProductToCart as AddProductToCartFixture;
 use Magento\Quote\Test\Fixture\GuestCart as GuestCartFixture;
 use Magento\TestFramework\Fixture\DataFixture;
@@ -33,7 +37,14 @@ use PHPUnit\Framework\TestCase;
 
 #[DbIsolation(false)]
 #[DataFixture(ScheduledSearchIndex::class)]
-#[DataFixture(ProductFixture::class, ['sku' => 'ol-var', 'price' => 100, 'special_price' => 80], 'var')]
+#[DataFixture(CategoryFixture::class, ['name' => 'OL Clothing'], 'clothing')]
+#[DataFixture(CategoryFixture::class, ['name' => 'OL Jackets', 'parent_id' => '$clothing.id$'], 'jackets')]
+#[DataFixture(CategoryFixture::class, ['name' => 'OL Hidden', 'parent_id' => '$jackets.id$', 'is_active' => false], 'hidden')]
+#[DataFixture(
+    ProductFixture::class,
+    ['sku' => 'ol-var', 'price' => 100, 'special_price' => 80, 'category_ids' => ['$clothing.id$', '$jackets.id$', '$hidden.id$']],
+    'var'
+)]
 #[DataFixture(AttributeFixture::class, as: 'attr')]
 #[DataFixture(ProductFixture::class, ['sku' => 'ol-var-a', 'price' => 50, 'special_price' => 40, '$attr.attribute_code$' => '$attr.option_1$'], 'var_a')]
 #[DataFixture(ProductFixture::class, ['sku' => 'ol-var-b', 'price' => 60, '$attr.attribute_code$' => '$attr.option_2$'], 'var_b')]
@@ -107,6 +118,64 @@ class RendererTest extends TestCase
         $rendered = $this->renderer->render('{RATING} stars from {REVIEW_COUNT} reviews', $product, $this->context());
 
         self::assertSame('4.3 stars from 4 reviews', $rendered->getHtml());
+    }
+
+    public function testCategoryNameIsTheProductsDeepestActiveCategory(): void
+    {
+        $product = $this->products->get('ol-var');
+        $this->renderer->preload([$product], $this->context());
+
+        $rendered = $this->renderer->render('New in {CATEGORY_NAME}', $product, $this->context());
+
+        self::assertSame('New in OL Jackets', $rendered->getHtml(), 'deepest category wins, inactive ones are skipped');
+    }
+
+    public function testCategoryNameOnACategoryPageIsThatCategory(): void
+    {
+        $registry = Bootstrap::getObjectManager()->get(Registry::class);
+        $clothing = Bootstrap::getObjectManager()->get(CategoryRepositoryInterface::class)
+            ->get((int) DataFixtureStorageManager::getStorage()->get('clothing')->getId(), 1);
+        $registry->register('current_category', $clothing, true);
+        try {
+            $product = $this->products->get('ol-var');
+            self::assertSame('OL Clothing', $this->renderer->render('{CATEGORY_NAME}', $product, $this->context())->getHtml());
+
+            $registry->register('current_product', $product, true);
+            self::assertSame(
+                'OL Jackets',
+                $this->renderer->render('{CATEGORY_NAME}', $product, $this->context())->getHtml(),
+                'on a product page the product\'s own category is used, whatever category the shopper came from (page cache)'
+            );
+        } finally {
+            $registry->unregister('current_category');
+            $registry->unregister('current_product');
+        }
+    }
+
+    public function testCategoryNameIsEmptyWithoutACategory(): void
+    {
+        $rendered = $this->renderer->render('{CATEGORY_NAME}', $this->products->get('ol-var-b'), $this->context());
+
+        self::assertSame('', $rendered->getHtml());
+        self::assertSame(['CATEGORY_NAME'], $rendered->getEmptyVariables());
+    }
+
+    public function testBrandReadsTheConfiguredAttribute(): void
+    {
+        $attribute = DataFixtureStorageManager::getStorage()->get('attr');
+        $config = Bootstrap::getObjectManager()->get(MutableScopeConfigInterface::class);
+        $product = $this->products->get('ol-var-a');
+        try {
+            self::assertTrue($this->renderer->render('{BRAND}', $product, $this->context())->hasEmptyVariable(), 'no manufacturer set');
+
+            $config->setValue('openlabel/variables/brand_attribute', $attribute->getAttributeCode(), 'store', 'default');
+            $rendered = $this->renderer->render('by {BRAND}', $product, $this->context());
+
+            self::assertSame('by ' . $product->getAttributeText($attribute->getAttributeCode()), $rendered->getHtml());
+            self::assertFalse($rendered->hasEmptyVariable());
+        } finally {
+            $config->setValue('openlabel/variables/brand_attribute', 'manufacturer', 'store', 'default');
+        }
     }
 
     private function context(): Context
