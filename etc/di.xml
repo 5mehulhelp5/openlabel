@@ -25,6 +25,9 @@
                 <item name="price_range" xsi:type="string">Iranimij\OpenLabel\Model\Condition\PriceRange</item>
                 <item name="rating" xsi:type="string">Iranimij\OpenLabel\Model\Condition\Rating</item>
                 <item name="review_count" xsi:type="string">Iranimij\OpenLabel\Model\Condition\ReviewCount</item>
+                <item name="bestseller" xsi:type="string">Iranimij\OpenLabel\Model\Condition\Bestseller</item>
+                <item name="most_viewed" xsi:type="string">Iranimij\OpenLabel\Model\Condition\MostViewed</item>
+                <item name="free_shipping" xsi:type="string">Iranimij\OpenLabel\Model\Condition\FreeShipping</item>
             </argument>
         </arguments>
     </type>

@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Iranimij\OpenLabel\Model\Label;
 
+use Iranimij\OpenLabel\Model\Condition\Bestseller;
 use Iranimij\OpenLabel\Model\Condition\IsNew;
 use Iranimij\OpenLabel\Model\Condition\OnSale;
 use Iranimij\OpenLabel\Model\Condition\Rating;
@@ -36,10 +37,11 @@ class QuickConditions
         'low_stock' => ['low_stock_qty', Stock::class, Stock::SALABLE_QTY, '<=', null],
         'out_of_stock' => [null, Stock::class, Stock::IS_SALABLE, '==', '0'],
         'rating' => ['rating_min', Rating::class, Rating::RATING, '>=', null],
+        'bestseller' => ['bestseller_top', Bestseller::class, Bestseller::RANK_30D, '<=', null],
     ];
 
     /** Defaults shown when a toggle is switched on for the first time. */
-    public const DEFAULT_VALUES = ['on_sale_min' => '10', 'new_days' => '30', 'low_stock_qty' => '5', 'rating_min' => '4'];
+    public const DEFAULT_VALUES = ['on_sale_min' => '10', 'new_days' => '30', 'low_stock_qty' => '5', 'rating_min' => '4', 'bestseller_top' => '10'];
 
     /**
      * @param Json $json

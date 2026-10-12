@@ -32,6 +32,9 @@ category, SKU, attribute set; store-scoped attributes are evaluated per store vi
 | Price range | `final_price`, `price` | price index |
 | Rating | `rating` (stars) | review summary of the store view |
 | Review count | `review_count` | review summary of the store view |
+| Bestseller (1.1) | `sold_last_7d`, `sold_last_30d`, `sold_last_90d` (units), `sales_rank_30d` (1 = best) | order items of the website's store views; canceled and refunded quantities do not count; a configurable sale counts for the configurable |
+| Most viewed (1.1) | `views_last_7d`, `views_last_30d`, `view_rank_30d` | product view events of Magento's reports (`report_event`; keep product view reports enabled) |
+| Ships free (1.1) | `free_shipping` (yes/no) | an active cart rule without coupon and without conditions that gives free shipping to the website and group, or the product's final price (price index) reaching the free shipping method's minimum order amount |
 
 **Operators.** Numeric built-ins offer *is*, *is not*, *equals or greater than*, *greater than*, *equals or less
 than*, *less than*, *is one of* and *is not one of* (e.g. "days since created is less than 30", "salable quantity
@@ -43,14 +46,20 @@ condition is tested with every operator it offers (`Test/Integration/Model/Condi
 for price conditions, without a rating for `rating`, without a stock row (and composites) for `salable_qty`, and a
 product without a value for a product attribute condition (e.g. "news from date on or before 2020-01-01" does not
 pick up products without that date). A product without reviews has `review_count` 0, so "review count is 0" finds
-products nobody reviewed yet. This holds on every supported Magento version: 2.4.7 and 2.4.8 would otherwise
+products nobody reviewed yet. Likewise products without sales or views count 0 units / 0 views but have **no
+rank**, so "bestseller rank at most 10" only picks products that sold. This holds on every supported Magento version: 2.4.7 and 2.4.8 would otherwise
 treat missing values as 0.
 
+**Daily refresh.** Bestseller, most viewed, ships free and the "days since" conditions change with time, not with
+product saves: labels using them are reindexed by the daily cron (`openlabel_daily_is_new`, despite its name it covers every time-dependent condition), so a new
+bestseller appears within a day. Run `bin/magento openlabel:reindex <label_id>` to refresh one sooner.
+
 Matching happens in SQL: the tree is attached to a product collection with `Iranimij\OpenLabel\Model\Rule\SqlBuilder`,
-the core rule builder with two changes. It keeps the joins of every condition when it recurses into nested groups
+the core rule builder with three changes. It keeps the joins of every condition when it recurses into nested groups
 (the core one drops those collected before a nested group, which broke quick switches combined with advanced
 conditions). And it writes the SQL of every condition itself (the core operators, without the `IFNULL(field, 0)` of 2.4.7 and
-2.4.8), so the rules above hold on every Magento version. PHP `validate()` exists
+2.4.8), so the rules above hold on every Magento version. And a condition may join a bounded subquery instead of
+a table (the 7/30/90-day sales and view counts with their `RANK()`). PHP `validate()` exists
 on every condition for previews and tests. Custom conditions: extend
 `Iranimij\OpenLabel\Model\Condition\AbstractBuiltIn` and register the class in the
 `Iranimij\OpenLabel\Model\Condition\ConditionPool` `types` argument.
