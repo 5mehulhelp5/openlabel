@@ -12,6 +12,7 @@ use Iranimij\OpenLabel\Model\ResourceModel\Design\CollectionFactory;
 use Iranimij\OpenLabel\Ui\DataProvider\Design\Form;
 use Iranimij\OpenLabel\Test\Fixture\Design as DesignFixture;
 use Magento\Framework\Acl\Builder;
+use Magento\TestFramework\Fixture\Config as ConfigFixture;
 use Magento\TestFramework\Fixture\DataFixture;
 use Magento\TestFramework\Fixture\DataFixtureStorageManager;
 use Magento\TestFramework\TestCase\AbstractBackendController;
@@ -68,5 +69,21 @@ class EditTest extends AbstractBackendController
         self::assertSame('Angebot', $data['store_texts'][1]['text']);
         self::assertSame('0', (string) $data['store_texts'][1]['use_default']);
         self::assertFalse($provider->getMeta()['custom_css']['arguments']['data']['config']['visible']);
+    }
+
+    #[ConfigFixture('openlabel/images/max_upload_kb', '3072', 'default')]
+    public function testTheImageUploaderAllowsTheConfiguredSize(): void
+    {
+        $provider = $this->_objectManager->create(Form::class, [
+            'name' => 'openlabel_design_form_data_source',
+            'primaryFieldName' => 'design_id',
+            'requestFieldName' => 'id',
+        ]);
+
+        self::assertSame(
+            3 * 1024 * 1024,
+            $provider->getMeta()['image']['children']['image']['arguments']['data']['config']['maxFileSize'] ?? null,
+            'the browser must not refuse what the "Largest image upload" setting allows'
+        );
     }
 }

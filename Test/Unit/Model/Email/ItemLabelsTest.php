@@ -41,6 +41,9 @@ class ItemLabelsTest extends TestCase
 
     private bool $enabled = true;
 
+    /** what the stubbed variable renderer returns; null = the text in brackets */
+    private ?string $rendered = null;
+
     public function testTextLabelsOfTheEmailAreaWithInlineStyles(): void
     {
         $this->resolved = [
@@ -62,6 +65,19 @@ class ItemLabelsTest extends TestCase
             $html,
             'image labels and other areas are left out; colours that are not hex fall back'
         );
+    }
+
+    public function testACountdownShowsItsEndDateInEmailsWhichAreReadLater(): void
+    {
+        $this->resolved = [$this->label(1, 'email', 'text', null, 'Ends in {COUNTDOWN}', '#b91c1c', '#ffffff')];
+        $this->rendered = 'Ends in <span class="ol-countdown" data-ol-end="2026-10-12T00:00:00Z"><span aria-hidden="true">2d 12:00:00</span>'
+            . '<span class="ol-sr">Ends 11/10/2026</span></span>';
+
+        $html = $this->itemLabels()->forOrderItem($this->orderItem());
+
+        self::assertStringContainsString('>Ends in Ends 11/10/2026</span>', $html);
+        self::assertStringNotContainsString('2d 12:00:00', $html, 'a frozen timer would be wrong by the time the email is read');
+        self::assertStringNotContainsString('ol-sr', $html, 'emails have no stylesheet to hide it');
     }
 
     public function testNoLabelsNoMarkup(): void
@@ -97,7 +113,7 @@ class ItemLabelsTest extends TestCase
         });
         $renderer = $this->createStub(Renderer::class);
         $renderer->method('render')->willReturnCallback(
-            static fn (string $text, $product, Context $context): Rendered => new Rendered('[' . $text . ']', [])
+            fn (string $text, $product, Context $context): Rendered => new Rendered($this->rendered ?? '[' . $text . ']', [])
         );
         $store = $this->createStub(Store::class);
         $store->method('getWebsiteId')->willReturn(1);

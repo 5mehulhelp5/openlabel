@@ -26,7 +26,8 @@ define([
         left_t: 'ol-pos-ost', left_m: 'ol-pos-osm', left_b: 'ol-pos-osb',
         right_t: 'ol-pos-oet', right_m: 'ol-pos-oem', right_b: 'ol-pos-oeb'
     },
-        INLINE = ['near_price', 'near_cart', 'under_name'];
+        INLINE = ['near_price', 'near_cart', 'under_name'],
+        ITEM_AREAS = ['cart', 'minicart', 'wishlist', 'compare', 'email'];
 
     return Element.extend({
         defaults: {
@@ -268,7 +269,11 @@ define([
                 return $t('This label is hidden for this customer group.');
             }
             if (!this.placements().length) {
-                return $t('No placement on this page yet.');
+                return (data.placements || []).some(function (row) {
+                    return row && ITEM_AREAS.indexOf(row.area) > -1 && !(row.delete === true || row.delete === 'true');
+                }) ?
+                    $t('This label shows as text with the item in the cart, mini cart, wish list, compare page or emails; this preview shows the category and product pages.') :
+                    $t('No placement on this page yet.');
             }
 
             return '';

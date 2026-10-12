@@ -11,6 +11,7 @@ namespace Iranimij\OpenLabel\Ui\DataProvider\Design;
 use Iranimij\OpenLabel\Api\Data\DesignInterface;
 use Iranimij\OpenLabel\Api\DesignRepositoryInterface;
 use Iranimij\OpenLabel\Controller\Adminhtml\Design\Save;
+use Iranimij\OpenLabel\Model\Config;
 use Iranimij\OpenLabel\Model\Design\ImageUrl;
 use Iranimij\OpenLabel\Model\ResourceModel\Design\CollectionFactory;
 use Iranimij\OpenLabel\Model\Variable\Help;
@@ -36,6 +37,7 @@ class Form extends AbstractDataProvider
      * @param ImageUrl $imageUrl
      * @param Help $variableHelp
      * @param DataPersistorInterface $dataPersistor
+     * @param Config $config
      * @param array<string, mixed> $meta
      * @param array<string, mixed> $data
      */
@@ -50,6 +52,7 @@ class Form extends AbstractDataProvider
         private readonly ImageUrl $imageUrl,
         private readonly Help $variableHelp,
         private readonly DataPersistorInterface $dataPersistor,
+        private readonly Config $config,
         array $meta = [],
         array $data = []
     ) {
@@ -84,6 +87,9 @@ class Form extends AbstractDataProvider
         $meta = parent::getMeta();
         $meta['custom_css']['arguments']['data']['config']['visible']
             = $this->authorization->isAllowed('Iranimij_OpenLabel::custom_css');
+        // The browser checks the size first: it must allow what the "Largest image upload" setting allows.
+        $meta['image']['children']['image']['arguments']['data']['config']['maxFileSize']
+            = $this->config->getMaxUploadKb() * 1024;
         $meta['text']['children']['store_texts_text']['arguments']['data']['config']['variables']
             = array_values($this->variableHelp->getVariables());
 

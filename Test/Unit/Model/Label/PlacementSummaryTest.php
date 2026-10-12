@@ -34,6 +34,14 @@ class PlacementSummaryTest extends TestCase
 
     public function testUnknownAreaIsShownAsIs(): void
     {
-        self::assertSame('Cart BR', (new PlacementSummary())->format('cart:br'));
+        self::assertSame('Checkout BR', (new PlacementSummary())->format('checkout:br'));
+    }
+
+    public function testItemListsAndEmailsReadAsWords(): void
+    {
+        self::assertSame(
+            'Cart, Mini cart, Wish list, Compare, Emails',
+            (new PlacementSummary())->format('cart:under_name,minicart:under_name,wishlist:under_name,compare:under_name,email:under_name')
+        );
     }
 }

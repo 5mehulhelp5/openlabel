@@ -79,10 +79,26 @@ class ItemLabels
             if ($rendered->getHtml() === '' || ($label->isHideOnZeroVariable() && $rendered->hasEmptyVariable())) {
                 continue;
             }
-            $spans .= '<span style="' . $this->style($design) . '">' . $rendered->getHtml() . '</span>';
+            $spans .= '<span style="' . $this->style($design) . '">' . $this->forEmail($rendered->getHtml()) . '</span>';
         }
 
         return $spans === '' ? '' : '<p class="openlabel-email" style="margin:4px 0 0;">' . $spans . '</p>';
+    }
+
+    /**
+     * Emails are read later and have no stylesheet: a {COUNTDOWN} becomes its end date, which the storefront only
+     * gives to screen readers.
+     *
+     * @param string $html
+     * @return string
+     */
+    private function forEmail(string $html): string
+    {
+        return (string) preg_replace(
+            '#<span class="ol-countdown"[^>]*><span aria-hidden="true">.*?</span><span class="ol-sr">(.*?)</span></span>#s',
+            '$1',
+            $html
+        );
     }
 
     /**
