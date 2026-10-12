@@ -32,6 +32,9 @@ class LabelsResolverTest extends TestCase
 
     private bool $enabled = true;
 
+    /** label id the stubbed LabelData leaves out (hide on zero) */
+    private int $hiddenLabel = 0;
+
     public function testOneLookupForAllProductsOfTheQuery(): void
     {
         $requests = [$this->request(100), $this->request(200), $this->request(300)];
@@ -49,6 +52,16 @@ class LabelsResolverTest extends TestCase
         $this->resolver()->resolve($this->context(1, 0), $this->field(), [$this->request(100), $this->request(200)]);
 
         self::assertSame(['-{SAVE_PERCENT}%'], $this->preloaded);
+    }
+
+    public function testLabelsHiddenByTheirVariablesAreLeftOut(): void
+    {
+        $this->hiddenLabel = 1;
+        $request = $this->request(100);
+
+        $response = $this->resolver()->resolve($this->context(1, 0), $this->field(), [$request]);
+
+        self::assertSame([['id' => 2, 'product' => 100]], $response->findResponseFor($request));
     }
 
     public function testDisabledModuleAnswersEmptyListsWithoutAQuery(): void
@@ -78,7 +91,7 @@ class LabelsResolverTest extends TestCase
         );
         $labelData = $this->createStub(LabelData::class);
         $labelData->method('toArray')->willReturnCallback(
-            static fn (ResolvedLabelInterface $label, Product $product): array => [
+            fn (ResolvedLabelInterface $label, Product $product): ?array => $label->getLabelId() === $this->hiddenLabel ? null : [
                 'id' => $label->getLabelId(),
                 'product' => (int) $product->getId(),
             ]

@@ -140,6 +140,7 @@ class Form extends AbstractDataProvider
             LabelInterface::CUSTOMER_GROUP_IDS => [],
             LabelInterface::APPLY_TO_PARENT => '1',
             LabelInterface::HIDE_LOWER_PRIORITY => '0',
+            LabelInterface::HIDE_ON_ZERO_VARIABLE => '0',
             'quick' => $this->quickConditions->decompose(null)[0],
             LabelInterface::PLACEMENTS => [[
                 PlacementInterface::AREA => PlacementInterface::AREA_LISTING,
@@ -185,6 +186,7 @@ class Form extends AbstractDataProvider
             LabelInterface::DESIGN_ID => (string) $label->getDesignId(),
             LabelInterface::APPLY_TO_PARENT => $label->isApplyToParent() ? '1' : '0',
             LabelInterface::HIDE_LOWER_PRIORITY => $label->isHideLowerPriority() ? '1' : '0',
+            LabelInterface::HIDE_ON_ZERO_VARIABLE => $label->isHideOnZeroVariable() ? '1' : '0',
             LabelInterface::STORE_IDS => $stores === [] ? ['0'] : $stores,
             LabelInterface::CUSTOMER_GROUP_IDS => array_map('strval', $label->getCustomerGroupIds()),
             LabelInterface::VALID_FROM => $this->dateConverter->toLocal($label->getValidFrom()),

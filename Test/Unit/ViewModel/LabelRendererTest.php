@@ -175,6 +175,42 @@ class LabelRendererTest extends TestCase
         self::assertSame(['-{SAVE_PERCENT}%'], $this->preloadedTexts);
     }
 
+    public function testHideOnZeroDropsALabelWhoseVariableIsZeroOrEmpty(): void
+    {
+        $this->resolved = [
+            $this->label(1, 'tl', 'vertical', 'text', 'Only {ZERO} left', hideOnZero: true),
+            $this->label(2, 'tl', 'vertical', 'text', 'Only {ZERO} left'),
+            $this->label(3, 'tl', 'vertical', 'text', 'Sale', hideOnZero: true),
+        ];
+
+        $stacks = $this->renderer()->getStacks($this->product(), 'listing');
+
+        self::assertSame([2, 3], array_column($stacks[0]['labels'], 'id'), 'the flag drops only its own label, and only when a variable is empty');
+    }
+
+    public function testAStackWhoseLabelsAreAllHiddenIsNotRendered(): void
+    {
+        $this->resolved = [
+            $this->label(1, 'tl', 'vertical', 'text', '{ZERO} sold', hideOnZero: true),
+            $this->label(2, 'br', 'vertical', 'text', 'New'),
+        ];
+
+        $stacks = $this->renderer()->getStacks($this->product(), 'listing');
+
+        self::assertCount(1, $stacks);
+        self::assertSame([2], array_column($stacks[0]['labels'], 'id'));
+        self::assertSame('', $this->renderer()->getStacksHtml($this->product(), 'product'), 'no labels, no markup');
+    }
+
+    public function testHiddenLabelsDoNotTagThePage(): void
+    {
+        $this->resolved = [$this->label(1, 'tl', 'vertical', 'text', '{ZERO} sold', hideOnZero: true)];
+        $renderer = $this->renderer();
+
+        self::assertSame('', $renderer->getStacksHtml($this->product(), 'listing'));
+        self::assertSame(['cat_p_100'], $renderer->getIdentities(), 'the product tag stays: the label shows once the variable is not zero');
+    }
+
     public function testStacksHtmlRendersTheTemplateWithThePreparedStacks(): void
     {
         $this->resolved = [$this->label(1, 'tl', 'vertical', 'text', 'X')];
@@ -193,7 +229,7 @@ class LabelRendererTest extends TestCase
 
         $renderer = $this->createStub(Renderer::class);
         $renderer->method('render')->willReturnCallback(
-            static fn (string $text): Rendered => new Rendered('<b>' . $text . '</b>', [])
+            static fn (string $text): Rendered => new Rendered('<b>' . $text . '</b>', str_contains($text, '{ZERO}') ? ['ZERO'] : [])
         );
         $renderer->method('preloadFor')->willReturnCallback(function (array $products, Context $context, array $texts): void {
             $this->preloadedTexts = array_merge($this->preloadedTexts, $texts);
@@ -244,7 +280,8 @@ class LabelRendererTest extends TestCase
         ?string $text,
         ?string $shape = null,
         bool $pinned = false,
-        int $offsetX = 0
+        int $offsetX = 0,
+        bool $hideOnZero = false
     ): ResolvedLabel {
         $om = new ObjectManager($this);
         /** @var Placement $placement */
@@ -261,6 +298,6 @@ class LabelRendererTest extends TestCase
         ]);
         $design->setText($text)->setAltText($type === 'image' ? 'New in' : null);
 
-        return new ResolvedLabel($id, 'Label ' . $id, $id, false, 100, null, $placement, $design);
+        return new ResolvedLabel($id, 'Label ' . $id, $id, false, 100, null, $placement, $design, $hideOnZero);
     }
 }

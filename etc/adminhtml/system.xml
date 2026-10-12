@@ -39,6 +39,14 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
             </group>
+            <group id="variables" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Label text variables</label>
+                <field id="brand_attribute" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Brand attribute</label>
+                    <comment>Attribute code that {BRAND} shows, e.g. manufacturer. Set "Used in Product Listing" to Yes on the attribute so category pages can show it.</comment>
+                    <validate>validate-code</validate>
+                </field>
+            </group>
         </section>
     </system>
 </config>

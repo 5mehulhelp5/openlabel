@@ -129,6 +129,20 @@ class LabelResolverTest extends TestCase
         self::assertSame([$a->getLabelId(), $h->getLabelId()], array_map(static fn (ResolvedLabelInterface $l) => $l->getLabelId(), $labels));
     }
 
+    public function testTheHideOnZeroFlagReachesTheRenderer(): void
+    {
+        $flagged = $this->label('Only {STOCK_QTY} left', ['hide_on_zero_variable' => true]);
+        $plain = $this->label('Sale', ['priority' => 1]);
+
+        $labels = $this->resolver->getForProducts([$this->productIds[0]], 1, 0)[$this->productIds[0]];
+        $flags = [];
+        foreach ($labels as $label) {
+            $flags[$label->getLabelId()] = $label->isHideOnZeroVariable();
+        }
+
+        self::assertSame([$flagged->getLabelId() => true, $plain->getLabelId() => false], $flags);
+    }
+
     public function testCustomerGroupRestrictionsAreHonouredWithoutPriceConditions(): void
     {
         $wholesale = $this->label('Wholesale only', ['customer_group_ids' => [2]]);

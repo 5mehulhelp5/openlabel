@@ -57,7 +57,7 @@ class FormMapperTest extends TestCase
 
         $this->mapper()->apply($label, [
             'name' => '  Black Friday ', 'status' => '1', 'priority' => '3', 'design_id' => '7',
-            'apply_to_parent' => '1', 'hide_lower_priority' => '0',
+            'apply_to_parent' => '1', 'hide_lower_priority' => '0', 'hide_on_zero_variable' => '1',
             'store_ids' => ['1', '2'], 'customer_group_ids' => ['0', '1'],
             'valid_from' => '2026-11-27 00:00:00', 'valid_to' => '2026-11-30',
         ]);
@@ -68,6 +68,7 @@ class FormMapperTest extends TestCase
         self::assertSame(7, $label->getDesignId());
         self::assertTrue($label->isApplyToParent());
         self::assertFalse($label->isHideLowerPriority());
+        self::assertTrue($label->isHideOnZeroVariable());
         self::assertSame([1, 2], $label->getStoreIds());
         self::assertSame([0, 1], $label->getCustomerGroupIds(), 'group 0 is NOT LOGGED IN, not "all"');
         self::assertSame('2026-11-26 23:00:00', $label->getValidFrom());

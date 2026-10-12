@@ -23,6 +23,7 @@ class ResolvedLabel implements ResolvedLabelInterface
      * @param int|null $parentProductId
      * @param PlacementInterface $placement
      * @param DesignInterface $design
+     * @param bool $hideOnZeroVariable
      */
     public function __construct(
         private readonly int $labelId,
@@ -32,7 +33,8 @@ class ResolvedLabel implements ResolvedLabelInterface
         private readonly int $productId,
         private readonly ?int $parentProductId,
         private readonly PlacementInterface $placement,
-        private readonly DesignInterface $design
+        private readonly DesignInterface $design,
+        private readonly bool $hideOnZeroVariable = false
     ) {
     }
 
@@ -66,6 +68,14 @@ class ResolvedLabel implements ResolvedLabelInterface
     public function isHideLowerPriority(): bool
     {
         return $this->hideLowerPriority;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isHideOnZeroVariable(): bool
+    {
+        return $this->hideOnZeroVariable;
     }
 
     /**

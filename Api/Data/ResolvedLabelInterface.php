@@ -37,6 +37,11 @@ interface ResolvedLabelInterface
     public function isHideLowerPriority(): bool;
 
     /**
+     * @return bool leave the label out when a variable in its text is zero or empty
+     */
+    public function isHideOnZeroVariable(): bool;
+
+    /**
      * @return int the product the label is shown on
      */
     public function getProductId(): int;

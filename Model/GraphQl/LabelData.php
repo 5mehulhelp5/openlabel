@@ -38,9 +38,9 @@ class LabelData
      * @param ResolvedLabelInterface $label
      * @param ProductInterface $product
      * @param Context $context
-     * @return array<string, mixed>
+     * @return array<string, mixed>|null null when "hide when a variable is zero or empty" applies
      */
-    public function toArray(ResolvedLabelInterface $label, ProductInterface $product, Context $context): array
+    public function toArray(ResolvedLabelInterface $label, ProductInterface $product, Context $context): ?array
     {
         $design = $label->getDesign();
         $designId = (int) $design->getDesignId();
@@ -50,12 +50,20 @@ class LabelData
             $classes[] = 'ol-shape-' . $design->getShape();
         }
         $placement = $label->getPlacement();
+        $text = null;
+        if (!$isImage) {
+            $rendered = $this->renderer->render((string) $label->getText(), $product, $context);
+            if ($label->isHideOnZeroVariable() && $rendered->hasEmptyVariable()) {
+                return null;
+            }
+            $text = $this->plainText($rendered->getHtml());
+        }
 
         return [
             'id' => $label->getLabelId(),
             'name' => $label->getName(),
             'type' => $design->getType(),
-            'text' => $isImage ? null : $this->plainText((string) $label->getText(), $product, $context),
+            'text' => $text,
             'image_url' => $isImage ? $this->imageUrl->get($design->getImagePath()) : null,
             'alt' => $isImage ? $this->nullIfEmpty($label->getAltText()) : null,
             'position' => $placement->getPosition(),
@@ -69,16 +77,14 @@ class LabelData
     }
 
     /**
-     * Variables rendered for the store's locale, then the allow-listed markup dropped: `{BR}` becomes a line break.
+     * The rendered text (variables filled for the store's locale) without the allow-listed markup: `{BR}` becomes a
+     * line break.
      *
-     * @param string $text
-     * @param ProductInterface $product
-     * @param Context $context
+     * @param string $html
      * @return string
      */
-    private function plainText(string $text, ProductInterface $product, Context $context): string
+    private function plainText(string $html): string
     {
-        $html = $this->renderer->render($text, $product, $context)->getHtml();
         $html = (string) preg_replace('#<br\s*/?>#i', "\n", $html);
 
         // phpcs:ignore Magento2.Functions.DiscouragedFunction -- plain text for JSON, never written into HTML

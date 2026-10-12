@@ -122,9 +122,14 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
         foreach ($stacks as $labels) {
             $items = [];
             foreach ($labels as $label) {
-                $items[] = $this->labelData($label, $product, $context, $loading, $debug);
+                $item = $this->labelData($label, $product, $context, $loading, $debug);
+                if ($item !== null) {
+                    $items[] = $item;
+                }
             }
-            $result[] = ['classes' => $this->stackClasses($labels[0]->getPlacement()), 'labels' => $items];
+            if ($items !== []) {
+                $result[] = ['classes' => $this->stackClasses($labels[0]->getPlacement()), 'labels' => $items];
+            }
         }
 
         return $result;
@@ -204,7 +209,7 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
      * @param Context $context
      * @param string $loading
      * @param bool $debug
-     * @return array<string, mixed>
+     * @return array<string, mixed>|null null when "hide when a variable is zero or empty" applies
      */
     private function labelData(
         ResolvedLabelInterface $label,
@@ -212,9 +217,17 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
         Context $context,
         string $loading,
         bool $debug
-    ): array {
+    ): ?array {
         $design = $label->getDesign();
         $designId = (int) $design->getDesignId();
+        $html = '';
+        if ($design->getType() !== DesignInterface::TYPE_IMAGE) {
+            $rendered = $this->renderer->render((string) $label->getText(), $product, $context);
+            if ($label->isHideOnZeroVariable() && $rendered->hasEmptyVariable()) {
+                return null;
+            }
+            $html = $rendered->getHtml();
+        }
         $this->identities[Label::CACHE_TAG_PREFIX . $label->getLabelId()] = true;
         $this->identities[Design::CACHE_TAG . '_' . $designId] = true;
 
@@ -223,7 +236,6 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
             $classes[] = 'ol-shape-' . $design->getShape();
         }
         $image = null;
-        $html = '';
         if ($design->getType() === DesignInterface::TYPE_IMAGE) {
             $image = [
                 'src' => (string) $this->imageUrl->get($design->getImagePath()),
@@ -232,8 +244,6 @@ class LabelRenderer implements ArgumentInterface, ResetAfterRequestInterface
                 'alt' => (string) $label->getAltText(),
                 'loading' => $loading === 'eager' ? 'eager' : 'lazy',
             ];
-        } else {
-            $html = $this->renderer->render((string) $label->getText(), $product, $context)->getHtml();
         }
 
         return [

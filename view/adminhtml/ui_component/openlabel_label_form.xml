@@ -114,6 +114,25 @@
                 </validation>
             </settings>
         </field>
+        <field name="hide_on_zero_variable" formElement="checkbox" sortOrder="55">
+            <settings>
+                <label translate="true">Hide when a variable is zero</label>
+                <notice translate="true">Leave the label out on products where a variable in its text is 0 or empty, e.g. "Only {STOCK_QTY} left".</notice>
+                <dataType>boolean</dataType>
+                <dataScope>hide_on_zero_variable</dataScope>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <prefer>toggle</prefer>
+                        <valueMap>
+                            <map name="false" xsi:type="string">0</map>
+                            <map name="true" xsi:type="string">1</map>
+                        </valueMap>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
         <field name="hide_lower_priority" formElement="checkbox" sortOrder="50">
             <settings>
                 <label translate="true">Hide other labels</label>

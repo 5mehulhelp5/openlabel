@@ -27,7 +27,8 @@ class DuplicatorTest extends TestCase
         $source = $om->getObject(Label::class);
         $source->setData(['label_id' => 5, 'name' => 'Sale', 'status' => 1, 'priority' => 2, 'design_id' => 3,
             'conditions_serialized' => '{"type":"combine"}', 'store_ids' => [1], 'customer_group_ids' => [0],
-            'valid_from' => '2026-11-01 00:00:00', 'apply_to_parent' => true]);
+            'valid_from' => '2026-11-01 00:00:00', 'apply_to_parent' => true,
+            'hide_on_zero_variable' => true, 'click_url' => '/sale.html', 'click_nofollow' => true]);
         $placement = $om->getObject(Placement::class)->setArea('listing')->setPosition('tr')->setGap(6);
         $placement->setPlacementId(44)->setLabelId(5);
         $source->setPlacements([$placement]);
@@ -48,6 +49,9 @@ class DuplicatorTest extends TestCase
             $copy->getPriority(), $copy->getDesignId(), $copy->getConditionsSerialized(), $copy->getStoreIds(),
             $copy->getCustomerGroupIds(), $copy->getValidFrom(), $copy->isApplyToParent(),
         ]);
+        self::assertSame([true, '/sale.html', true], [
+            $copy->isHideOnZeroVariable(), $copy->getClickUrl(), $copy->isClickNofollow(),
+        ], '1.1 fields are copied too');
         self::assertCount(1, $copy->getPlacements());
         self::assertNull($copy->getPlacements()[0]->getPlacementId());
         self::assertSame(['listing', 'tr', 6], [
