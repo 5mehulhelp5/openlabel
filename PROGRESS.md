@@ -26,6 +26,23 @@ Merged by me when CI is green, **but never anything visible on GitHub during wor
 | S12 | Label packs FR/ES/NL/IT | |
 | S13 | Close-out, README matrix, 1.1.0 | |
 
+### M5 QA pass (2026-10-12, S1–S9, tech lead + product owner + QA, storefront and admin in Chrome)
+
+Fixed and tested (openlabel commits on `feat/m5-s9-product-tab`, openlabel-hyva `e034f13` on `feat/m5-s8-areas`, dev-env `4937073`; they ship with the S8/S9 pushes):
+1. Product cards on pages where labels are hidden got the cached card with labels (Hyvä's card cache key has no page type): `-openlabel-off` key suffix.
+2. Countdown in order emails showed a frozen timer: emails show the end date.
+3. Design image upload ignored the configured maximum size in the admin uploader.
+4. Placement summary in the label grid had no words for the item areas (cart, mini cart, ...).
+5. Live preview said nothing for item areas: it now explains that these show next to the item.
+6. GraphQL `area` doc listed only listing/product.
+7. Variant mode switched on for every configurable with a parent label, hiding labels on swatch change: only when a variant has labels of its own.
+8. The label stylesheet link ignored "Enable OpenLabel = No": `Block/Css` uses `Labels::isModuleEnabled()`.
+9. `setup:upgrade` kept serving the previous version's CSS: `Setup/RecurringData` rebuilds the stylesheet (failure only logs a warning); upgrade docs name static content deploy.
+10. Saving the custom CSS in the admin rebuilt the stylesheet with the old value (configuration cached for the request): the saved value is passed to the rebuild.
+11. `acceptance-starter.spec.ts` deleted every label on the dev store: it now backs up and restores labels, placements and manual assignments.
+
+Verified: unit openlabel 442 + hyva 46, coverage gate, PHPStan, PHPCS, integration (full), Playwright 102/102, mkdocs strict. Browser: listing bands, inline slots, link labels, tooltips, hover, motion, PDP, variant switch (XS + Blue), countdown ticking, cart, mini cart, compare, wish list, hide on pages; admin labels grid, label form (31 new designs, hide-on-zero, link validation, Bestseller switch, new conditions, 5×5 picker, preview), design form (tooltip, AVIF, sizes, motion), configuration (hidden pages, brand attribute, upload limit, custom CSS), product tab assign + unassign (storefront follows). No console errors.
+
 ## M5 decisions
 
 - Q1–Q7 unanswered at approval, recommendations applied: new methods on the existing `Api/Data` interfaces (CHANGELOG notes implementers must add them); 1.1.0 on all three repos (rc first); small Alpine piece for the mini-cart; "recently added to category" moved to 1.2; manual assignment in a new `openlabel_label_product` table; FR/ES/NL/IT by me, "community review wanted"; Amasty/Mirasvit named only in the README comparison.
@@ -203,6 +220,8 @@ M5 S10 (REST CRUD + bulk read, GraphQL mutations) stacked on S9. After hours, in
 
 - Hyvä 1.3 end-to-end leg: Hyvä 1.3 needs `hyva-themes/magento2-reset-theme`, which is not in Hyvä's public GitHub repositories. Options: your portal keys as a GitHub secret on openlabel-dev-env (adds a 1.3 leg), or test 1.4 only and state "1.3: best effort" in the README. CI runs Hyvä 1.4.2 from the public OSL repositories (your choice, 2026-10-11).
 - Recorded real-person tests: M2 custom label ≤ 3 min; M3 VoiceOver/NVDA reading "Sale -25%" with the product name (the accessible name is asserted automatically).
+
+- Label "test" (#341, 5 listing top-left placements, priority 0, no conditions) and #323 were deleted on 2026-10-12 by the old `acceptance-starter.spec.ts` run on the dev store (no binlog, not recoverable). Re-create it?
 
 ## Known failing or skipped tests
 
