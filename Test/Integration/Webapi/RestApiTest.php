@@ -15,6 +15,7 @@ use Iranimij\OpenLabel\Api\LabelRepositoryInterface;
 use Iranimij\OpenLabel\Plugin\Webapi\DesignGuardPlugin;
 use Iranimij\OpenLabel\Test\Fixture\Design as DesignFixture;
 use Iranimij\OpenLabel\Test\Fixture\Label as LabelFixture;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\AuthorizationInterface;
 use Magento\Framework\Exception\LocalizedException;
@@ -95,6 +96,10 @@ class RestApiTest extends TestCase
         self::assertSame('Sale EN', $read['store_texts'][1]['text'], 'keyed by store ID');
         self::assertSame('Ends Sunday', $read['store_texts'][0]['tooltip']);
         self::assertSame(['sm' => ['width' => 40]], $read['sizes']);
+        $criteria = Bootstrap::getObjectManager()->get(SearchCriteriaBuilder::class)->addFilter('design_id', $designId)->create();
+        $listed = $this->read(DesignRepositoryInterface::class, 'getList', $repository->getList($criteria));
+        self::assertSame($read['store_texts'], $listed['items'][0]['store_texts'], 'the same in a list');
+        self::assertSame($read['sizes'], $listed['items'][0]['sizes']);
 
         $read['store_texts'][1]['text'] = 'Deal';
         $repository->save($this->send(DesignRepositoryInterface::class, 'save', ['design' => $read])[0]);
@@ -200,10 +205,15 @@ class RestApiTest extends TestCase
         $reader = Bootstrap::getObjectManager()->get(DiReader::class);
         $found = [];
         foreach (['global', 'webapi_rest', 'webapi_soap', 'adminhtml', 'crontab'] as $area) {
-            $found[$area] = isset($reader->read($area)[DesignRepositoryInterface::class]['plugins']['openlabel_webapi_guard']);
+            $config = $reader->read($area);
+            $found[$area] = [
+                isset($config[DesignRepositoryInterface::class]['plugins']['openlabel_webapi_guard']),
+                isset($config[ServiceOutputProcessor::class]['plugins']['openlabel_design_output']),
+            ];
         }
 
-        self::assertSame(['global' => false, 'webapi_rest' => true, 'webapi_soap' => true, 'adminhtml' => false, 'crontab' => false], $found);
+        $webapiOnly = ['global' => [false, false], 'webapi_rest' => [true, true], 'webapi_soap' => [true, true], 'adminhtml' => [false, false], 'crontab' => [false, false]];
+        self::assertSame($webapiOnly, $found);
     }
 
     /**
