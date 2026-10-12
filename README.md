@@ -45,8 +45,8 @@ The live preview follows every change. Details: [docs/admin.md](docs/admin.md).
 - **Cache-correct.** Labels are part of the cached HTML; Varnish and the built-in page cache keep one copy per
   customer group, as Magento does for prices. Saving a label purges exactly the pages it changes.
 - **No layout shift, almost no JavaScript.** Labels are positioned with CSS; one small generated stylesheet per
-  store view. Tooltips, links and animations are CSS only. A few lines of JavaScript load only on pages that use
-  a live countdown, variant labels or the mini cart. Lighthouse scores and CLS are identical with and without
+  store view. Tooltips, links and animations are CSS only. A few lines of JavaScript load only on pages that show a live
+  countdown, and on product pages with variant labels. Lighthouse scores and CLS are identical with and without
   the module.
 - **Hyvä-native, theme-safe.** Works on a fresh Hyvä install without a Tailwind build; CSP-clean (no inline
   styles or scripts); right-to-left stores mirror positions automatically.

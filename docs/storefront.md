@@ -4,7 +4,7 @@ How labels reach the shop (milestone M3). Theme specifics for Hyvä are in [hyva
 
 ## What the shopper's browser gets
 
-- **HTML first.** Labels are rendered on the server inside the cached page, with no inline styles. Tooltips, links, animations and hover effects are CSS only. JavaScript is added only where a page needs it: the live countdown, labels that follow the chosen variant, and the Hyvä mini cart; each script is small and registered with Hyvä's CSP helper, so a strict Content Security Policy needs no exception.
+- **HTML first.** Labels are rendered on the server inside the cached page, with no inline styles. Tooltips, links, animations and hover effects are CSS only. JavaScript is added only where a page needs it: the live countdown and labels that follow the chosen variant. The script is small and registered with Hyvä's CSP helper, so a strict Content Security Policy needs no exception.
 - **One stylesheet per store view**, `pub/media/openlabel/<store_id>/openlabel.<hash>.css` (about 8 KB, 2 KB compressed, for the 31 built-in designs; ≤ 20 KB for 100 designs). It holds the structural `ol-*` rules, one custom-property line per design and per placement with offsets, and the sanitized custom CSS. The file name changes with its content, so the web server can cache it for a year (Magento's sample nginx and Apache configs already do for `pub/media`).
 - **No theme build needed.** Nothing depends on Tailwind: labels are positioned and styled by that stylesheet, also on a theme that was never rebuilt after installing OpenLabel. `bin/magento hyva:config:generate` still lists the module for theme builds that want to scan it.
 
