@@ -116,12 +116,14 @@ class Form extends AbstractDataProvider
         $data['store_texts'][0] = [
             'text' => $texts[0]['text'] ?? null,
             'alt_text' => $texts[0]['alt_text'] ?? null,
+            'tooltip' => $texts[0]['tooltip'] ?? null,
         ];
         foreach ($this->storeManager->getStores() as $store) {
             $id = (int) $store->getId();
             $data['store_texts'][$id] = [
                 'text' => $texts[$id]['text'] ?? null,
                 'alt_text' => $texts[$id]['alt_text'] ?? null,
+                'tooltip' => $texts[$id]['tooltip'] ?? null,
                 'use_default' => isset($texts[$id]) ? '0' : '1',
             ];
         }
@@ -179,6 +181,7 @@ class Form extends AbstractDataProvider
                     'notice' => (string) __('Shown in this store view instead of the default text.'),
                 ]),
                 'alt_text' => $field((string) __('Alternative text'), 'alt_text', 'input', 30, $disabledByDefault),
+                'tooltip' => $field((string) __('Tooltip'), 'tooltip', 'input', 40, $disabledByDefault),
             ],
         ];
     }

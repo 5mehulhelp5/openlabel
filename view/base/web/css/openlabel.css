@@ -82,7 +82,7 @@
     display: inline-flex;
     margin-inline-start: .5em;
     max-inline-size: 100%;
-    position: static;
+    position: relative;
     vertical-align: middle;
 }
 
@@ -166,6 +166,34 @@
         transition: none;
     }
 }
+
+/*
+ * Tooltip and click-through (1.1): these labels take the pointer; the tooltip is the label's next sibling, shown on
+ * hover and on keyboard focus, above the stack.
+ */
+.ol-has-tip,
+.ol-label--link { pointer-events: auto; }
+.ol-label--link { text-decoration: none; }
+
+.ol-tip {
+    background: #111827;
+    border-radius: 4px;
+    color: #fff;
+    display: none;
+    font-size: 12px;
+    font-weight: 400;
+    inline-size: max-content;
+    inset-block-end: calc(100% + 4px);
+    inset-inline-start: 0;
+    line-height: 1.3;
+    max-inline-size: 16em;
+    padding: .4em .6em;
+    position: absolute;
+    z-index: 10;
+}
+
+.ol-has-tip:hover + .ol-tip,
+.ol-has-tip:focus + .ol-tip { display: block; }
 
 /* Mobile minimum (08 · UX Spec §2): small screens, and narrow cards such as mobile listings and sliders. */
 @media (max-width: 767px) {

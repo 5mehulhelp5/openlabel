@@ -69,6 +69,11 @@ class LabelData
             'bg_color' => $this->nullIfEmpty($design->getBgColor()),
             'text_color' => $this->nullIfEmpty($design->getTextColor()),
             'priority' => $label->getPriority(),
+            'tooltip' => $label->getTooltip() === null
+                ? null
+                : $this->plainText($this->renderer->render($label->getTooltip(), $product, $context)->getHtml()),
+            'click_url' => $label->getClickUrl(),
+            'click_nofollow' => $label->isClickNofollow(),
             'design_id' => $designId,
         ];
     }

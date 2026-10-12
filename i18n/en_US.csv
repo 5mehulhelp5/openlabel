@@ -381,3 +381,8 @@
 "On the image, in the band around it (dashed), or in the product text next to the price, next to Add to Cart or under the name.","On the image, in the band around it (dashed), or in the product text next to the price, next to Add to Cart or under the name."
 "Position on or around the image","Position on or around the image"
 "Position in the product text","Position in the product text"
+"Tooltip","Tooltip"
+"Optional. Shown when the shopper points at the label or moves to it with the keyboard, e.g. ""Offer ends Sunday"". Variables work here too.","Optional. Shown when the shopper points at the label or moves to it with the keyboard, e.g. ""Offer ends Sunday"". Variables work here too."
+"Link","Link"
+"Optional. Where a click on the label goes: a page of this shop such as /sale.html, or https://... On product cards the image already opens the product, so labels there are not links.","Optional. Where a click on the label goes: a page of this shop such as /sale.html, or https://... On product cards the image already opens the product, so labels there are not links."
+"Ask search engines not to follow the link","Ask search engines not to follow the link"

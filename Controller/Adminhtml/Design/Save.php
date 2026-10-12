@@ -153,10 +153,11 @@ class Save extends Action implements HttpPostActionInterface
             }
             $text = $this->nullable($row['text'] ?? null);
             $alt = $this->nullable($row['alt_text'] ?? null);
-            if ($storeId !== 0 && $text === null && $alt === null) {
+            $tooltip = $this->nullable($row['tooltip'] ?? null);
+            if ($storeId !== 0 && $text === null && $alt === null && $tooltip === null) {
                 continue;
             }
-            $texts[$storeId] = ['text' => $text, 'alt_text' => $alt, 'tooltip' => null];
+            $texts[$storeId] = ['text' => $text, 'alt_text' => $alt, 'tooltip' => $tooltip];
         }
 
         return $texts;

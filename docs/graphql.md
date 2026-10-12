@@ -26,6 +26,8 @@ OpenLabel adds one field to `ProductInterface`, so every product type in every p
 | `css_class` | The `ol-*` classes the storefront uses; load the generated stylesheet to reuse them |
 | `bg_color`, `text_color` | Hex colours of the design |
 | `priority` | 0 is the highest |
+| `tooltip` | Tooltip for the store view with variables filled in, plain text; `null` without one (1.1) |
+| `click_url`, `click_nofollow` | Click-through link (`https://`, `http://` or a shop path starting with `/`) and whether it should carry `rel="nofollow"` (1.1) |
 
 ## Rules
 

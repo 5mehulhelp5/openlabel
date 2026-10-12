@@ -18,4 +18,7 @@ type OpenLabelLabel @doc(description: "One OpenLabel label in one placement.") {
     bg_color: String @doc(description: "Background colour (hex).")
     text_color: String @doc(description: "Text colour (hex).")
     priority: Int! @doc(description: "Priority, 0 is the highest.")
+    tooltip: String @doc(description: "Tooltip for the store view with variables filled in, as plain text. Null when the design has none.")
+    click_url: String @doc(description: "Click-through link: https://, http:// or a path of this shop starting with /. Null when the label is not a link.")
+    click_nofollow: Boolean! @doc(description: "Whether the click-through link should carry rel=nofollow.")
 }

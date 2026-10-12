@@ -26,7 +26,7 @@ class DesignRulesTest extends TestCase
         ]);
 
         self::assertSame(
-            '.ol-d-12{--ol-bg:#e11d48;--ol-fg:#ffffff;--ol-border:#000;--ol-bw:2px;--ol-op:0.9;--ol-rot:-12deg;'
+            '.ol-d-12{--ol-bg:#e11d48;--ol-fg:#fff;--ol-border:#000;--ol-bw:2px;--ol-op:0.9;--ol-rot:-12deg;'
             . '--ol-w:18cqw;--ol-fs-max:15px}',
             (new DesignRules())->forDesign($design)
         );
@@ -37,6 +37,13 @@ class DesignRulesTest extends TestCase
         $design = $this->design(3, ['size_mode' => 'px', 'width' => 80, 'opacity' => 100, 'font_size' => 14]);
 
         self::assertSame('.ol-d-3{--ol-w:80px;--ol-fs-max:14px}', (new DesignRules())->forDesign($design));
+    }
+
+    public function testColoursAreWrittenInTheirShortestForm(): void
+    {
+        $design = $this->design(5, ['bg_color' => '#AABBCC', 'text_color' => '#ffffffff', 'border_color' => '#12345678']);
+
+        self::assertSame('.ol-d-5{--ol-bg:#abc;--ol-fg:#ffff;--ol-border:#12345678}', (new DesignRules())->forDesign($design));
     }
 
     public function testInvalidColoursNeverReachTheStylesheet(): void
