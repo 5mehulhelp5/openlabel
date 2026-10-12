@@ -115,6 +115,7 @@
     padding: .3em .7em;
     text-align: center;
     transform: rotate(var(--ol-rot, 0deg)) translateY(var(--ol-lift, 0)) scale(var(--ol-scale, 1));
+    white-space: pre-wrap; /* a flex box drops the space between text and <b>, <small> or the countdown otherwise */
 }
 
 .ol-label--image {
@@ -194,6 +195,19 @@
 
 .ol-has-tip:hover + .ol-tip,
 .ol-has-tip:focus + .ol-tip { display: block; }
+
+/* Variant labels waiting for their variant, the countdown (digits keep their width) and screen-reader-only text. */
+.ol-label--hidden { display: none; }
+.ol-countdown { font-variant-numeric: tabular-nums; }
+
+.ol-sr {
+    block-size: 1px;
+    clip-path: inset(50%);
+    inline-size: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+}
 
 /* Mobile minimum (08 · UX Spec §2): small screens, and narrow cards such as mobile listings and sliders. */
 @media (max-width: 767px) {

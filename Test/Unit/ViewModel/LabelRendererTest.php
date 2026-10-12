@@ -13,7 +13,9 @@ use Iranimij\OpenLabel\Model\Css\DesignRules;
 use Iranimij\OpenLabel\Model\Design;
 use Iranimij\OpenLabel\Model\Design\ImageUrl;
 use Iranimij\OpenLabel\Model\Placement;
+use Iranimij\OpenLabel\Model\Resolver\Arranger;
 use Iranimij\OpenLabel\Model\Resolver\ResolvedLabel;
+use Iranimij\OpenLabel\Model\Resolver\Variants;
 use Iranimij\OpenLabel\Model\Variable\Context;
 use Iranimij\OpenLabel\Model\Variable\Rendered;
 use Iranimij\OpenLabel\Model\Variable\Renderer;
@@ -34,6 +36,12 @@ class LabelRendererTest extends TestCase
     private array $resolved = [];
 
     private bool $debug = false;
+
+    /** @var array<int, ResolvedLabel[]> labels of other products (configurable children) */
+    private array $byProduct = [];
+
+    /** @var Product[] children the variant lookup returns */
+    private array $children = [];
 
     /** @var string[] texts handed to preloadFor() */
     private array $preloadedTexts = [];
@@ -148,6 +156,55 @@ class LabelRendererTest extends TestCase
         self::assertFalse($cardLabels[0]['tooltip']['focusable'] ?? null, 'nothing focusable inside the card link');
         self::assertNull($cardLabels[1]['tooltip']);
         self::assertStringContainsString('ol-has-tip', $labels[0]['classes']);
+    }
+
+    public function testTheProductPageCarriesEveryVariantsLabelsHiddenUntilItIsChosen(): void
+    {
+        $this->resolved = [
+            $this->label(1, 'tl', 'vertical', 'text', 'New', area: 'product'),
+            $this->label(2, 'tr', 'vertical', 'text', 'Sale', area: 'product', parentProductId: 201),
+        ];
+        $this->byProduct = [
+            201 => [$this->label(2, 'tr', 'vertical', 'text', 'Sale', area: 'product', productId: 201)],
+            202 => [],
+        ];
+        $this->children = [$this->product(201), $this->product(202)];
+        $renderer = $this->renderer();
+
+        $seen = [];
+        foreach ($renderer->getProductPageStacks($this->product()) as $stack) {
+            foreach ($stack['labels'] as $label) {
+                $seen[] = [$label['id'], $label['variant'], str_contains($label['classes'], 'ol-label--hidden')];
+            }
+        }
+
+        self::assertEqualsCanonicalizing([
+            [1, 0, false], [2, 0, false],   // the configurable as it opens
+            [1, 201, true], [2, 201, true], // its own label plus the sale of variant 201
+            [1, 202, true],                 // variant 202 is not on sale
+        ], $seen);
+        self::assertTrue($renderer->isScriptNeeded());
+    }
+
+    public function testProductsWithoutVariantsKeepTheOrdinaryStacks(): void
+    {
+        $this->resolved = [$this->label(1, 'tl', 'vertical', 'text', 'New', area: 'product')];
+        $renderer = $this->renderer();
+
+        $stacks = $renderer->getProductPageStacks($this->product());
+
+        self::assertSame([null], array_column($stacks[0]['labels'], 'variant'));
+        self::assertFalse($renderer->isScriptNeeded(), 'no script for a page without variants or countdowns');
+    }
+
+    public function testACountdownNeedsTheScriptEvenFromACachedProductCard(): void
+    {
+        $this->resolved = [$this->label(1, 'tl', 'vertical', 'text', 'Ends in {COUNTDOWN}')];
+        $renderer = $this->renderer();
+
+        $renderer->collectIdentities(100);
+
+        self::assertTrue($renderer->isScriptNeeded());
     }
 
     public function testInlinePositionsAreLeftOutOfTheImageSlot(): void
@@ -325,7 +382,9 @@ class LabelRendererTest extends TestCase
     private function renderer(): LabelRenderer
     {
         $labels = $this->createStub(Labels::class);
-        $labels->method('getForProduct')->willReturnCallback(fn (): array => $this->resolved);
+        $labels->method('getForProduct')->willReturnCallback(
+            fn (int $id): array => $id === 100 ? $this->resolved : ($this->byProduct[$id] ?? [])
+        );
         $labels->method('getForProducts')->willReturnCallback(fn (): array => [100 => $this->resolved]);
         $labels->method('getStoreId')->willReturn(1);
         $labels->method('getCustomerGroupId')->willReturn(0);
@@ -363,16 +422,19 @@ class LabelRendererTest extends TestCase
         $store->method('getBaseUrl')->willReturn('https://shop.test/');
         $storeManager->method('getStore')->willReturn($store);
 
-        return new LabelRenderer($labels, $renderer, new DesignRules(), $imageUrl, $config, $layout, $storeManager);
+        $variants = $this->createStub(Variants::class);
+        $variants->method('getChildren')->willReturnCallback(fn (): array => $this->children);
+
+        return new LabelRenderer($labels, $renderer, new DesignRules(), $imageUrl, $config, $layout, $storeManager, new Arranger(), $variants);
     }
 
     /** @var array<string, mixed> */
     private array $blockData = [];
 
-    private function product(): Product
+    private function product(int $id = 100): Product
     {
         $product = $this->createStub(Product::class);
-        $product->method('getId')->willReturn(100);
+        $product->method('getId')->willReturn($id);
 
         return $product;
     }
@@ -389,7 +451,9 @@ class LabelRendererTest extends TestCase
         bool $hideOnZero = false,
         string $area = 'listing',
         ?string $clickUrl = null,
-        bool $nofollow = false
+        bool $nofollow = false,
+        int $productId = 100,
+        ?int $parentProductId = null
     ): ResolvedLabel {
         $om = new ObjectManager($this);
         /** @var Placement $placement */
@@ -406,6 +470,6 @@ class LabelRendererTest extends TestCase
         ]);
         $design->setText($text)->setAltText($type === 'image' ? 'New in' : null);
 
-        return new ResolvedLabel($id, 'Label ' . $id, $id, false, 100, null, $placement, $design, $hideOnZero, $clickUrl, $nofollow);
+        return new ResolvedLabel($id, 'Label ' . $id, $id, false, $productId, $parentProductId, $placement, $design, $hideOnZero, $clickUrl, $nofollow);
     }
 }

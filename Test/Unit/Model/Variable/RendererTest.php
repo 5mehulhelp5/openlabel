@@ -47,6 +47,17 @@ class RendererTest extends TestCase
         self::assertStringContainsString('<span>x</span>', $html);
     }
 
+    public function testMarkupFromVariablesKeepsItsAttributesWhileTheMerchantsTextIsCleaned(): void
+    {
+        $rendered = $this->renderer('en_US')->render('<span data-x="1" aria-hidden="true">Ends in</span> {TICK}', $this->product(), $this->context());
+
+        self::assertSame(
+            '<span>Ends in</span> <span class="ol-countdown" data-ol-end="2026-10-12T00:00:00Z"><span aria-hidden="true">1d</span></span>',
+            $rendered->getHtml(),
+            'the countdown markup comes from code; attributes typed into the text are still removed'
+        );
+    }
+
     public function testZeroVariablesRenderAsZeroAndAreReportedAsEmpty(): void
     {
         $rendered = $this->renderer('en_US')->render('Only {EMPTY} left', $this->product(), $this->context());
@@ -105,6 +116,7 @@ class RendererTest extends TestCase
             'QTY' => $this->processor('QTY', static fn () => Value::number(1234.0)),
             'TEXT' => $this->processor('TEXT', static fn () => Value::text('<i>Tom & Jerry</i>')),
             'BR' => $this->processor('BR', static fn () => Value::html('<br>')),
+            'TICK' => $this->processor('TICK', static fn () => Value::html('<span class="ol-countdown" data-ol-end="2026-10-12T00:00:00Z"><span aria-hidden="true">1d</span></span>')),
             'EMPTY' => $this->processor('EMPTY', static fn () => Value::number(0)),
             'ATTR' => $this->processor('ATTR', static fn (ProductInterface $p, Context $c, string $arg) => Value::text($arg === 'color' ? 'Red' : null)),
         ]);

@@ -87,6 +87,8 @@ class LabelData
      */
     private function plainText(string $html): string
     {
+        // Screen-reader-only parts (the end date of a countdown) are not part of the visible text.
+        $html = (string) preg_replace('#<span class="ol-sr">.*?</span>#s', '', $html);
         $html = (string) preg_replace('#<br\s*/?>#i', "\n", $html);
 
         // phpcs:ignore Magento2.Functions.DiscouragedFunction -- plain text for JSON, never written into HTML

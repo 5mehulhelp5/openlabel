@@ -15,8 +15,8 @@ use PHPUnit\Framework\TestCase;
  */
 class I18nTest extends TestCase
 {
-    /** Strings shoppers can see (variables {SPECIAL_ENDS_IN}, {NEW_FOR}). */
-    private const STOREFRONT = ['1 day', '%1 days', '1 hour', '%1 hours'];
+    /** Strings shoppers can see (variables {SPECIAL_ENDS_IN}, {NEW_FOR}, {COUNTDOWN}). */
+    private const STOREFRONT = ['1 day', '%1 days', '1 hour', '%1 hours', 'Ends %1'];
 
     public function testEveryPhraseInTheCodeIsInEnUs(): void
     {
