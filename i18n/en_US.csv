@@ -414,3 +414,7 @@
 "Compare","Compare"
 "Emails","Emails"
 "This label shows as text with the item in the cart, mini cart, wish list, compare page or emails; this preview shows the category and product pages.","This label shows as text with the item in the cart, mini cart, wish list, compare page or emails; this preview shows the category and product pages."
+"Built-in designs are locked. Create your own design instead.","Built-in designs are locked. Create your own design instead."
+"Upload the image in the admin (Catalog > OpenLabel > Designs), then use its path, e.g. designs/sale.png.","Upload the image in the admin (Catalog > OpenLabel > Designs), then use its path, e.g. designs/sale.png."
+"Store view %1 does not exist.","Store view %1 does not exist."
+"Customer group %1 does not exist.","Customer group %1 does not exist."

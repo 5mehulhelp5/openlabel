@@ -150,6 +150,23 @@ class DesignRepositoryTest extends TestCase
         }
     }
 
+    public function testSaveRejectsTextsForAnUnknownStoreView(): void
+    {
+        $design = $this->factory->create();
+        $design->setName('Texts')->setType(DesignInterface::TYPE_TEXT)
+            ->setStoreTexts([0 => ['text' => 'Sale'], 9999 => ['text' => 'Ausverkauf']]);
+
+        try {
+            $this->repository->save($design);
+            self::fail('ValidationException expected');
+        } catch (ValidationException $e) {
+            self::assertSame(
+                ['Store view 9999 does not exist.'],
+                array_map(static fn (\Throwable $error): string => $error->getMessage(), $e->getErrors())
+            );
+        }
+    }
+
     #[DataFixture(DesignFixture::class, [], 'design')]
     #[DataFixture(LabelFixture::class, ['design_id' => '$design.design_id$'], 'label')]
     public function testDeleteRefusesADesignThatLabelsStillUse(): void

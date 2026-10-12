@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Iman Aboheydary. All rights reserved.
+ * See LICENSE for license details (MIT).
+ */
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <route url="/V1/openlabel/labels/:labelId" method="GET">
+        <service class="Iranimij\OpenLabel\Api\LabelRepositoryInterface" method="getById"/>
+        <resources>
+            <resource ref="Iranimij_OpenLabel::labels"/>
+        </resources>
+    </route>
+    <route url="/V1/openlabel/labels" method="GET">
+        <service class="Iranimij\OpenLabel\Api\LabelRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="Iranimij_OpenLabel::labels"/>
+        </resources>
+    </route>
+    <route url="/V1/openlabel/labels" method="POST">
+        <service class="Iranimij\OpenLabel\Api\LabelRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="Iranimij_OpenLabel::labels"/>
+        </resources>
+    </route>
+    <route url="/V1/openlabel/labels/:labelId" method="PUT">
+        <service class="Iranimij\OpenLabel\Api\LabelRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="Iranimij_OpenLabel::labels"/>
+        </resources>
+    </route>
+    <route url="/V1/openlabel/labels/:labelId" method="DELETE">
+        <service class="Iranimij\OpenLabel\Api\LabelRepositoryInterface" method="deleteById"/>
+        <resources>
+            <resource ref="Iranimij_OpenLabel::labels"/>
+        </resources>
+    </route>
+
+    <route url="/V1/openlabel/designs/:designId" method="GET">
+        <service class="Iranimij\OpenLabel\Api\DesignRepositoryInterface" method="getById"/>
+        <resources>
+            <resource ref="Iranimij_OpenLabel::designs"/>
+        </resources>
+    </route>
+    <route url="/V1/openlabel/designs" method="GET">
+        <service class="Iranimij\OpenLabel\Api\DesignRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="Iranimij_OpenLabel::designs"/>
+        </resources>
+    </route>
+    <route url="/V1/openlabel/designs" method="POST">
+        <service class="Iranimij\OpenLabel\Api\DesignRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="Iranimij_OpenLabel::designs"/>
+        </resources>
+    </route>
+    <route url="/V1/openlabel/designs/:designId" method="PUT">
+        <service class="Iranimij\OpenLabel\Api\DesignRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="Iranimij_OpenLabel::designs"/>
+        </resources>
+    </route>
+    <route url="/V1/openlabel/designs/:designId" method="DELETE">
+        <service class="Iranimij\OpenLabel\Api\DesignRepositoryInterface" method="deleteById"/>
+        <resources>
+            <resource ref="Iranimij_OpenLabel::designs"/>
+        </resources>
+    </route>
+</routes>

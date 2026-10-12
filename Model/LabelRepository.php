@@ -14,6 +14,7 @@ use Iranimij\OpenLabel\Api\Data\LabelSearchResultsInterfaceFactory;
 use Iranimij\OpenLabel\Api\DesignRepositoryInterface;
 use Iranimij\OpenLabel\Api\LabelRepositoryInterface;
 use Iranimij\OpenLabel\Model\Label\Validator;
+use Iranimij\OpenLabel\Model\Validation\References;
 use Iranimij\OpenLabel\Model\ResourceModel\Label as LabelResource;
 use Iranimij\OpenLabel\Model\ResourceModel\Label\CollectionFactory;
 use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
@@ -35,6 +36,7 @@ class LabelRepository implements LabelRepositoryInterface
      * @param Validator $validator
      * @param ValidationResultFactory $validationResultFactory
      * @param DesignRepositoryInterface $designRepository
+     * @param References $references
      */
     public function __construct(
         private readonly LabelResource $resource,
@@ -44,7 +46,8 @@ class LabelRepository implements LabelRepositoryInterface
         private readonly LabelSearchResultsInterfaceFactory $searchResultsFactory,
         private readonly Validator $validator,
         private readonly ValidationResultFactory $validationResultFactory,
-        private readonly DesignRepositoryInterface $designRepository
+        private readonly DesignRepositoryInterface $designRepository,
+        private readonly References $references
     ) {
     }
 
@@ -53,7 +56,7 @@ class LabelRepository implements LabelRepositoryInterface
      */
     public function save(LabelInterface $label): LabelInterface
     {
-        $errors = $this->validator->validate($label);
+        $errors = array_merge($this->validator->validate($label), $this->references->forLabel($label));
         if ($errors !== []) {
             throw new ValidationException(
                 __('The label could not be saved.'),

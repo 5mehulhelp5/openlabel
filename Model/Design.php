@@ -443,6 +443,22 @@ class Design extends AbstractModel implements DesignInterface, IdentityInterface
     /**
      * @inheritDoc
      */
+    public function setCreatedAt(?string $createdAt): self
+    {
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setUpdatedAt(?string $updatedAt): self
+    {
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getText(int $storeId = self::DEFAULT_STORE_ID): ?string
     {
         return $this->storeValue('text', $storeId);

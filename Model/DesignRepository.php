@@ -14,6 +14,7 @@ use Iranimij\OpenLabel\Api\Data\DesignSearchResultsInterfaceFactory;
 use Iranimij\OpenLabel\Api\Data\LabelInterface;
 use Iranimij\OpenLabel\Api\DesignRepositoryInterface;
 use Iranimij\OpenLabel\Model\Design\Validator;
+use Iranimij\OpenLabel\Model\Validation\References;
 use Iranimij\OpenLabel\Model\ResourceModel\Design as DesignResource;
 use Iranimij\OpenLabel\Model\ResourceModel\Design\CollectionFactory;
 use Iranimij\OpenLabel\Model\ResourceModel\Label\CollectionFactory as LabelCollectionFactory;
@@ -36,6 +37,7 @@ class DesignRepository implements DesignRepositoryInterface
      * @param DesignSearchResultsInterfaceFactory $searchResultsFactory
      * @param Validator $validator
      * @param ValidationResultFactory $validationResultFactory
+     * @param References $references
      */
     public function __construct(
         private readonly DesignResource $resource,
@@ -45,7 +47,8 @@ class DesignRepository implements DesignRepositoryInterface
         private readonly CollectionProcessorInterface $collectionProcessor,
         private readonly DesignSearchResultsInterfaceFactory $searchResultsFactory,
         private readonly Validator $validator,
-        private readonly ValidationResultFactory $validationResultFactory
+        private readonly ValidationResultFactory $validationResultFactory,
+        private readonly References $references
     ) {
     }
 
@@ -54,7 +57,7 @@ class DesignRepository implements DesignRepositoryInterface
      */
     public function save(DesignInterface $design): DesignInterface
     {
-        $errors = $this->validator->validate($design);
+        $errors = array_merge($this->validator->validate($design), $this->references->forDesign($design));
         if ($errors !== []) {
             throw new ValidationException(
                 __('The design could not be saved.'),
