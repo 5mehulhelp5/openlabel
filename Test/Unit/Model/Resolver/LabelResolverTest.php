@@ -13,6 +13,7 @@ use Iranimij\OpenLabel\Model\DesignFactory;
 use Iranimij\OpenLabel\Model\Placement;
 use Iranimij\OpenLabel\Model\PlacementFactory;
 use Iranimij\OpenLabel\Model\Resolver\Arranger;
+use Iranimij\OpenLabel\Model\Design\LabelPack;
 use Iranimij\OpenLabel\Model\Resolver\LabelResolver;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Adapter\AdapterInterface;
@@ -88,7 +89,10 @@ class LabelResolverTest extends TestCase
         $dateTime = $this->createStub(DateTime::class);
         $dateTime->method('gmtDate')->willReturn('2026-10-09 12:00:00');
 
-        return new LabelResolver($resource, new Arranger(), $placementFactory, $designFactory, $dateTime);
+        $labelPack = $this->createStub(LabelPack::class);
+        $labelPack->method('translate')->willReturnArgument(0);
+
+        return new LabelResolver($resource, new Arranger(), $placementFactory, $designFactory, $dateTime, $labelPack);
     }
 
     /**
