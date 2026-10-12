@@ -23,6 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 - REST API for labels and designs: `GET`, `POST`, `PUT` and `DELETE` on `/V1/openlabel/labels` and `/V1/openlabel/designs` (search criteria for lists), admin or integration token with the Labels or Designs permission. The design form's rules apply: built-in designs are locked, custom CSS needs its own permission, image designs use images uploaded in the admin. See docs/rest-api.md.
 - Saving a label with a store view or customer group that does not exist, or a design with texts for an unknown store view, is refused with a clear message (before, the label hid silently or the design failed with a database error).
 - Label packs: the built-in designs' texts in English, German, French, Spanish, Dutch and Italian, chosen by the store view's locale (storefront, GraphQL, order emails); the countdown and "ends in" texts in the same languages. Phrases are prefixed (`Label text: …`) so they never clash with other modules' translations.
+- README: how OpenLabel 1.1 compares with Amasty and Mirasvit Product Labels, line by line, built only from their public documentation.
 - Export file format version 2 with these fields; version 1 files from OpenLabel 1.0 still import, the new fields taking their defaults.
 
 ### Changed
